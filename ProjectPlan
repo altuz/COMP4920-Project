@@ -1,0 +1,35 @@
+User Stories:
+As a user I want to keep a diary so that I can keep my life in track.
+As a user I want a mobile app instead of a notebook.
+As a user I want a reminder 
+Product Backlog:
+
+Estimation of Work:
+
+Release Plan:
+Version 1.0: Without network features
+Version 2.0: With community features
+
+Sprint Plan:
+
+Allocation of Roles:
+Scrum Master: Nicholas Mulianto
+Product Owner: David Mo
+Developers:
+We rotate as needed, but initially
+Front End:
+Xubing Liang(Ryan)
+Andre Ang
+
+Back End: 
+Nicholas Mulianto
+David Mo
+Shiyun Zhang
+
+Meeting Schedule:
+Weekly on Fridays
+
+Relevant Extreme Programming Practices:
+Test-Driven Development - Shiyun will make tests for back apis
+Pair Programming - Any two people
+

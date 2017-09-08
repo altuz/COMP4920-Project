@@ -1,0 +1,30 @@
+Features:
+Basic - 
+Diary
+Goal Setting
+Reminders
+Progress Report(statistics)
+Account creating and features
+
+Intermediate:
+Calender planning
+Automatic scheduling
+Cloud data saving
+
+Advanced:
+Sharing/Community features (login)
+
+Software Stack:
+Front End - React Native
+Back End -
+Database: sqlite
+API: node.js
+
+Tools:
+Jira/Trello
+WebStone
+
+Weekly Meeting:
+Friday 
+
+

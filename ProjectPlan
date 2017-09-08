@@ -10,8 +10,23 @@ As a user I want community features so I can find out how other people with simi
 
 
 Product Backlog:
+Basic (High Priority)
+Diary
+Goals 
+Reminders
+Progress Report(statistics)
+Account creating and features
+
+Intermediate:
+Calendar
+Automatic scheduling
+Cloud data saving
+
+Advanced: (Low Priority)
+Sharing/Community features
 
 Estimation of Work:
+
 
 Release Plan:
 Version 1.0: Without network features

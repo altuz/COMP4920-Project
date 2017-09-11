@@ -2,7 +2,7 @@
   "name": "react-project",
   "version": "0.0.0",
   "description": "",
-  "main": "webpack.config.js",
+  "main": "index.js",
   "dependencies": {
     "axios": "^0.12.0",
     "babel-core": "^6.18.2",

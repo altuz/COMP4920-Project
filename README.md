@@ -1,14 +1,21 @@
 # COMP4920-Project
 ## instruction:
 ### frontend:
-* cd frontend
+```sh
+$ cd frontend
+```
 run the following command first if package.json was modified
-* npm install
+```sh
+$ npm install
+```
 otherwise run the following command straightaway:
-* npm run dev
+```sh
+$ npm run dev
+```
 
 ### backend:
-* cd backend 
-* python manage.py runserver
-
+```sh
+$ cd backend 
+$ python manage.py runserver
+```
 

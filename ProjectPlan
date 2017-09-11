@@ -14,19 +14,29 @@ Basic (High Priority)
 Diary
 Goals 
 Reminders
-Progress Report(statistics)
 Account creating and features
 
 Intermediate:
+Progress Report(statistics)
 Calendar
 Automatic scheduling
-Cloud data saving
 
 Advanced: (Low Priority)
 Sharing/Community features
 
 Estimation of Work:
+Basic
+Front End:
+Concept Design - for presentation
 
+
+Back End:
+Database Setup and Design - 1 day
+Diary and Goals - 1 
+Progress report - 2 days
+Calendar - 1 week
+Automatic scheduling - 2 day
+Reminders (push notification) - 1 week (unsure cause idk how)
 
 Release Plan:
 Version 1.0: Without network features

@@ -1,12 +1,29 @@
-import React from "react"
-import ReactDOM from "react-dom"
-import { Provider } from "react-redux"
+import React from "react";
+import ReactDOM from "react-dom";
+import { Provider } from "react-redux";
+import { HashRouter as Router, Route,Switch } from 'react-router-dom';
 
-import Layout from "./components/Layout"
+import Main from "./components/Main"
 import store from "./store"
 
-const app = document.getElementById('app')
+const app = document.getElementById('app');
 
-ReactDOM.render(<Provider store={store}>
-  <Layout />
-</Provider>, app);
+
+
+class App extends React.Component{
+	render(){
+		return(			
+			<Provider store={store}>
+			 <Router>
+	          <Switch>
+	            <Route path='/' component={Main} />
+	          </Switch>		
+          	 </Router>
+	         </Provider>
+
+		);
+	}
+}
+
+
+ReactDOM.render(<App/>, app);

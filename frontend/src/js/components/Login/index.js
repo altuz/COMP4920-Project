@@ -27,10 +27,12 @@ export default class Login extends React.Component {
 	  render() {
 
 	    return (
-	      <div>
-	        <div onClick={this.open} >
-	          Login
-	        </div>
+     <div>
+      	<img src='static/images/user.svg' className='user-icon'/>
+        <div className='user-detail'>
+          <a href='#' onClick={this.open} className='login logout'>Please Login</a>
+        </div>
+         <div>
 	        <Modal show={this.state.showModal} onHide={this.close}>
 	          <Modal.Header closeButton>
 	            <Modal.Title>Login</Modal.Title>
@@ -43,7 +45,8 @@ export default class Login extends React.Component {
 	          </Modal.Footer>
 	        </Modal>
 	      </div>
+      </div>
 	    );
 	  }
-	}
+}
 

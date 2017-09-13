@@ -1,7 +1,7 @@
 import React from "react";
 // import { connect } from "react-redux";
 import { Link, Switch, Route, Redirect } from 'react-router-dom';
-import Navi from "./Nav";
+import Nav from "./Nav";
 import Footer from "./Footer";
 
 
@@ -16,8 +16,7 @@ export default class Main extends React.Component {
   render() {
     return(
       <div >
-        <Navi />
-        <Footer />
+        <Nav />
       </div>
     );
   }

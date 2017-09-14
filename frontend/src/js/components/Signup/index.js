@@ -8,11 +8,14 @@ export default class SignupForm extends React.Component {
     constructor(props){
       super(props);
       this.state = {
-            username:'',
-            email:'',
-            password:'',
-            passwordconfirm:'',
+          user:{
+              username:'',
+              email:'',
+              password:'',
+              passwordconfirm:''
+          }
         }
+        console.log(this.state)
     }
     render() {
         return(

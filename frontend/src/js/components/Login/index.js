@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, Switch, Route, Redirect } from 'react-router-dom';
 import { Modal,Button, FieldGroup } from "react-bootstrap";
-import Log from "./LoginForm";
+import LoginForm from "./LoginForm";
 
 
 export default class Login extends React.Component {
@@ -23,7 +23,7 @@ export default class Login extends React.Component {
 	  open() {
 	  	console.log(this.state)
 	    this.setState({ showModal: true });
-	  } 
+	  }
 
 	  render() {
 
@@ -35,17 +35,10 @@ export default class Login extends React.Component {
         </div>
          <div>
 	        <Modal show={this.state.showModal} onHide={this.close}>
-	          <Modal.Header closeButton>
-	            <Modal.Title>Login</Modal.Title>
-	          </Modal.Header>
-	          <Log/>
-	          <Modal.Footer>
-	          	<Button type = "submit"> Login</Button>
-	          </Modal.Footer>
+			  <LoginForm/>
 	        </Modal>
 	      </div>
       </div>
 	    );
 	  }
 }
-

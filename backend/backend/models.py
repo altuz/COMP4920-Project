@@ -9,7 +9,6 @@ class User(models.Model):
     user_id = models.IntegerField()
     privacy = models.BooleanField()
 
-
 class PlayerLibrary(models.Model):
     user_name = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)

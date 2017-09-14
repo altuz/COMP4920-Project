@@ -19,3 +19,5 @@ $ cd backend
 $ python manage.py runserver
 ```
 
+### NOTE TO SELF
+If it goes well and we choose to publically release or make this repo public DON'T put config.py (database details) onto git

@@ -3,10 +3,10 @@ from django.db import models
 
 # by default, field is not null
 class User(models.Model):
-    user_name = models.CharField(max_length=15, primary_key=True, db_index=True)
-    email = models.TextField()
-    pass_word = models.TextField()
-    user_id = models.IntegerField()
+    user_id = models.AutoField(primary_key=True, db_index=True)
+    user_name = models.CharField(max_length=15, db_index=True)
+    email = models.CharField(max_length=30)
+    pass_word = models.CharField(max_length=30)
     privacy = models.BooleanField()
 
     def __str__(self):
@@ -50,7 +50,7 @@ class Categories(models.Model):
 
 
 class Rating(models.Model):
-    user_name = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
+    user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
     rate = models.IntegerField()
     comment = models.TextField(null=True)  # comment can be null
@@ -60,7 +60,7 @@ class Rating(models.Model):
 
 
 class Follow(models.Model):
-    user_name = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
+    user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
     following = models.CharField(max_length=15, db_index=True)
 
     def __str__(self):

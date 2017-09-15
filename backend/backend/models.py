@@ -12,6 +12,16 @@ class User(models.Model):
     def __str__(self):
         return self.user_name
 
+class Session(models.Model):
+    user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
+    session_id = models.IntegerField(db_index=True)
+
+    class Meta:
+        unique_together = ('user_id', 'session_id')
+
+    def __str__(self):
+        return str(self.user_id) + '/' + str(self.session_id)
+
 
 class PlayerLibrary(models.Model):
     user_name = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
@@ -25,7 +35,7 @@ class PlayerLibrary(models.Model):
         unique_together = ('user_name', 'game_id')
 
     def __str__(self):
-        return str(self.user_name) + str(self.game_id)
+        return str(self.user_name) + '/' + str(self.game_id)
 
 
 class GameList(models.Model):

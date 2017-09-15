@@ -2,9 +2,6 @@ from django.utils import timezone
 import json
 
 from django.http import HttpResponse
-from exponent_server_sdk import PushClient
-from exponent_server_sdk import PushMessage
-from exponent_server_sdk import PushServerError
 from rest_framework.decorators import api_view
 from rest_framework.renderers import JSONRenderer
 

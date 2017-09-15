@@ -1,6 +1,7 @@
 from django.db import models
 from rest_framework import serializers
 
+
 # by default, field is not null
 class User(models.Model):
     user_id = models.AutoField(primary_key=True, db_index=True)
@@ -11,6 +12,7 @@ class User(models.Model):
 
     def __str__(self):
         return self.user_name
+
 
 class Session(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
@@ -65,16 +67,10 @@ class Rating(models.Model):
     rate = models.IntegerField()
     comment = models.TextField(null=True)  # comment can be null
 
-    def __str__(self):
-        return str(self.user_name) + "/" + str(self.game_id)
-
 
 class Follow(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
     following = models.CharField(max_length=15, db_index=True)
-
-    def __str__(self):
-        return str(self.user_name) + "/" + str(self.following)
 
 
 class UserSerializer(serializers.ModelSerializer):

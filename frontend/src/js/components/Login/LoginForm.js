@@ -11,13 +11,13 @@ export default class LoginForm extends React.Component {
 			   username:'',
 			   password:''
 		   },
+		   isSubmitting:false,
 		   issignup: false,
 	   };
 	   this.requestsignup = this.requestsignup.bind(this);
 	   this.onChange = this.onChange.bind(this);
 	   this.handleSubmit = this.handleSubmit.bind(this);
 	}
-
 	requestsignup() {
 		this.setState({ issignup: true });
 	}
@@ -28,8 +28,10 @@ export default class LoginForm extends React.Component {
 	}
 
 	handleSubmit(e){
-		alert('A name was submitted: ' + this.state.user);
 		e.preventDefault();
+		this.setState({isSubmitting:true});
+		console.log(this.state.isSubmitting);
+
 	}
 
 	render() {
@@ -60,6 +62,7 @@ export default class LoginForm extends React.Component {
 						</div>
 						<div className="form-group">
 							<Button type="submit" name="Submit"> Login</Button>
+							{this.state.isSubmitting ?<img src='static/images/loading.svg' height="50" width="50"/>:""}
 						</div>
 					</form>
 				</Modal.Body>

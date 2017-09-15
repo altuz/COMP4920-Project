@@ -1,5 +1,5 @@
 from django.db import models
-
+from rest_framework import serializers
 
 # by default, field is not null
 class User(models.Model):
@@ -75,3 +75,9 @@ class Follow(models.Model):
 
     def __str__(self):
         return str(self.user_name) + "/" + str(self.following)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = "__all__"

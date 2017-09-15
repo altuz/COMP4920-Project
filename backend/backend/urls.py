@@ -15,7 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from rest_framework.urlpatterns import format_suffix_patterns
+
+import views as view
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+
+    # sign up
+    url(r'^backend/sign_up', view.user_sign_up),
 ]

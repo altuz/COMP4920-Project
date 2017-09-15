@@ -56,6 +56,8 @@ def user_sign_up(request):
     :param request: the request object
     :return: different json object represent different info
     """
+    print("user sign up function is running ...")
+    print("")
     obj = None
     try:
         obj = json.loads(request.body.decode())

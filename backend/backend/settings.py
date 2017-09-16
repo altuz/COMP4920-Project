@@ -120,11 +120,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-
-
-# Email set up
-
-EMAIL_HOST = 'smtp.mail.yahoo.com'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'm_monism@yahoo.com'
-EMAIL_HOST_PASSWORD = 'yun960806'

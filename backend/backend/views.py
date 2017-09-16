@@ -76,12 +76,17 @@ def user_register(request):
 
         # create new user for the register table and get info from the request
         key = blake2b("%s,%s,%s" % (obj['user_name'], obj['email'], obj['pass_word']))  # key send to the user
-
         link = "http://domainName.com/activate/" + key
+
+        # send activation email
         try:
-            send_mail(subject="SteamR Registration",
-                      message="User Name: %s\nActivation Link: %s\n" % (obj['user_name'], link),
-                      from_email="SteamR Team", recipient_list=[obj['email']], fail_silently=False, )
+            server = smtplib.SMTP('smtp.gmail.com:587')
+            server.starttls()
+            server.login('yun553966858@gmail.com', 'asdqwienvlasdkf')
+            message = 'Subject: {}\n\n{}'.format("SteamR Registration",
+                                                 "User Name: %s\nActivation Link: %s\n" % (obj['user_name'], link))
+            server.sendmail('SteamR Team', obj['email'], message)
+            server.quit()
         except smtplib.SMTPException:
             return HttpResponse(msg_to_json("fail to send email"))
 

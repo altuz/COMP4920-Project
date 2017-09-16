@@ -22,5 +22,6 @@ import backend.views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^backend/login/', backend.views.user_login),
-    url(r'^backend/sign_up/', backend.views.user_sign_up),
+    url(r'^backend/register/', backend.views.user_register),
+    url(r'^backend/activate/(/w+)', backend.views.activate_user)
 ]

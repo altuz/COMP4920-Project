@@ -73,6 +73,14 @@ class Follow(models.Model):
     following = models.CharField(max_length=15, db_index=True)
 
 
+class Register(models.Model):
+    user_name = models.CharField(primary_key=True, max_length=15)
+    email = models.CharField(max_length=30)
+    pass_word = models.CharField(max_length=30)
+    privacy = models.BooleanField()
+    key = models.TextField(db_index=True)
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

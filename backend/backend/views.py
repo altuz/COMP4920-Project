@@ -24,13 +24,18 @@ def user_login(request):
     # if obj is None:
     #     return HttpResponse('"{message":"no request"}')
     single_entry = None
+    #Check if user is activated
     try:
-        single_entry = User.objects.get(user_name=request.POST.get('username'), pass_word=request.POST.get('password'))
+        single_entry = Register.objects.get(user_name = request.POST.get('username'))
+        # If it doesn't throw exception, user has not activated
+        return HttpResponse('{"message":"account not activated"}')
     except:
-        return HttpResponse('{"message":"does not exist"}')
-
-    return HttpResponse(objs_to_json(single_entry))
-
+        try:
+            single_entry = User.objects.get(user_name=request.POST.get('username'),
+                                            pass_word=request.POST.get('password'))
+            return HttpResponse(objs_to_json(single_entry))
+        except:
+            return HttpResponse('{"message":"does not exist"}')
 
 def user_logout(username, session_id):
     # Flush specified users session

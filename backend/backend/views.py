@@ -28,14 +28,24 @@ def user_login(request):
     try:
         single_entry = Register.objects.get(user_name = request.POST.get('username'))
         # If it doesn't throw exception, user has not activated
-        return HttpResponse('{"message":"account not activated"}')
+        rresponse=HttpResponse('{"message":"account not activated"}')
+        response['Access-Control-Allow-Origin']="*"
+        response['Access-Control-Allow-Headers']='Origin, X-Requested-With, Content-Type, Accept'
+        return response
     except:
         try:
             single_entry = User.objects.get(user_name=request.POST.get('username'),
                                             pass_word=request.POST.get('password'))
-            return HttpResponse(objs_to_json(single_entry))
+
+            response=HttpResponse(objs_to_json(single_entry))
+            response['Access-Control-Allow-Origin']="*"
+            response['Access-Control-Allow-Headers']='Origin, X-Requested-With, Content-Type, Accept'
+            return response
         except:
-            return HttpResponse('{"message":"does not exist"}')
+            response=HttpResponse('{"message":"does not exist"}')
+            response['Access-Control-Allow-Origin']="*"
+            response['Access-Control-Allow-Headers']='Origin, X-Requested-With, Content-Type, Accept'
+            return response
 
 def user_logout(username, session_id):
     # Flush specified users session

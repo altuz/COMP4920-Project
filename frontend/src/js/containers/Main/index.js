@@ -10,7 +10,7 @@ export default class Main extends React.Component {
   render() {
     return(
       <div >
-        <Nav />
+        <Nav path={this.props.location.pathname}/>
         <div className='content'>
             <Switch>
                 <Route exact path='/' render={() => <Redirect to='/discover'/>} />

@@ -14,6 +14,9 @@ $ npm run dev
 ```
 
 ### backend:
+python version: 3.6
+pakage needed:
+pip3 install django-cors-headers
 ```sh
 $ cd backend 
 $ python manage.py runserver

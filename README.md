@@ -27,6 +27,7 @@ pakage needed:
 pip3 install django-cors-headers
 pip install djangorestframework
 ```
+open another terminal, and cd to project directory
 ```sh
 $ cd backend 
 $ python manage.py runserver

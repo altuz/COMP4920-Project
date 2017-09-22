@@ -195,3 +195,23 @@ input {
   height: 17px;
   bottom: 2px;
 }
+
+.search-page-icon {
+  height: 80px;
+  bottom: 2px;
+}
+
+.search-bar {
+  width: 100%;
+  max-width: 1016px;
+  text-align: center;
+  margin: auto;
+  padding-top: 10px;
+}
+
+.steamrtitle {
+    margin-top: 10%;
+    font-size: 70px;
+    font-weight: 400;
+    text-align: center;
+}

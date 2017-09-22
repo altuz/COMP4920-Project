@@ -2,6 +2,7 @@ from backend.models import User, UserSerializer, Register, GameList, PlayerLibra
 from rest_framework.decorators import api_view
 from rest_framework.renderers import JSONRenderer
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from hashlib import blake2b
 import smtplib
 from django.core.mail import send_mail
@@ -39,6 +40,7 @@ def update_userlist(request):
     return None
 # curl -d "param1=value1&param2=value2" -X POST http://localhost:3000/data
 @api_view(['POST'])
+@ensure_csrf_cookie
 def user_login(request):
     obj = None
     # try:
@@ -76,7 +78,7 @@ def user_login(request):
     # store in database along with ip address
     return HttpResponse(objs_to_json(single_entry))
 
-
+@csrf_exempt
 def test_session(request):
     return HttpResponse('{"test":"' + request.session.get('username', "Hello") + '"}')
 

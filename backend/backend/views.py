@@ -56,21 +56,27 @@ def user_login(request):
         pass
 
     try:
-        single_entry = Register.objects.get(user_name = obj['username'])
+        single_entry = Register.objects.get(user_name = obj['user']['username'])
         # If it doesn't throw exception, user has not activated
         return HttpResponse('{"message":"account not activated", "user":{}}')
     except:
         try:
-            single_entry = User.objects.get(user_name=obj['username'],
-                                            pass_word=obj['password'])
+            print(obj['user']['username'])
+            print(obj['user']['password'])
+            single_entry = User.objects.get(user_name=obj['user']['username'],
+                                            pass_word=obj['user']['password'])
         except:
             return HttpResponse('{"message":"does not exist, "user":{}"}')
 
+    request.session['username'] = obj['user']['username']
+    request.session['password'] = obj['user']['password']
     # Now generate session ???
     # idea:
     # generate random number,
     # store in database along with ip address
     return HttpResponse(objs_to_json(single_entry))
+
+
 
 @api_view(['POST'])
 def check_session(request):

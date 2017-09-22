@@ -78,7 +78,7 @@ def user_login(request):
 
 
 def test_session(request):
-    return request.session.get('username', "Hello")
+    return HttpResponse('{"test":"' + request.session.get('username', "Hello") + '"}')
 
 @api_view(['POST'])
 def check_session(request):

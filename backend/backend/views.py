@@ -1,4 +1,4 @@
-from backend.models import User, UserSerializer, Register
+from backend.models import User, UserSerializer, Register, GameList, PlayerLibrary
 from rest_framework.decorators import api_view
 from rest_framework.renderers import JSONRenderer
 from django.http import HttpResponse
@@ -7,7 +7,36 @@ import smtplib
 from django.core.mail import send_mail
 import json
 
-
+#PlayerLibrary
+#user_name
+#game_id
+#wish_list
+#played
+@api_view(['POST'])
+def update_userlist(request):
+    obj = None
+    try:
+        # Checks if player exist in database
+        # Checks if game exist in database
+        # Unsuccessful if either check throws does not exist
+        player  = User.objects.get(user_name = request.POST.get('username'))
+        game    = GameList.objects.get(game_id = request.POST.get('game_id'))
+        played  = request.POST.get('played', False)
+        wishes  = request.POST.get('wish', True)
+        new_entry = PlayerLibrary(user_name = player, game_id = game, wish_list = wishes, played = played)
+        new_entry.save()
+        return HttpResponse('''
+            {
+                "message":"Successful"
+            }    
+        ''')
+    except:
+        return HttpResponse('''
+            {
+                "message":"Invalid Request"
+            }
+        ''')
+    return None
 # curl -d "param1=value1&param2=value2" -X POST http://localhost:3000/data
 @api_view(['POST'])
 def user_login(request):

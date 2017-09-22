@@ -24,7 +24,11 @@ class Session(models.Model):
     def __str__(self):
         return str(self.user_id) + '/' + str(self.session_id)
 
-
+#PlayerLibrary
+#user_name
+#game_id
+#wish_list
+#played
 class PlayerLibrary(models.Model):
     user_name = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)

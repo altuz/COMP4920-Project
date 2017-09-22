@@ -1,4 +1,5 @@
 Function: User Login
+Url: backend/login/
 Type: POST
 Input: username=x, password=y
 Output:
@@ -15,3 +16,11 @@ Output:
     }
 }
 
+Function: Edit User Played/Wishlist
+Url: backend/edit_list
+Type: POST
+Input: username=x, game_id=y, wish=True/False, played=True/False
+Output:
+{
+    "message":"Successful/Invalid Request"
+}

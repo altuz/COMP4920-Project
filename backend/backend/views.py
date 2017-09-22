@@ -80,6 +80,7 @@ def user_login(request):
 
 @csrf_exempt
 def test_session(request):
+    print(request.session.get('username', "Not here"))
     return HttpResponse('{"test":"' + request.session.get('username', "Hello") + '"}')
 
 @api_view(['POST'])

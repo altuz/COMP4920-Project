@@ -7,6 +7,7 @@ export default class Main extends React.Component {
     return(
       <div >
         <h1>discover</h1>
+        <h2>todo: grab data from steam and display on datatables</h2>
       </div>
     );
   }

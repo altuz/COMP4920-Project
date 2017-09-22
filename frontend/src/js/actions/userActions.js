@@ -1,13 +1,18 @@
 import axios from 'axios';
 
 export function login(user) {
+  console.log(user)
   return function(dispatch){
     axios.post('http://localhost:8000/backend/login/',{
-        username:user.username,
-        password:user.password
+        user
     })
     .then((response)=>{
-        console.log(response.data);
+        console.log("ff");
+        axios.post('http://localhost:8000/backend/test_session/',{
+
+        }).then((response)=>{
+            console.log(response)
+        })
     })
     }
 }

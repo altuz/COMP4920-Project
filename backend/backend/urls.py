@@ -23,5 +23,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^backend/login/', backend.views.user_login),
     url(r'^backend/register/', backend.views.user_register),
+    url(r'^backend/edit_list/', backend.views.edit_userlist),
     url(r'^backend/activate/(/w+)', backend.views.activate_user)
 ]

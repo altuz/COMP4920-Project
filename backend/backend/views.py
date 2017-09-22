@@ -50,13 +50,19 @@ def user_login(request):
     single_entry = None
     #Check if user is activated
     try:
-        single_entry = Register.objects.get(user_name = request.POST.get('username'))
+        obj = json.loads(request.body.decode())
+    except:
+        print("Error when loading the Json")
+        pass
+
+    try:
+        single_entry = Register.objects.get(user_name = obj['username'])
         # If it doesn't throw exception, user has not activated
         return HttpResponse('{"message":"account not activated", "user":{}}')
     except:
         try:
-            single_entry = User.objects.get(user_name=request.POST.get('username'),
-                                            pass_word=request.POST.get('password'))
+            single_entry = User.objects.get(user_name=obj['username'],
+                                            pass_word=obj['password'])
         except:
             return HttpResponse('{"message":"does not exist, "user":{}"}')
 

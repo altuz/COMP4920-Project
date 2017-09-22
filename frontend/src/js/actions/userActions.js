@@ -7,12 +7,7 @@ export function login(user) {
         user
     })
     .then((response)=>{
-        console.log("ff");
-        axios.post('http://localhost:8000/backend/test_session/',{
-
-        }).then((response)=>{
-            console.log(response)
-        })
+        
     })
     }
 }

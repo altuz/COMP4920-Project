@@ -8,11 +8,6 @@ from django.core.mail import send_mail
 import json
 
 
-def user_create(username, password, email):
-    # TODO Check with ryan to check if pw and confirm pw are checked in frontend
-    return -1
-
-
 # curl -d "param1=value1&param2=value2" -X POST http://localhost:3000/data
 @api_view(['POST'])
 def user_login(request):
@@ -28,14 +23,28 @@ def user_login(request):
     try:
         single_entry = Register.objects.get(user_name = request.POST.get('username'))
         # If it doesn't throw exception, user has not activated
-        return HttpResponse('{"message":"account not activated"}')
+        return HttpResponse('{"message":"account not activated", "user":{}}')
     except:
         try:
             single_entry = User.objects.get(user_name=request.POST.get('username'),
                                             pass_word=request.POST.get('password'))
-            return HttpResponse(objs_to_json(single_entry))
         except:
-            return HttpResponse('{"message":"does not exist"}')
+            return HttpResponse('{"message":"does not exist, "user":{}"}')
+
+    # Now generate session ???
+    # idea:
+    # generate random number,
+    # store in database along with ip address
+    return HttpResponse(objs_to_json(single_entry))
+
+@api_view(['POST'])
+def check_session(request):
+    obj = None
+    single_entry = None
+    try:
+        ses_hash = blake2b(request.POST.get('username') + request.POST.get('ip_address'))
+    except:
+        return None
 
 def user_logout(username, session_id):
     # Flush specified users session
@@ -49,7 +58,7 @@ def objs_to_json(objs):
 
 
 def msg_with_data(json_obj):
-    return '{"message":"success", "data":%s}' % json_obj
+    return '{"message":"success", "user":%s}' % json_obj
 
 
 def msg_to_json(msg):

@@ -1,0 +1,17 @@
+Function: User Login
+Type: POST
+Input: username=x, password=y
+Output:
+{
+    "message":"error/success",
+    "user":
+    {
+        "user_id":0,
+        "user_name":"IHMS",
+        "email":"asdasd@asdasd.com",
+        "pass_word":"123456",
+        "privacy":true
+        // empty if fail
+    }
+}
+

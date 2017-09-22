@@ -1,11 +1,15 @@
-export function fetchUser() {
-  return {
-    type: "FETCH_USER_FULFILLED",
-    payload: {
-      name: "Will",
-      age: 35,
+import axios from 'axios';
+
+export function login(user) {
+  return function(dispatch){
+    axios.post('http://localhost:8000/backend/login/',{
+        username:user.username,
+        password:user.password
+    })
+    .then((response)=>{
+        console.log(response.data);
+    })
     }
-  }
 }
 
 export function setUserName(name) {

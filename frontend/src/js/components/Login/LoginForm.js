@@ -1,7 +1,12 @@
 import React from  "react";
+import { connect } from 'react-redux';
 import {Button, Modal} from 'react-bootstrap';
 import SignupForm from '../Signup'
+import {login} from '../../actions/userActions.js';
 
+@connect((store)=>{
+	return store.user;
+})
 
 export default class LoginForm extends React.Component {
 	constructor(props) {
@@ -30,7 +35,7 @@ export default class LoginForm extends React.Component {
 	handleSubmit(e){
 		e.preventDefault();
 		this.setState({isSubmitting:true});
-		console.log(this.state.isSubmitting);
+		this.props.dispatch(login(this.state.user));
 
 	}
 

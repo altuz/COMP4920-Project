@@ -85,6 +85,13 @@ input {
   margin-right: 7px;
 }
 
+.sidebar-icon {
+  height: 23px;
+  position: relative;
+  bottom: 2px;
+  margin-right: 20px;
+}
+
 .user-icon {
   height: 50px;
   float: left;

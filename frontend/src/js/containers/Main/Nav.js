@@ -18,21 +18,42 @@ class Header extends React.Component {
 	}
 }
 
+class SideBar extends React.Component{
+	render() {
+		const { path, token } = this.props;
+		console.log(path)
+		const active = path === '/feeds' ? 'feeds' : (path === '/preferences' ? 'preferences' : path.match('^/learning-centre') ? 'learning-centre' : path === '/search' ? 'search' :'discover');
+		const base_links = [['discover', true], ['search', true], ['feeds', false], ['preferences', false], ['learning-centre', false]];
+		const links = base_links.filter((e) => e[1] || token).map((e) => e[0]);
+		const sideLinks = links.map((link, i) =>
+			<li className={link + '-sidebar sidebar ' + (active === link ? 'active' : '')} key={i}>
+			<Link to={`/${link}`}>
+			<img src={`static/images/${link}.svg`} className={`sidebar-icon`}/>
+			  {link.replace('-',' ')}
+			</Link>
+		</li>)
+		return (
+			<nav className='side-nav'>
+			   <ul>
+				 <li className='user'>
+				   <Login />
+				 </li>
+				 {sideLinks}
+			 </ul>
+		   </nav>
+		)
+
+	}
+}
+
 
 export default class Nav extends React.Component {
   render() {
     return(
     	<div>
     	<Header />
-		 <nav className='side-nav'>
-	        <ul>
-	          <li className='user'>
-	            <Login />
-	          </li>
-	      </ul>
-		</nav>
+		<SideBar path={this.props.path}/>
 		</div>
     );
   }
 }
-

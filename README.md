@@ -14,6 +14,20 @@ $ npm run dev
 ```
 
 ### backend:
+python version:
+```sh
+python 3.6
+```
+Django version:
+```sh
+Django 1.11.5
+```
+pakage needed:
+```sh
+pip3 install django-cors-headers
+pip install djangorestframework
+```
+open another terminal, and cd to project directory
 ```sh
 $ cd backend 
 $ python manage.py runserver

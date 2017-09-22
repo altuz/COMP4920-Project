@@ -72,13 +72,13 @@ def user_login(request):
 
     request.session['username'] = obj['user']['username']
     request.session['password'] = obj['user']['password']
+    request.session.modifies = True
     # Now generate session ???
     # idea:
     # generate random number,
     # store in database along with ip address
     return HttpResponse(objs_to_json(single_entry))
 
-@csrf_exempt
 def test_session(request):
     print(request.session.get('username', "Not here"))
     return HttpResponse('{"test":"' + request.session.get('username', "Hello") + '"}')

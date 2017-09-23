@@ -12,11 +12,12 @@ class User(models.Model):
 
     def __str__(self):
         return self.user_name
-
-
+#Session
+#user_id
+#session_id
 class Session(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
-    session_id = models.IntegerField(db_index=True)
+    session_id = models.CharField(max_length = 256, db_index=True)
 
     class Meta:
         unique_together = ('user_id', 'session_id')

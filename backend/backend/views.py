@@ -1,12 +1,14 @@
-from backend.models import User, UserSerializer, Register, GameList, PlayerLibrary
+from backend.models import User, UserSerializer, Register, GameList, PlayerLibrary, Session
 from rest_framework.decorators import api_view
 from rest_framework.renderers import JSONRenderer
 from django.http import HttpResponse
+from django.shortcuts import  render
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from hashlib import blake2b
 import smtplib
 from django.core.mail import send_mail
 import json
+import time
 
 #PlayerLibrary
 #user_name
@@ -40,19 +42,13 @@ def update_userlist(request):
     return None
 # curl -d "param1=value1&param2=value2" -X POST http://localhost:3000/data
 @api_view(['POST'])
-@ensure_csrf_cookie
 def user_login(request):
     obj = None
-    # try:
-    #     obj = json.loads(request.body.decode('utf-8'))
-    # except:
-    #     pass
-    # if obj is None:
-    #     return HttpResponse('"{message":"no request"}')
     single_entry = None
     #Check if user is activated
     try:
         obj = json.loads(request.body.decode())
+        print(obj)
     except:
         print("Error when loading the Json")
         pass
@@ -63,23 +59,27 @@ def user_login(request):
         return HttpResponse('{"message":"account not activated", "user":{}}')
     except:
         try:
-            print(obj['user']['username'])
-            print(obj['user']['password'])
             single_entry = User.objects.get(user_name=obj['user']['username'],
                                             pass_word=obj['user']['password'])
         except:
             return HttpResponse('{"message":"does not exist, "user":{}"}')
 
-    request.session['username'] = obj['user']['username']
-    request.session['password'] = obj['user']['password']
-    request.session.modifies = True
-    # Now generate session ???
-    # idea:
-    # generate random number,
-    # store in database along with ip address
-    return HttpResponse(objs_to_json(single_entry))
+    # Session
+    # user_id
+    # session_id
+    # Get time and hash.
+    # Insert it as session
+    user_session = blake2b(str(time.time()).encode('utf-8')).hexdigest()
 
+    new_session = Session(user_id = single_entry, session_id = user_session)
+    new_session.save()
+    response = HttpResponse(objs_to_json(single_entry))
+    response.set_cookie('session_id', user_session);
+    return response
+
+@api_view(['POST'])
 def test_session(request):
+    request.session.sessionkey = 'ivb2jmftgbv3z97nnyfqtpwlpn1qv97k'
     print(request.session.get('username', "Not here"))
     return HttpResponse('{"test":"' + request.session.get('username', "Hello") + '"}')
 

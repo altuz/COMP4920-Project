@@ -14,23 +14,27 @@ import time
 @api_view(['POST'])
 def get_gamelist(request):
     json_obj = None
+    # decode json
     try:
         json_obj = json.loads(request.body.decode())
     except:
         print("Error when loading the Json")
         return HttpResponse('{"message":"input invalid", "gamelist":[]}')
-
+    # retrieve database objects
     try:
+        # check if player exist
+        # find gamelist related to player
         player = User.objects.get(json_obj['user']['username'])
         gamelist = PlayerLibrary.objects.filter(user_name = player, played = True)
         json_list = []
-        #convert to json list
+        # convert to json list
         for entries in gamelist:
             game = entries.game_id
             g_id = game.game_id
             g_name = game.game_name
             g_json = '{"game_name":"%s", "game_id":"%s"}'.format(g_name, g_id)
             json_list.append(g_json)
+        # construct json object
         ret_json = '''
             {
                 "message":"success",
@@ -46,13 +50,16 @@ def get_gamelist(request):
 # Get a user's wish list
 def get_wishlist(request):
     json_obj = None
+    # decode json
     try:
         json_obj = json.loads(request.body.decode())
     except:
         print("Error when loading the Json")
         return HttpResponse('{"message":"input invalid", "wishlist":[]}')
-
+    # retrieve database objects
     try:
+        # check if player exist
+        # find gamelist related to player
         player = User.objects.get(json_obj['user']['username'])
         gamelist = PlayerLibrary.objects.filter(user_name = player, played = False, wish_list = True)
         json_list = []
@@ -63,6 +70,7 @@ def get_wishlist(request):
             g_name = game.game_name
             g_json = '{"game_name":"%s", "game_id":"%s"}'.format(g_name, g_id)
             json_list.append(g_json)
+        # construct json object
         ret_json = '''
             {
                 "message":"success",

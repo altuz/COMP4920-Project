@@ -1,4 +1,4 @@
-from backend.models import User, UserSerializer, Register, GameList, PlayerLibrary, Session
+from backend.models import User, UserSerializer, Register, GameList, PlayerLibrary, Session, Follow
 from rest_framework.decorators import api_view
 from rest_framework.renderers import JSONRenderer
 from django.http import HttpResponse
@@ -9,6 +9,28 @@ import smtplib
 from django.core.mail import send_mail
 import json
 import time
+
+
+# Follow user
+# User1 -> User2
+@api_view(['POST'])
+def follow_user(request):
+    json_obj = None
+    # decond json
+    try:
+        json_obj = json.loads(request.body.decode())
+    except:
+        print("Error loading json")
+        return HttpResponse('{"message" : "input invalid", "success" : "False"}')
+    # check if user1 and user2 exists
+    try:
+        user_1 = User.objects.get(json_obj['user']['user1'])
+        user_2 = User.objects.get(json_obj['user']['user2'])
+        new_entry = Follow(user_id = user_1, following = user_2)
+        new_entry.save()
+        return HttpResponse('{"message" : "Followed", "success" : "True"}')
+    except:
+        return HttpResponse('{"message" : "User1 or User2 does not exist", "success" : "False"}')
 
 # Get a user's game list
 @api_view(['POST'])

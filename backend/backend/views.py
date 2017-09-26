@@ -172,6 +172,7 @@ def user_login(request):
     #new_session.save()
     response = HttpResponse(objs_to_json(user_entry))
     # response.set_cookie('session_id', user_session);
+    # response.set_cookie('username', obj['user']['username']
     return response
 
 @api_view(['POST'])
@@ -193,7 +194,9 @@ def check_session(request):
 
 
 def user_logout(username, session_id):
-    # Flush specified users session
+    response = HttpResponse('{"message":"success"}')
+    response.delete_cookie('session_id')
+    response.delete_cookie('username')
     return -1
 
 

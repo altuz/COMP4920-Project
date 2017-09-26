@@ -141,7 +141,7 @@ def update_userlist(request):
 @api_view(['POST'])
 def user_login(request):
     obj = None
-    single_entry = None
+    user_entry = None
     #Check if user is activated
     try:
         obj = json.loads(request.body.decode())
@@ -151,15 +151,15 @@ def user_login(request):
         return HttpResponse('{"message":"input invalid", "user":{}}')
 
     try:
-        single_entry = Register.objects.get(user_name = obj['user']['username'])
+        user_entry = Register.objects.get(user_name = obj['user']['username'])
         # If it doesn't throw exception, user has not activated
         return HttpResponse('{"message":"account not activated", "user":{}}')
     except:
         try:
-            single_entry = User.objects.get(user_name=obj['user']['username'],
+            user_entry = User.objects.get(user_name=obj['user']['username'],
                                             pass_word=obj['user']['password'])
         except:
-            return HttpResponse('{"message":"does not exist, "user":{}"}')
+            return HttpResponse('{"message":"does not exist", "user":{}}')
 
     # Session
     # user_id
@@ -168,20 +168,29 @@ def user_login(request):
     # Insert it as session
     #user_session = blake2b(str(time.time()).encode('utf-8')).hexdigest()
 
-    #new_session = Session(user_id = single_entry, session_id = user_session)
+    #new_session = Session(user_id = user_entry, session_id = user_session)
     #new_session.save()
-    response = HttpResponse(objs_to_json(single_entry))
+    response = HttpResponse(objs_to_json(user_entry))
     # response.set_cookie('session_id', user_session);
     return response
 
 @api_view(['POST'])
 def check_session(request):
-    obj = None
-    single_entry = None
+    json_obj = None
+    # decode json
     try:
-        ses_hash = blake2b(request.POST.get('username') + request.POST.get('ip_address'))
+        json_obj = json.loads(request.body.decode())
     except:
-        return None
+        print("Error when loading the Json")
+        return HttpResponse('{"message":"input invalid, "user":{}"}')
+
+    try:
+        user_entry = User.objects.get(user_name = json_obj['user']['username'])
+        session_entry = Session.objects.get(user_id = user_entry, session_id = json_obj['user']['session_id'])
+        response = HttpResponse(objs_to_json(user_entry))
+    except:
+        return HttpResponse('{"message":"does not exist or session invalid", "user":{}}')
+
 
 def user_logout(username, session_id):
     # Flush specified users session

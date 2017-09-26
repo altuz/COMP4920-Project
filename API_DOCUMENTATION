@@ -63,3 +63,21 @@ Output:
     "message":"message"
     "success":"True/False"
 }
+
+Function: Check session
+Url: backend/session_check
+Type: POST
+Input: {"user":{"username":"xxx", "session_id":"yyy"}}
+Output:
+{
+    "message":"error/success",
+    "user":
+    {
+        "user_id":0,
+        "user_name":"xxx",
+        "email":"asdasd@asdasd.com",
+        "pass_word":"123456",
+        "privacy":true
+        // empty if fail
+    }
+}

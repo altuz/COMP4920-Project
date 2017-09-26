@@ -1,0 +1,9 @@
+1. Session Table:
+    i. session_id should be a CharField
+2. Game List:
+    i. maybe have a url to the game thumbnail? So we have a picture to show.
+    ii. Also store description? So we can also search description.
+3. Rating:
+    i. Should have a date field, defaulted to entry datetime
+4. Follow:
+    i. following field should also be a foreign key to user

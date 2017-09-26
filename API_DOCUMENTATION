@@ -1,7 +1,7 @@
 Function: User Login
 Url: backend/login/
 Type: POST
-Input: username=x, password=y
+Input: {"user":{"username":"xxx","password":"yyy"}}
 Output:
 {
     "message":"error/success",
@@ -19,7 +19,8 @@ Output:
 Function: Edit User Played/Wishlist
 Url: backend/edit_list
 Type: POST
-Input: username=x, game_id=y, wish=True/False, played=True/False
+Input: {"user" : { "username" : "xxx", "game_id" : "yyy", "wish" : "True/False", "played" : "True/False"}
+username=x, game_id=y, wish=True/False, played=True/False
 Output:
 {
     "message":"Successful/Invalid Request"
@@ -31,5 +32,44 @@ Type: GET
 Input: q=query_string, category=string_of_categories
 Output:
 {
-    "results":
+    "results": "David is still figuring this out lol"
+
+}
+
+Function: Get User's Played Game List
+Url: backend/game_list
+Type: POST
+Input: {"user":{"username":"xxx"}}
+Output:
+{
+    "message":"error/success"
+    "game_list": [
+        {"game_name" : "abc", "game_id" : "123"},
+        ....
+        ....
+    ]
+}
+
+Function: Get User's Wish List
+Url: backend/wish_list
+Type: POST
+Input: {"user":{"username":"xxx"}}
+Output:
+{
+    "message":"error/success"
+    "wish_list": [
+        {"game_name" : "abc", "game_id" : "123"},
+        ....
+        ....
+    ]
+}
+
+Function: Make user1 follow user2
+Url: backend/follow_user
+Type: POST
+Input: {"user":{"user1":"xxx", "user2":"yyy"}}
+Output:
+{
+    "message":"message"
+    "success":"True/False"
 }

@@ -17,7 +17,7 @@ Output:
 }
 
 Function: Edit User Played/Wishlist
-Url: backend/edit_list
+Url: backend/edit_list/
 Type: POST
 Input: {"user" : { "username" : "xxx", "game_id" : "yyy", "wish" : "True/False", "played" : "True/False"}
 username=x, game_id=y, wish=True/False, played=True/False
@@ -37,13 +37,13 @@ Output:
 }
 
 Function: Get User's Played Game List
-Url: backend/game_list
+Url: backend/game_list/
 Type: POST
 Input: {"user":{"username":"xxx"}}
 Output:
 {
     "message":"error/success"
-    "game_list": [
+    "gamelist": [
         {"game_name" : "abc", "game_id" : "123"},
         ....
         ....
@@ -51,13 +51,13 @@ Output:
 }
 
 Function: Get User's Wish List
-Url: backend/wish_list
+Url: backend/wish_list/
 Type: POST
 Input: {"user":{"username":"xxx"}}
 Output:
 {
     "message":"error/success"
-    "wish_list": [
+    "wishlist": [
         {"game_name" : "abc", "game_id" : "123"},
         ....
         ....
@@ -65,7 +65,7 @@ Output:
 }
 
 Function: Make user1 follow user2
-Url: backend/follow_user
+Url: backend/follow_user/
 Type: POST
 Input: {"user":{"user1":"xxx", "user2":"yyy"}}
 Output:
@@ -75,7 +75,7 @@ Output:
 }
 
 Function: Check session
-Url: backend/session_check
+Url: backend/session_check/
 Type: POST
 Input: {"user":{"username":"xxx", "session_id":"yyy"}}
 Output:
@@ -93,11 +93,30 @@ Output:
 }
 
 Function: Logout
-Url: backend/logout
+Url: backend/logout/
 Type: None
 Input: None
 Output:
 Flushes cookie.
 {
     "message" : "success"
+}
+
+Function: Get user profile
+Url: backend/user_prof/
+Type: GET
+Input: user=xxx
+Output:
+{
+    "user" : {"user_name" : "xxx", "user_id" : "xxx"},
+    "gamelist" : [
+        {"game_name" : "abc", "game_id" : "123"},
+        ....
+        ....
+    ]
+    "wishlist": [
+        {"game_name" : "abc", "game_id" : "123"},
+        ....
+        ....
+    ]
 }

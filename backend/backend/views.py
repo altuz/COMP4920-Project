@@ -13,7 +13,39 @@ import time
 # TODO: retrieve user profile, to be shown in profile page
 @api_view(['GET'])
 def user_prof(request):
-    return None
+    game_list = ""
+    wish_list = ""
+    user_prof = ""
+    # Get user
+    try:
+        user_entry = User.objects.get(user_name = request.GET['username'])
+        user_prof = '''
+            { 
+                "username" : "%s",
+                "user_id" : "%s"
+            }
+        '''.format(user_entry.user_name, user_entry.user_id)
+    except:
+        HttpResponse('{ "user" : {}, "gamelist" : {}, "wishlist" : {} }')
+    # Get game list
+    try:
+        game_list = get_gamelist(request.GET['username'], True)
+    except:
+        print("No games")
+    # Get wish list
+    try:
+        wish_list = get_gamelist(request.GET['username'], False)
+    except:
+        print("No wishes")
+
+    ret_json = '''
+        {
+            "user" : %s,
+            "gamelist" : [%s],
+            "wishlist" : [%s]
+        }
+    '''.format(user_prof, game_list, wish_list)
+    return HttpResponse(ret_json)
 # Follow user
 # User1 -> User2
 @api_view(['POST'])
@@ -35,6 +67,29 @@ def follow_user(request):
     except:
         return HttpResponse('{"message" : "User1 or User2 does not exist", "success" : "False"}')
 
+# Helper function for get game/wishlist
+def get_list(username, type):
+    # retrieve database objects
+    try:
+        # check if player exist
+        # find gamelist related to player
+        player = User.objects.get(username)
+        gamelist = None
+        if type is True:
+            gamelist = PlayerLibrary.objects.filter(user_name=player, played=True)
+        else:
+            gamelist = PlayerLibrary.objects.filter(user_name=player, played=False, wish_list=True)
+        json_list = []
+        # convert to json list
+        for entries in gamelist:
+            game = entries.game_id
+            g_id = game.game_id
+            g_name = game.game_name
+            g_json = '{"game_name":"%s", "game_id":"%s"}'.format(g_name, g_id)
+            json_list.append(g_json)
+        return ','.join(json_list)
+    except Exception as e:
+        raise e
 # Get a user's game list
 @api_view(['POST'])
 def get_gamelist(request):
@@ -49,16 +104,7 @@ def get_gamelist(request):
     try:
         # check if player exist
         # find gamelist related to player
-        player = User.objects.get(json_obj['user']['username'])
-        gamelist = PlayerLibrary.objects.filter(user_name = player, played = True)
-        json_list = []
-        # convert to json list
-        for entries in gamelist:
-            game = entries.game_id
-            g_id = game.game_id
-            g_name = game.game_name
-            g_json = '{"game_name":"%s", "game_id":"%s"}'.format(g_name, g_id)
-            json_list.append(g_json)
+        game_list = get_list(json_obj['user']['username'], True)
         # construct json object
         ret_json = '''
             {
@@ -67,7 +113,7 @@ def get_gamelist(request):
                     %s
                 ]
             }
-        '''.format(','.join(json_list))
+        '''.format(','.join(game_list))
         return HttpResponse(ret_json)
     except:
         return HttpResponse('{"message":"does not exist, "gamelist":[]"}')
@@ -85,16 +131,7 @@ def get_wishlist(request):
     try:
         # check if player exist
         # find gamelist related to player
-        player = User.objects.get(json_obj['user']['username'])
-        gamelist = PlayerLibrary.objects.filter(user_name = player, played = False, wish_list = True)
-        json_list = []
-        # convert to json list
-        for entries in gamelist:
-            game = entries.game_id
-            g_id = game.game_id
-            g_name = game.game_name
-            g_json = '{"game_name":"%s", "game_id":"%s"}'.format(g_name, g_id)
-            json_list.append(g_json)
+        game_list = get_list(json_obj['user']['username'], True)
         # construct json object
         ret_json = '''
             {
@@ -103,7 +140,7 @@ def get_wishlist(request):
                     %s
                 ]
             }
-        '''.format(','.join(json_list))
+        '''.format(','.join(game_list))
         return HttpResponse(ret_json)
     except:
         return HttpResponse('{"message":"does not exist, "wishlist":[]"}')
@@ -111,7 +148,6 @@ def get_wishlist(request):
 @api_view(['POST'])
 def update_userlist(request):
     json_obj = None
-
     try:
         json_obj = json.loads(request.body.decode())
     except:

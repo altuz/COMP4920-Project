@@ -10,7 +10,7 @@ from django.core.mail import send_mail
 import json
 import time
 
-# TODO: retrieve user profile, to be shown in profile page
+# Retrieves user profile along with game list and wish list
 @api_view(['GET'])
 def user_prof(request):
     game_list = ""

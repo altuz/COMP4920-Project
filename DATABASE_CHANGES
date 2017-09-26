@@ -3,6 +3,7 @@
 2. Game List:
     i. maybe have a url to the game thumbnail? So we have a picture to show.
     ii. Also store description? So we can also search description.
+    iii. Change game_name, charField max_length from 20 to 110
 3. Rating:
     i. Should have a date field, defaulted to entry datetime
 4. Follow:

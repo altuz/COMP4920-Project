@@ -10,7 +10,10 @@ from django.core.mail import send_mail
 import json
 import time
 
-
+# TODO: retrieve user profile, to be shown in profile page
+@api_view(['GET'])
+def user_prof(request):
+    return None
 # Follow user
 # User1 -> User2
 @api_view(['POST'])

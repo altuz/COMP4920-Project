@@ -91,3 +91,13 @@ Output:
         // empty if fail
     }
 }
+
+Function: Logout
+Url: backend/logout
+Type: None
+Input: None
+Output:
+Flushes cookie.
+{
+    "message" : "success"
+}

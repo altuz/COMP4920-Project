@@ -180,3 +180,27 @@ def activate_user(request, key):
     exist_register.delete()
     
     return HttpResponse(msg_to_json("used activated"))
+
+# Search for games
+# FOr testing
+# curl -X GET http://localhost:8000/backend/search_game/?q=no_space_query
+@api_view(['GET'])
+def search_game(request):
+    """
+    function that searches for games matching search criteria
+    :param request: the search request
+    :return: if search match, return match list, else return json does not exist
+    """
+    print("search game function is running ...")
+    print("")
+    query = request.GET.get('q')
+    # TODO Later, do a combined search with category, only checking if query is empty for now
+    # TODO how to test by feeding a url with spaces?
+    if query:
+        query_list = query.split() # TODO for more advanced search later
+        results = GameList.objects.filter(game_name__icontains=query)
+        print("the results are")
+        print(results)
+        # TODO turn this into a JSON object
+
+    return HttpResponse(msg_to_json("search performed"))

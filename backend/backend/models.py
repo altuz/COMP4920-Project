@@ -47,7 +47,7 @@ class PlayerLibrary(models.Model):
 
 class GameList(models.Model):
     game_id = models.IntegerField(primary_key=True, db_index=True)
-    game_name = models.CharField(max_length=20, db_index=True)
+    game_name = models.CharField(max_length=110, db_index=True)
     num_player = models.IntegerField()
 
     class Meta:

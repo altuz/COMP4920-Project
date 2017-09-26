@@ -25,5 +25,6 @@ urlpatterns = [
     url(r'^backend/register/', backend.views.user_register),
     url(r'backend/test_session', backend.views.test_session),
     url(r'^backend/edit_list/', backend.views.update_userlist),
-    url(r'^backend/activate/(/w+)', backend.views.activate_user)
+    url(r'^backend/activate/(/w+)', backend.views.activate_user),
+    url(r'^backend/search_game/', backend.views.search_game)
 ]

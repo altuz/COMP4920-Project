@@ -24,3 +24,12 @@ Output:
 {
     "message":"Successful/Invalid Request"
 }
+
+Function: Search Game
+Url: backend/search_game/
+Type: GET
+Input: q=query_string, category=string_of_categories
+Output:
+{
+    "results":
+}

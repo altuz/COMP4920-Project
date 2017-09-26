@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^backend/edit_list/', backend.views.update_userlist),
     url(r'^backend/game_list/', backend.views.get_gamelist),
     url(r'^backend/wish_list/', backend.views.get_wishlist),
+    url(r'^backend/follow_user/', backend.views.follow_user),
     url(r'^backend/activate/(/w+)', backend.views.activate_user)
 
 ]

@@ -10,20 +10,87 @@ from django.core.mail import send_mail
 import json
 import time
 
-#PlayerLibrary
-#user_name
-#game_id
-#wish_list
-#played
+# Get a user's game list
+@api_view(['POST'])
+def get_gamelist(request):
+    json_obj = None
+    try:
+        json_obj = json.loads(request.body.decode())
+    except:
+        print("Error when loading the Json")
+        return HttpResponse('{"message":"input invalid", "gamelist":[]}')
+
+    try:
+        player = User.objects.get(json_obj['user']['username'])
+        gamelist = PlayerLibrary.objects.filter(user_name = player, played = True)
+        json_list = []
+        #convert to json list
+        for entries in gamelist:
+            game = entries.game_id
+            g_id = game.game_id
+            g_name = game.game_name
+            g_json = '{"game_name":"%s", "game_id":"%s"}'.format(g_name, g_id)
+            json_list.append(g_json)
+        ret_json = '''
+            {
+                "message":"success",
+                "gamelist": [
+                    %s
+                ]
+            }
+        '''.format(','.join(json_list))
+        return HttpResponse(ret_json)
+    except:
+        return HttpResponse('{"message":"does not exist, "gamelist":[]"}')
+
+# Get a user's wish list
+def get_wishlist(request):
+    json_obj = None
+    try:
+        json_obj = json.loads(request.body.decode())
+    except:
+        print("Error when loading the Json")
+        return HttpResponse('{"message":"input invalid", "wishlist":[]}')
+
+    try:
+        player = User.objects.get(json_obj['user']['username'])
+        gamelist = PlayerLibrary.objects.filter(user_name = player, played = False, wish_list = True)
+        json_list = []
+        # convert to json list
+        for entries in gamelist:
+            game = entries.game_id
+            g_id = game.game_id
+            g_name = game.game_name
+            g_json = '{"game_name":"%s", "game_id":"%s"}'.format(g_name, g_id)
+            json_list.append(g_json)
+        ret_json = '''
+            {
+                "message":"success",
+                "wishlist": [
+                    %s
+                ]
+            }
+        '''.format(','.join(json_list))
+        return HttpResponse(ret_json)
+    except:
+        return HttpResponse('{"message":"does not exist, "wishlist":[]"}')
+# Adding a game to a user's wish or played list
 @api_view(['POST'])
 def update_userlist(request):
-    obj = None
+    json_obj = None
+
+    try:
+        json_obj = json.loads(request.body.decode())
+    except:
+        print("Error when loading the Json")
+        return HttpResponse('{"message":"input invalid", "gamelist":{}}')
+
     try:
         # Checks if player exist in database
         # Checks if game exist in database
         # Unsuccessful if either check throws does not exist
-        player  = User.objects.get(user_name = request.POST.get('username'))
-        game    = GameList.objects.get(game_id = request.POST.get('game_id'))
+        player  = User.objects.get(user_name = json_obj['user']['username'])
+        game    = GameList.objects.get(game_id = json_obj['user']['gameid'])
         played  = request.POST.get('played', False)
         wishes  = request.POST.get('wish', True)
         new_entry = PlayerLibrary(user_name = player, game_id = game, wish_list = wishes, played = played)
@@ -39,7 +106,7 @@ def update_userlist(request):
                 "message":"Invalid Request"
             }
         ''')
-    return None
+
 # curl -d "param1=value1&param2=value2" -X POST http://localhost:3000/data
 @api_view(['POST'])
 def user_login(request):
@@ -51,7 +118,7 @@ def user_login(request):
         print(obj)
     except:
         print("Error when loading the Json")
-        pass
+        return HttpResponse('{"message":"input invalid", "user":{}}')
 
     try:
         single_entry = Register.objects.get(user_name = obj['user']['username'])
@@ -69,19 +136,13 @@ def user_login(request):
     # session_id
     # Get time and hash.
     # Insert it as session
-    user_session = blake2b(str(time.time()).encode('utf-8')).hexdigest()
+    #user_session = blake2b(str(time.time()).encode('utf-8')).hexdigest()
 
-    new_session = Session(user_id = single_entry, session_id = user_session)
-    new_session.save()
+    #new_session = Session(user_id = single_entry, session_id = user_session)
+    #new_session.save()
     response = HttpResponse(objs_to_json(single_entry))
-    response.set_cookie('session_id', user_session);
+    # response.set_cookie('session_id', user_session);
     return response
-
-@api_view(['POST'])
-def test_session(request):
-    request.session.sessionkey = 'ivb2jmftgbv3z97nnyfqtpwlpn1qv97k'
-    print(request.session.get('username', "Not here"))
-    return HttpResponse('{"test":"' + request.session.get('username', "Hello") + '"}')
 
 @api_view(['POST'])
 def check_session(request):

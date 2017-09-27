@@ -32,7 +32,21 @@ Type: GET
 Input: q=query_string, category=string_of_categories
 Output:
 {
-    "results": "David is still figuring this out lol"
+    "results":
+    { // List of results of this format
+        [
+            {
+                "game_id": 1,
+                "game_name": "Left for dank",
+                "num_player": 23
+            },
+            {
+                "game_id": 3,
+                "game_name": "Age of MEme-pires 2",
+                "num_player": 23
+            } //etc
+        ]
+    }
 
 }
 

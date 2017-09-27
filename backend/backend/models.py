@@ -57,6 +57,13 @@ class GameList(models.Model):
     def __str__(self):
         return str(self.game_id) + "/" + str(self.game_name)
 
+    # dict for use with game_search
+    def as_dict(self):
+        return {
+            "game_id": self.game_id,
+            "game_name": self.game_name,
+            "num_player": self.num_player
+        }
 
 class Categories(models.Model):
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)

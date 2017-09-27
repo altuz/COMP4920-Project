@@ -9,6 +9,8 @@ import smtplib
 from django.core.mail import send_mail
 import json
 import time
+from django.core import serializers
+from django.http import JsonResponse
 
 # Retrieves user profile along with game list and wish list
 @api_view(['GET'])
@@ -326,6 +328,8 @@ def activate_user(request, key):
 # Search for games
 # FOr testing
 # curl -X GET http://localhost:8000/backend/search_game/?q=no_space_query
+# curl -X GET -v "http://localhost:8000/backend/search_game" --data-urlencode "q=dank for"
+
 @api_view(['GET'])
 def search_game(request):
     """
@@ -337,12 +341,12 @@ def search_game(request):
     print("")
     query = request.GET.get('q')
     # TODO Later, do a combined search with category, only checking if query is empty for now
-    # TODO how to test by feeding a url with spaces?
+    # TODO how to test by feeding a url with spaces? For now, could manually set a query variable that has spaces
     if query:
-        query_list = query.split() # TODO for more advanced search later
-        results = GameList.objects.filter(game_name__icontains=query)
-        print("the results are")
-        print(results)
-        # TODO turn this into a JSON object
-
-    return HttpResponse(msg_to_json("search performed"))
+        # query_list = query.split() # TODO for more advanced search later
+        results = GameList.objects.filter(game_name__icontains=query) # Returns a QuerySet
+        # Put 'results' querySet into dict format to convert into JSON dict
+        dicts = [obj.as_dict() for obj in results]
+        return HttpResponse(json.dumps({"results": dicts}), content_type='application/json')
+    else:
+        return HttpResponse(msg_to_json("No query provided"))

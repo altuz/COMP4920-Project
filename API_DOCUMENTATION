@@ -29,24 +29,25 @@ Output:
 Function: Search Game
 Url: backend/search_game/
 Type: GET
-Input: q=query_string, category=string_of_categories
+Input: q=keywords_separated_by_spaces, category=categories_separated_by_commas
 Output:
 {
     "results":
-    { // List of results of this format
-        [
-            {
-                "game_id": 1,
-                "game_name": "Left for dank",
-                "num_player": 23
-            },
-            {
-                "game_id": 3,
-                "game_name": "Age of MEme-pires 2",
-                "num_player": 23
-            } //etc
-        ]
-    }
+    [ // List of results of this format
+        {
+            "game_id": 1,
+            "game_name": "Left for dank",
+            "num_player": 23
+        },
+        {
+            "game_id": 3,
+            "game_name": "Age of MEme-pires 2",
+            "num_player": 23
+        }
+        ...
+        ...  
+        // empty if no matches
+    ]
 
 }
 

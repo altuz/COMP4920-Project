@@ -326,30 +326,46 @@ def activate_user(request, key):
     return HttpResponse(msg_to_json("used activated"))
 
 # Search for games
-# FOr testing
-# curl -X GET "http://localhost:8000/backend/search_game/?q=no_space_query&category=categories_string"
+# For testing - note: %20 is a space, %2C is a comma in URL character encoding
+# curl -X GET "http://localhost:8000/backend/search_game/?q=for%20left&category=strategy%2CRTS"
+from django.db.models import Q
+import operator
+from functools import reduce
+from django.db.models import Count
 
 @api_view(['GET'])
 def search_game(request):
     """
     function that searches for games matching search criteria
-    :param request: the search request
+    :param request: the search request, empty query returns everything
     :return: if search match, return match list, else return json does not exist
     """
     print("search game function is running ...")
     print("")
+
     query = request.GET.get('q')
-    category = request.GET.get('category') # TODO separate category string by commas
-    # TODO Later, do a combined search with category, only checking if query is empty for now
-    # TODO how to test by feeding a url with spaces? For now, could manually set a query variable that has spaces
-    # query_list = query.split() # TODO for more advanced search later
+    category = request.GET.get('category')
+
+    query_list = query.split()
+    category_list = category.split(",")
 
     if category: # Add category filter
-        catObjs = Categories.objects.filter(category__iexact=category)
-        results = GameList.objects.filter(game_id__in=catObjs.values('game_id'),
-                                          game_name__icontains=query)
-    else:
-        results = GameList.objects.filter(game_name__icontains=query) # Returns a QuerySet
+        catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
+        catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches
+        catObjs = catObjs.filter(matches__iexact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
+
+        if query:
+            results = GameList.objects.filter(reduce(operator.and_, (Q(game_name__icontains=q) for q in query_list)),
+                                              game_id__in=catObjs.values('game_id'))
+        else:
+            results = GameList.objects.filter(game_id__in=catObjs.values('game_id')) # All games of those categories
+    else: # No category filter
+        if query:
+            results = GameList.objects.filter(
+                reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
+            )# Returns a QuerySet
+        else:
+            results = GameList.objects.all() # TODO discuss with group what they want with empty query
 
     # Put 'results' querySet into dict format to convert into JSON dict
     dicts_to_sort = [obj.as_dict() for obj in results]

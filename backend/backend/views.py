@@ -1,16 +1,18 @@
-from backend.models import User, UserSerializer, Register, GameList, PlayerLibrary, Session, Follow, Categories
+from backend.models import User, UserSerializer, Register, GameList, PlayerLibrary, Session, Follow, Categories, Rating
 from rest_framework.decorators import api_view
 from rest_framework.renderers import JSONRenderer
 from django.http import HttpResponse
 from django.shortcuts import  render
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from hashlib import blake2b
-import smtplib
 from django.core.mail import send_mail
+from django.db.models import Q
+from functools import reduce
+from django.db.models import Count
+import smtplib
 import json
 import time
-from django.core import serializers
-from django.http import JsonResponse
+import operator
 
 # Retrieves user profile along with game list and wish list
 @api_view(['GET'])
@@ -328,17 +330,12 @@ def activate_user(request, key):
 # Search for games
 # For testing - note: %20 is a space, %2C is a comma in URL character encoding
 # curl -X GET "http://localhost:8000/backend/search_game/?q=for%20left&category=strategy%2CRTS"
-from django.db.models import Q
-import operator
-from functools import reduce
-from django.db.models import Count
-
 @api_view(['GET'])
 def search_game(request):
     """
     function that searches for games matching search criteria
-    :param request: the search request, empty query returns everything
-    :return: if search match, return match list, else return json does not exist
+    :param request: the search request with parameters q=keywords_separated_by_spaces, category=categories_separated_by_commas
+    :return: if search match, return match list, else return empty JSON object
     """
     print("search game function is running ...")
     print("")
@@ -352,7 +349,7 @@ def search_game(request):
     if category: # Add category filter
         catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
         catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches
-        catObjs = catObjs.filter(matches__iexact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
+        catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
 
         if query:
             results = GameList.objects.filter(reduce(operator.and_, (Q(game_name__icontains=q) for q in query_list)),
@@ -365,9 +362,67 @@ def search_game(request):
                 reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
             )# Returns a QuerySet
         else:
-            results = GameList.objects.all() # TODO discuss with group what they want with empty query
+            results = GameList.objects.all() # TODO discuss with group what they want with empty query, atm returns everything
 
     # Put 'results' querySet into dict format to convert into JSON dict
     dicts_to_sort = [obj.as_dict() for obj in results]
     dicts = sorted(dicts_to_sort, key=lambda k: k['num_player'], reverse=True)# Sort results by popularity
     return HttpResponse(json.dumps({"results": dicts}), content_type='application/json')
+
+
+# Return average rating of a given a game_id #TODO or game name?
+# TODO need to test,
+# TODO might replace with storing average rating and number of ratings in table
+@api_view(['GET'])
+def get_average_rating(request):
+    target_game_id = request.GET.get('gameid')
+    games = Rating.filter(game_id__exact=target_game_id)
+    if len(games) != 0:
+        ratings_list = [obj.as_dict() for obj in games]
+        average = str(sum(d['rate'] for d in ratings_list)/len*ratings_list) # convert to string for json
+
+        return HttpResponse('''
+                    {
+                        "average-rating":%s
+                    }    
+                '''.format(average))
+    else:
+        return HttpResponse('{"message":"input invalid", "average-rating":{}}')
+
+# Save a rating or review
+# TODO need to test
+# For testing
+# curl -d '{"rating": {"username":"IHMS","gameid":4, "rate":4, "comment":"mada mada"} }' -X POST "http://localhost:8000/backend/rating/"
+# curl http://localhost:8000/backend/login/ -X POST -d '{"user":{"username":"IHMS","password":"123456"}}'
+@api_view(['POST'])
+def rate_and_review(request):
+    json_obj = None
+    try:
+        json_obj = json.loads(request.body.decode())
+    except:
+        print("Error when loading the Json")
+        return HttpResponse('{"message":"input invalid", "rating":{}}')
+
+    try:
+        # Checks if player exist in database
+        # Checks if game exist in database
+        # Unsuccessful if either check throws does not exist
+        user_id = User.objects.get(user_name=json_obj['rating']['username'])
+        game_id = GameList.objects.get(game_id=json_obj['rating']['gameid'])
+        rate = int(json_obj['rating']['rate']) # Asserts that rating is an integer
+        comment = json_obj['rating']['comment']
+
+        new_entry = Rating(user_id=user_id, game_id=game_id, rate=rate, comment=comment)
+        new_entry.save()
+        return HttpResponse('''
+            {
+                "message":"Successful"
+            }    
+        ''')
+    except:
+        return HttpResponse('''
+            {
+                "message":"Invalid Request"
+            }
+        ''')
+

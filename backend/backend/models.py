@@ -72,18 +72,19 @@ class Categories(models.Model):
     def __str__(self):
         return str(self.game_id) + "/" + str(self.category)
 
-    def as_dict(self):
-        return {
-            "game_id": self.game_id,
-            "category": self.category
-        }
-
 class Rating(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
     rate = models.IntegerField()
     comment = models.TextField(null=True)  # comment can be null
 
+    def as_dict(self):
+        return {
+            "user_id": self.user_id,
+            "game_id": self.game_id,
+            "rate": self.rate,
+            "comment": self.comment
+        }
 
 class Follow(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)

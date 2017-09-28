@@ -1,4 +1,4 @@
-from backend.models import User, UserSerializer, Register, GameList, PlayerLibrary, Session, Follow
+from backend.models import User, UserSerializer, Register, GameList, PlayerLibrary, Session, Follow, Categories
 from rest_framework.decorators import api_view
 from rest_framework.renderers import JSONRenderer
 from django.http import HttpResponse
@@ -327,8 +327,7 @@ def activate_user(request, key):
 
 # Search for games
 # FOr testing
-# curl -X GET http://localhost:8000/backend/search_game/?q=no_space_query
-# curl -X GET -v "http://localhost:8000/backend/search_game" --data-urlencode "q=dank for"
+# curl -X GET "http://localhost:8000/backend/search_game/?q=no_space_query&category=categories_string"
 
 @api_view(['GET'])
 def search_game(request):
@@ -340,13 +339,19 @@ def search_game(request):
     print("search game function is running ...")
     print("")
     query = request.GET.get('q')
+    category = request.GET.get('category') # TODO separate category string by commas
     # TODO Later, do a combined search with category, only checking if query is empty for now
     # TODO how to test by feeding a url with spaces? For now, could manually set a query variable that has spaces
-    if query:
-        # query_list = query.split() # TODO for more advanced search later
-        results = GameList.objects.filter(game_name__icontains=query) # Returns a QuerySet
-        # Put 'results' querySet into dict format to convert into JSON dict
-        dicts = [obj.as_dict() for obj in results]
-        return HttpResponse(json.dumps({"results": dicts}), content_type='application/json')
+    # query_list = query.split() # TODO for more advanced search later
+
+    if category: # Add category filter
+        catObjs = Categories.objects.filter(category__iexact=category)
+        results = GameList.objects.filter(game_id__in=catObjs.values('game_id'),
+                                          game_name__icontains=query)
     else:
-        return HttpResponse(msg_to_json("No query provided"))
+        results = GameList.objects.filter(game_name__icontains=query) # Returns a QuerySet
+
+    # Put 'results' querySet into dict format to convert into JSON dict
+    dicts_to_sort = [obj.as_dict() for obj in results]
+    dicts = sorted(dicts_to_sort, key=lambda k: k['num_player'], reverse=True)# Sort results by popularity
+    return HttpResponse(json.dumps({"results": dicts}), content_type='application/json')

@@ -72,6 +72,11 @@ class Categories(models.Model):
     def __str__(self):
         return str(self.game_id) + "/" + str(self.category)
 
+    def as_dict(self):
+        return {
+            "game_id": self.game_id,
+            "category": self.category
+        }
 
 class Rating(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)

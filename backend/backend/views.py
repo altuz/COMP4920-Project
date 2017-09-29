@@ -209,13 +209,25 @@ def user_login(request):
     # session_id
     # Get time and hash.
     # Insert it as session
-    #user_session = blake2b(str(time.time()).encode('utf-8')).hexdigest()
-
-    #new_session = Session(user_id = user_entry, session_id = user_session)
-    #new_session.save()
-    response = HttpResponse(objs_to_json(user_entry))
+    user_session = blake2b(str(time.time()).encode('utf-8')).hexdigest()
     # response.set_cookie('session_id', user_session);
-    # response.set_cookie('username', obj['user']['username']
+    # response.set_cookie('username', obj['user']['username'])
+    ret_json = '''
+        {
+            "message" : "success",
+            "user" : {
+                "user_name" : "%s",
+                "email" : "%s"
+            },
+            "cookie" : {
+                "user_name" : "%s",
+                "session" : "%s"
+            }
+        }
+    '''.format(user_entry['user_name'], user_entry['email'], user_entry['user_name'], user_session)
+    new_session = Session(user_id = user_entry, session_id = user_session)
+    new_session.save()
+    response = HttpResponse(ret_json)
     return response
 
 @api_view(['POST'])

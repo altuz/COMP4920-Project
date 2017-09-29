@@ -12,12 +12,12 @@ class User(models.Model):
 
     def __str__(self):
         return self.user_name
-#Session
-#user_id
-#session_id
+
+
+# user_id, session
 class Session(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
-    session_id = models.CharField(max_length = 256, db_index=True)
+    session_id = models.CharField(max_length=256, db_index=True)
 
     class Meta:
         unique_together = ('user_id', 'session_id')
@@ -25,11 +25,8 @@ class Session(models.Model):
     def __str__(self):
         return str(self.user_id) + '/' + str(self.session_id)
 
-#PlayerLibrary
-#user_name
-#game_id
-#wish_list
-#played
+
+# PlayerLibrary, user_name, game_id, wish_list, played
 class PlayerLibrary(models.Model):
     user_name = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
@@ -47,8 +44,12 @@ class PlayerLibrary(models.Model):
 
 class GameList(models.Model):
     game_id = models.IntegerField(primary_key=True, db_index=True)
-    game_name = models.CharField(max_length=110, db_index=True)
+    game_name = models.TextField(db_index=True)
     num_player = models.IntegerField()
+    image_url = models.TextField()
+    game_description = models.TextField(db_index=True)
+    average_rating = models.FloatField()
+    rating_count = models.IntegerField()
 
     class Meta:
         # order the table by number of player descending order, faster for search
@@ -65,6 +66,7 @@ class GameList(models.Model):
             "num_player": self.num_player
         }
 
+
 class Categories(models.Model):
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
     category = models.CharField(max_length=20, db_index=True)
@@ -72,11 +74,13 @@ class Categories(models.Model):
     def __str__(self):
         return str(self.game_id) + "/" + str(self.category)
 
+
 class Rating(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
     rate = models.IntegerField()
     comment = models.TextField(null=True)  # comment can be null
+    rated_time = models.DateTimeField(auto_now_add=True)  # add current time stamp
 
     def as_dict(self):
         return {
@@ -86,9 +90,10 @@ class Rating(models.Model):
             "comment": self.comment
         }
 
+
 class Follow(models.Model):
-    user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
-    following = models.CharField(max_length=15, db_index=True)
+    user_id = models.ForeignKey('User', related_name= "follower_id", on_delete=models.CASCADE, db_index=True)
+    follow_id = models.ForeignKey('User', related_name= "followed_id", on_delete=models.CASCADE, db_index=True)
 
 
 class Register(models.Model):

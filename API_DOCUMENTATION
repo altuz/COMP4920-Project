@@ -1,7 +1,7 @@
 Function: User Login
 Url: backend/login/
 Type: POST
-Input: username=x, password=y
+Input: {"user":{"username":"xxx","password":"yyy"}}
 Output:
 {
     "message":"error/success",
@@ -17,10 +17,130 @@ Output:
 }
 
 Function: Edit User Played/Wishlist
-Url: backend/edit_list
+Url: backend/edit_list/
 Type: POST
-Input: username=x, game_id=y, wish=True/False, played=True/False
+Input: {"user" : { "username" : "xxx", "game_id" : "yyy", "wish" : "True/False", "played" : "True/False"}
+username=x, game_id=y, wish=True/False, played=True/False
 Output:
 {
     "message":"Successful/Invalid Request"
+}
+
+Function: Search Game
+Url: backend/search_game/
+Type: GET
+Input: q=keywords_separated_by_spaces, category=categories_separated_by_commas
+Output:
+{
+    "results":
+    [ // List of results of this format
+        {
+            "game_id": 1,
+            "game_name": "Left for dank",
+            "num_player": 23
+        },
+        {
+            "game_id": 3,
+            "game_name": "Age of MEme-pires 2",
+            "num_player": 23
+        }
+        ...
+        ...
+        // empty if no matches
+    ]
+
+}
+
+Function: Get User's Played Game List
+Url: backend/game_list/
+Type: POST
+Input: {"user":{"username":"xxx"}}
+Output:
+{
+    "message":"error/success"
+    "gamelist": [
+        {"game_name" : "abc", "game_id" : "123"},
+        ....
+        ....
+    ]
+}
+
+Function: Get User's Wish List
+Url: backend/wish_list/
+Type: POST
+Input: {"user":{"username":"xxx"}}
+Output:
+{
+    "message":"error/success"
+    "wishlist": [
+        {"game_name" : "abc", "game_id" : "123"},
+        ....
+        ....
+    ]
+}
+
+Function: Make user1 follow user2
+Url: backend/follow_user/
+Type: POST
+Input: {"user":{"user1":"xxx", "user2":"yyy"}}
+Output:
+{
+    "message":"message"
+    "success":"True/False"
+}
+
+Function: Check session
+Url: backend/session_check/
+Type: POST
+Input: {"user":{"username":"xxx", "session_id":"yyy"}}
+Output:
+{
+    "message":"error/success",
+    "user":
+    {
+        "user_id":0,
+        "user_name":"xxx",
+        "email":"asdasd@asdasd.com",
+        "pass_word":"123456",
+        "privacy":true
+        // empty if fail
+    }
+}
+
+Function: Logout
+Url: backend/logout/
+Type: None
+Input: None
+Output:
+Flushes cookie.
+{
+    "message" : "success"
+}
+
+Function: Get user profile
+Url: backend/user_prof/
+Type: GET
+Input: user=xxx
+Output:
+{
+    "user" : {"user_name" : "xxx", "user_id" : "xxx"},
+    "gamelist" : [
+        {"game_name" : "abc", "game_id" : "123"},
+        ....
+        ....
+    ]
+    "wishlist": [
+        {"game_name" : "abc", "game_id" : "123"},
+        ....
+        ....
+    ]
+}
+
+Function: Rate and Review
+Url: backend/rating/
+Type: POST
+Input: {"rating": {"username":"IHMS","gameid":4, "rate":4, "comment":"mada mada"} }
+Output:
+{
+    "message":"error/success"
 }

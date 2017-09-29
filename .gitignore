@@ -3,3 +3,4 @@ backend/.idea
 backend/backend/*.pyc
 backend/backend/__pycache__
 backend/backend/migrations
+.idea/

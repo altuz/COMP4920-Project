@@ -1,0 +1,13 @@
+1. Session Table:
+    i. session_id should be a CharField
+2. Game List:
+    i. maybe have a url to the game thumbnail? So we have a picture to show.
+    ii. Also store description? So we can also search description.
+    iii. Change game_name, charField max_length from 20 to 110
+    iv. Should have an average rating, and number of ratings field (so back end does not have to recalculate at every search)
+3. Rating:
+    i. Should have a date field, defaulted to entry datetime
+4. Follow:
+    i. following field should also be a foreign key to user
+5. User:
+    i. Might want to have an entry for the user's steam account in case we do import account

@@ -23,7 +23,14 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^backend/login/', backend.views.user_login),
     url(r'^backend/register/', backend.views.user_register),
-    url(r'backend/test_session', backend.views.test_session),
     url(r'^backend/edit_list/', backend.views.update_userlist),
-    url(r'^backend/activate/(/w+)', backend.views.activate_user)
+    url(r'^backend/search_game/', backend.views.search_game),
+    url(r'^backend/game_list/', backend.views.get_gamelist),
+    url(r'^backend/wish_list/', backend.views.get_wishlist),
+    url(r'^backend/follow_user/', backend.views.follow_user),
+    url(r'^backend/session_check/', backend.views.check_session),
+    url(r'^backend/logout/', backend.views.user_logout),
+    url(r'^backend/user_prof/', backend.views.user_prof),
+    url(r'^backend/activate/(/w+)', backend.views.activate_user),
+    url(r'^backend/rating/', backend.views.rate_and_review)
 ]

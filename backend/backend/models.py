@@ -12,11 +12,12 @@ class User(models.Model):
 
     def __str__(self):
         return self.user_name
-
-
+#Session
+#user_id
+#session_id
 class Session(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
-    session_id = models.IntegerField(db_index=True)
+    session_id = models.CharField(max_length = 256, db_index=True)
 
     class Meta:
         unique_together = ('user_id', 'session_id')
@@ -46,7 +47,7 @@ class PlayerLibrary(models.Model):
 
 class GameList(models.Model):
     game_id = models.IntegerField(primary_key=True, db_index=True)
-    game_name = models.CharField(max_length=20, db_index=True)
+    game_name = models.CharField(max_length=110, db_index=True)
     num_player = models.IntegerField()
 
     class Meta:
@@ -56,6 +57,13 @@ class GameList(models.Model):
     def __str__(self):
         return str(self.game_id) + "/" + str(self.game_name)
 
+    # dict for use with game_search
+    def as_dict(self):
+        return {
+            "game_id": self.game_id,
+            "game_name": self.game_name,
+            "num_player": self.num_player
+        }
 
 class Categories(models.Model):
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
@@ -64,13 +72,19 @@ class Categories(models.Model):
     def __str__(self):
         return str(self.game_id) + "/" + str(self.category)
 
-
 class Rating(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
     rate = models.IntegerField()
     comment = models.TextField(null=True)  # comment can be null
 
+    def as_dict(self):
+        return {
+            "user_id": self.user_id,
+            "game_id": self.game_id,
+            "rate": self.rate,
+            "comment": self.comment
+        }
 
 class Follow(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)

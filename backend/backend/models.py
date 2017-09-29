@@ -17,7 +17,7 @@ class User(models.Model):
 # user_id, session
 class Session(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
-    session = models.CharField(max_length=256, db_index=True)
+    session_id = models.CharField(max_length=256, db_index=True)
 
     class Meta:
         unique_together = ('user_id', 'session_id')
@@ -92,8 +92,8 @@ class Rating(models.Model):
 
 
 class Follow(models.Model):
-    user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
-    follow_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
+    user_id = models.ForeignKey('User', related_name= "follower_id", on_delete=models.CASCADE, db_index=True)
+    follow_id = models.ForeignKey('User', related_name= "followed_id", on_delete=models.CASCADE, db_index=True)
 
 
 class Register(models.Model):

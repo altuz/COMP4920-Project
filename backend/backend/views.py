@@ -341,23 +341,24 @@ def search_game(request):
     print("")
 
     query = request.GET.get('q')
-    category = request.GET.get('category')
-
-    query_list = query.split()
-    category_list = category.split(",")
+    category = request.GET.get('category')    
 
     if category: # Add category filter
+        category_list = category.split(",")
+
         catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
         catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches
         catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
 
         if query:
+            query_list = query.split()
             results = GameList.objects.filter(reduce(operator.and_, (Q(game_name__icontains=q) for q in query_list)),
                                               game_id__in=catObjs.values('game_id'))
         else:
             results = GameList.objects.filter(game_id__in=catObjs.values('game_id')) # All games of those categories
     else: # No category filter
         if query:
+            query_list = query.split()
             results = GameList.objects.filter(
                 reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
             )# Returns a QuerySet

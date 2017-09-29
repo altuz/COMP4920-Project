@@ -55,6 +55,9 @@ class GameList(models.Model):
         # order the table by number of player descending order, faster for search
         order_with_respect_to = 'num_player'
 
+    def __str__(self):
+        return str(self.game_id) + "/" + str(self.game_name) + "/#player: " + str(self.num_player)
+
     # dict for use with game_search
     def as_dict(self):
         return {

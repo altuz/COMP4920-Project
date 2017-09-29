@@ -1,14 +1,10 @@
 export default function reducer(state={
-    user: {
-      id: null,
-      name: null,
-      age: null,
-    },
-    fetching: false,
-    fetched: false,
+    user: JSON.parse(localStorage.getItem('user_info'))||{},
+    fetching:  JSON.parse(localStorage.getItem('user_info'))? true:false,
+    fetched: JSON.parse(localStorage.getItem('user_info'))? true:false,
     error: null,
   }, action) {
-
+    console.log(action.type);
     switch (action.type) {
       case "FETCH_USER": {
         return {...state, fetching: true}
@@ -24,16 +20,20 @@ export default function reducer(state={
           user: action.payload,
         }
       }
-      case "SET_USER_NAME": {
+      case 'SET_USER': {
+        localStorage.setItem('user_info', JSON.stringify(action.payload));
         return {
           ...state,
-          user: {...state.user, name: action.payload},
+          user:action.payload,
+          fetched:true,
         }
       }
-      case "SET_USER_AGE": {
+      case "DELETE_USER": {
+        localStorage.removeItem('user_info');
         return {
           ...state,
-          user: {...state.user, age: action.payload},
+          user: {},
+          fetched:false,
         }
       }
     }

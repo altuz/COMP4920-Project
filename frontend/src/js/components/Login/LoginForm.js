@@ -2,7 +2,7 @@ import React from  "react";
 import { connect } from 'react-redux';
 import {Button, Modal} from 'react-bootstrap';
 import SignupForm from '../Signup'
-import {login} from '../../actions/userActions.js';
+import { login } from '../../actions/userActions.js';
 
 @connect((store)=>{
 	return store.user;
@@ -41,6 +41,7 @@ export default class LoginForm extends React.Component {
 		this.props.dispatch(login(user));
 
 	}
+
 
 	render() {
 		if(this.state.issignup){

@@ -209,13 +209,25 @@ def user_login(request):
     # session_id
     # Get time and hash.
     # Insert it as session
-    #user_session = blake2b(str(time.time()).encode('utf-8')).hexdigest()
-
-    #new_session = Session(user_id = user_entry, session_id = user_session)
-    #new_session.save()
-    response = HttpResponse(objs_to_json(user_entry))
+    user_session = blake2b(str(time.time()).encode('utf-8')).hexdigest()
     # response.set_cookie('session_id', user_session);
-    # response.set_cookie('username', obj['user']['username']
+    # response.set_cookie('username', obj['user']['username'])
+    ret_json = '''
+        {
+            "message" : "success",
+            "user" : {
+                "user_name" : "%s",
+                "email" : "%s"
+            },
+            "cookie" : {
+                "user_name" : "%s",
+                "session" : "%s"
+            }
+        }
+    '''.format(user_entry['user_name'], user_entry['email'], user_entry['user_name'], user_session)
+    new_session = Session(user_id = user_entry, session_id = user_session)
+    new_session.save()
+    response = HttpResponse(ret_json)
     return response
 
 @api_view(['POST'])
@@ -341,23 +353,24 @@ def search_game(request):
     print("")
 
     query = request.GET.get('q')
-    category = request.GET.get('category')
-
-    query_list = query.split()
-    category_list = category.split(",")
+    category = request.GET.get('category')    
 
     if category: # Add category filter
+        category_list = category.split(",")
+
         catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
         catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches
         catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
 
         if query:
+            query_list = query.split()
             results = GameList.objects.filter(reduce(operator.and_, (Q(game_name__icontains=q) for q in query_list)),
                                               game_id__in=catObjs.values('game_id'))
         else:
             results = GameList.objects.filter(game_id__in=catObjs.values('game_id')) # All games of those categories
     else: # No category filter
         if query:
+            query_list = query.split()
             results = GameList.objects.filter(
                 reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
             )# Returns a QuerySet

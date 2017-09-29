@@ -6,7 +6,7 @@
     iii. Change game_name, charField max_length from 20 to 110
     iv. Should have an average rating, and number of ratings field (so back end does not have to recalculate at every search)
 3. Rating:
-    i. Should have a date field, defaulted to entry datetime
+    i. Should have a date field, defaulted to entry datetime, datetime and rating
 4. Follow:
     i. following field should also be a foreign key to user
 5. User:

@@ -1,9 +1,17 @@
 import React from "react";
 import { Link, Switch, Route, Redirect } from 'react-router-dom';
 import { Modal,Button, FieldGroup } from "react-bootstrap";
+import { connect } from 'react-redux';
 import LoginForm from "./LoginForm";
+import { logout} from '../../actions/userActions.js';
 
 
+@connect((store) => {
+	return {
+		user: store.user.user,
+		fetched: store.user.fetched,
+	};
+})
 export default class Login extends React.Component {
 	  constructor(props) {
      	super(props);
@@ -20,13 +28,34 @@ export default class Login extends React.Component {
 	    this.setState({ showModal: false });
 	  }
 
+
 	  open() {
 	  	console.log(this.state)
 	    this.setState({ showModal: true });
 	  }
 
-	  render() {
 
+		handleClick(e){
+			e.preventDefault();
+			this.props.dispatch(logout());
+			this.setState({ showModal: false });
+			window.location.href='/#/discover';
+		}
+
+	  render() {
+			const { user,fetched } = this.props;
+			console.log(fetched);
+			if(fetched) {
+				return (
+				<div className='user-icon-container'>
+					<img src='static/images/user.svg' className='user-icon'/>
+					<div className='user-detail'>
+						Hi,{user.user_name}<br/>
+						<a href='#0' onClick={this.handleClick.bind(this)} className='login logout'>Click to logout</a>
+					</div>
+				</div>
+			);
+			}
 	    return (
      <div>
       	<img src='static/images/user.svg' className='user-icon'/>

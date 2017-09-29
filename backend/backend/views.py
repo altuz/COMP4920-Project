@@ -2,10 +2,7 @@ from backend.models import User, UserSerializer, Register, GameList, PlayerLibra
 from rest_framework.decorators import api_view
 from rest_framework.renderers import JSONRenderer
 from django.http import HttpResponse
-from django.shortcuts import  render
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from hashlib import blake2b
-from django.core.mail import send_mail
 from django.db.models import Q
 from functools import reduce
 from django.db.models import Count
@@ -13,6 +10,7 @@ import smtplib
 import json
 import time
 import operator
+
 
 # Retrieves user profile along with game list and wish list
 @api_view(['GET'])
@@ -50,6 +48,8 @@ def user_prof(request):
         }
     '''.format(user_prof, game_list, wish_list)
     return HttpResponse(ret_json)
+
+
 # Follow user
 # User1 -> User2
 @api_view(['POST'])
@@ -70,6 +70,7 @@ def follow_user(request):
         return HttpResponse('{"message" : "Followed", "success" : "True"}')
     except:
         return HttpResponse('{"message" : "User1 or User2 does not exist", "success" : "False"}')
+
 
 # Helper function for get game/wishlist
 def get_list(username, type):
@@ -94,6 +95,8 @@ def get_list(username, type):
         return ','.join(json_list)
     except Exception as e:
         raise e
+
+
 # Get a user's game list
 @api_view(['POST'])
 def get_gamelist(request):
@@ -122,6 +125,7 @@ def get_gamelist(request):
     except:
         return HttpResponse('{"message":"does not exist, "gamelist":[]"}')
 
+
 # Get a user's wish list
 def get_wishlist(request):
     json_obj = None
@@ -148,6 +152,8 @@ def get_wishlist(request):
         return HttpResponse(ret_json)
     except:
         return HttpResponse('{"message":"does not exist, "wishlist":[]"}')
+
+
 # Adding a game to a user's wish or played list
 @api_view(['POST'])
 def update_userlist(request):
@@ -179,6 +185,7 @@ def update_userlist(request):
                 "message":"Invalid Request"
             }
         ''')
+
 
 # curl -d "param1=value1&param2=value2" -X POST http://localhost:3000/data
 @api_view(['POST'])
@@ -229,6 +236,7 @@ def user_login(request):
     new_session.save()
     response = HttpResponse(ret_json)
     return response
+
 
 @api_view(['POST'])
 def check_session(request):
@@ -339,6 +347,7 @@ def activate_user(request, key):
     
     return HttpResponse(msg_to_json("used activated"))
 
+
 # Search for games
 # For testing - note: %20 is a space, %2C is a comma in URL character encoding
 # curl -X GET "http://localhost:8000/backend/search_game/?q=for%20left&category=strategy%2CRTS"
@@ -401,6 +410,7 @@ def get_average_rating(request):
                 '''.format(average))
     else:
         return HttpResponse('{"message":"input invalid", "average-rating":{}}')
+
 
 # Save a rating or review
 # TODO need to test

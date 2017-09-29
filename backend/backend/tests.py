@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.test import Client
 import smtplib
-from django.core.mail import send_mail
 import json
 # Create your tests here.
 

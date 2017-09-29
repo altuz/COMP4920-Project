@@ -2,4 +2,4 @@
 hostname = 'localhost'
 username = 'USERNAME'
 password = 'PASSWORD'
-database = 'DBNAME'
+database = 'mysqlite.db'

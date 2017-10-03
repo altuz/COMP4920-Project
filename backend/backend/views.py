@@ -31,12 +31,12 @@ def user_prof(request):
         HttpResponse('{ "user" : {}, "gamelist" : {}, "wishlist" : {} }')
     # Get game list
     try:
-        game_list = get_gamelist(request.GET['username'], True)
+        game_list = get_list(request.GET['username'], True)
     except:
         print("No games")
     # Get wish list
     try:
-        wish_list = get_gamelist(request.GET['username'], False)
+        wish_list = get_list(request.GET['username'], False)
     except:
         print("No wishes")
 

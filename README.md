@@ -36,7 +36,9 @@ $ python manage.py runserver
 
 update database
 ```sh
-python3 manage.py migrates
+rm all cache files, rm the db file
+python3.6 manage.py migrate --fake backend zero
+python3.6 manage.py migrates
 ```
 
 make superuser

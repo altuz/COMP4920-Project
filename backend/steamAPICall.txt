@@ -1,0 +1,10 @@
+
+Get all list of app id
+http://api.steampowered.com/ISteamApps/GetAppList/v1
+http://api.steampowered.com/ISteamApps/GetAppList/v2 // not sure what is the difference
+
+SteamSpy API call to get game info: (4 request per second)
+http://steamspy.com/api.php?request=appdetails&appid=appid
+
+Steam API call to get game info: (100,000 call per day and 1 call per sec? 200 requests per 5 mins)
+http://store.steampowered.com/api/appdetails?appids=656740

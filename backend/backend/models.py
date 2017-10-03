@@ -13,7 +13,13 @@ class User(models.Model):
     def __str__(self):
         return self.user_name
 
-
+    def as_dict(self):
+        return {
+            "user_id": self.user_id,
+            "user_name": self.user_name,
+            "email": self.email,
+            "privacy" : self.privacy
+        }
 # user_id, session
 class Session(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
@@ -51,19 +57,24 @@ class GameList(models.Model):
     average_rating = models.FloatField()
     rating_count = models.IntegerField()
 
-    class Meta:
-        # order the table by number of player descending order, faster for search
-        order_with_respect_to = 'num_player'
+
+    # class Meta:
+    #     # order the table by number of player descending order, faster for search
+    #     order_with_respect_to = 'num_player'
 
     def __str__(self):
-        return str(self.game_id) + "/" + str(self.game_name)
+        return str(self.game_id) + "/" + str(self.game_name) + "/#player: " + str(self.num_player)
 
     # dict for use with game_search
     def as_dict(self):
         return {
             "game_id": self.game_id,
             "game_name": self.game_name,
-            "num_player": self.num_player
+            "num_player": self.num_player,
+            "image_url": self.image_url,
+            "game_description": self.game_description,
+            "average_rating": self.average_rating,
+            "rating_count": self.rating_count
         }
 
 
@@ -71,8 +82,11 @@ class Categories(models.Model):
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
     category = models.CharField(max_length=20, db_index=True)
 
-    def __str__(self):
-        return str(self.game_id) + "/" + str(self.category)
+    def as_dict(self):
+        return {
+            "game_id": self.game_id,
+            "category": self.category
+        }
 
 
 class Rating(models.Model):
@@ -87,13 +101,20 @@ class Rating(models.Model):
             "user_id": self.user_id,
             "game_id": self.game_id,
             "rate": self.rate,
-            "comment": self.comment
+            "comment": self.comment,
+            "rated_time": self.rated_time
         }
 
 
 class Follow(models.Model):
     user_id = models.ForeignKey('User', related_name= "follower_id", on_delete=models.CASCADE, db_index=True)
     follow_id = models.ForeignKey('User', related_name= "followed_id", on_delete=models.CASCADE, db_index=True)
+
+    def as_dict(self):
+        return {
+            "user_id": self.user_id,
+            "follow_id": self.follow_id
+        }
 
 
 class Register(models.Model):

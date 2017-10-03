@@ -1,5 +1,6 @@
 import React from "react";
 import Login from '../../components/Login';
+import { connect } from 'react-redux';
 import { Link, Switch, Route } from 'react-router-dom';
 
 class Header extends React.Component {
@@ -18,13 +19,18 @@ class Header extends React.Component {
 	}
 }
 
+@connect((store) => {
+	return {
+		fetched: store.user.fetched,
+	};
+})
 class SideBar extends React.Component{
 	render() {
-		const { path, token } = this.props;
+		const { path, fetched } = this.props;
 		console.log(path)
-		const active = path === '/feeds' ? 'feeds' : (path === '/profile' ? 'profile' : path.match('^/learning-centre') ? 'learning-centre' : path === '/search' ? 'search' :'discover');
-		const base_links = [['search', true], ['discover', true], ['profile', false], ['feeds', false], ['learning-centre', false]];
-		const links = base_links.filter((e) => e[1] || token).map((e) => e[0]);
+		const active = path === '/about' ? 'about' : (path === '/profile' ? 'profile': path === '/search' ? 'search' :'discover');
+		const base_links = [['discover', true], ['search', true], ['profile', false], ['about', false]];
+		const links = base_links.filter((e) => e[1] || fetched).map((e) => e[0]);
 		const sideLinks = links.map((link, i) =>
 			<li className={link + '-sidebar sidebar ' + (active === link ? 'active' : '')} key={i}>
 			<Link to={`/${link}`}>

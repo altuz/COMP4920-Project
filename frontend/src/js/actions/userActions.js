@@ -13,6 +13,9 @@ export function login(user) {
             })
         }
     })
+    .catch((err)=>{
+      console.log("error");
+    })
     }
 }
 

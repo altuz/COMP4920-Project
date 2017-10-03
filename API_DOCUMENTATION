@@ -109,8 +109,8 @@ Output:
 
 Function: Logout
 Url: backend/logout/
-Type: None
-Input: None
+Type: POST
+Input: {"user":{"username":"xxx", "session_id":"yyy"}}
 Output:
 Flushes cookie.
 {

@@ -216,6 +216,7 @@ def user_login(request):
     # session_id
     # Get time and hash.
     # Insert it as session
+    user_dict = user_entry.as_dict()
     user_session = blake2b(str(time.time()).encode('utf-8')).hexdigest()
     # response.set_cookie('session_id', user_session);
     # response.set_cookie('username', obj['user']['username'])
@@ -231,7 +232,7 @@ def user_login(request):
                 "session" : "%s"
             }
         }
-    '''.format(user_entry['user_name'], user_entry['email'], user_entry['user_name'], user_session)
+    '''.format(user_dict['user_name'], user_dict['email'], user_dict['user_name'], user_session)
     new_session = Session(user_id = user_entry, session_id = user_session)
     new_session.save()
     response = HttpResponse(ret_json)
@@ -255,12 +256,28 @@ def check_session(request):
     except:
         return HttpResponse('{"message":"does not exist or session invalid", "user":{}}')
 
-
-def user_logout(username, session_id):
+@api_view(['POST'])
+def user_logout(request):
     response = HttpResponse('{"message":"success"}')
     response.delete_cookie('session_id')
     response.delete_cookie('username')
-    return -1
+    #TODO: delete db entry
+    json_obj = None
+    # decode json
+    try:
+        json_obj = json.loads(request.body.decode())
+    except:
+        print("Error when loading the Json")
+        return HttpResponse('{"message":"input invalid, "user":{}"}')
+
+    try:
+        user_entry = User.objects.get(user_name = json_obj['user']['username'])
+        session_entry = Session.objects.get(user_id = user_entry, session_id = json_obj['user']['session_id'])
+        session_entry.delete()
+    except:
+        return HttpResponse('{"message":"does not exist or session invalid", "user":{}}')
+
+    return response
 
 
 def objs_to_json(objs):

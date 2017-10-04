@@ -50,5 +50,14 @@ Password
 Password (again)
 ```
 
+Initialise DataBase, script running order
+```sh
+1. get_list_AppID.py: get json response from steam for all appid and store them locally at steam_data folder
+2. check_name_content_match.py: remove the local stored steam files that name of the file doesn't match the content steam_id
+3. insert_steam_data.py: from the locally stored steam game information insert them into data base
+4. get_steamspy_data.py: assume steam_data already there, get all data from for all appid soted locally from steam spy and store them at steam_spy_data folder
+5. insert_spy_data.py: update database base on all locally downloaded steam spy data
+```
+
 ### NOTE TO SELF
 If it goes well and we choose to publically release or make this repo public DON'T put config.py (database details) onto git

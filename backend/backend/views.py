@@ -425,7 +425,8 @@ def search_game(request):
 
     # Put 'results' querySet into dict format to convert into JSON dict
     dicts_to_sort = [obj.as_dict() for obj in results]
-    dicts = sorted(dicts_to_sort, key=lambda k: k['num_player'], reverse=True)# Sort results by popularity
+    dicts = dicts_to_sort
+    # dicts = sorted(dicts_to_sort, key=lambda k: k['num_player'], reverse=True)# Sort results by popularity
     return HttpResponse(json.dumps({"results": dicts}), content_type='application/json')
 
 

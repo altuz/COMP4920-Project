@@ -90,6 +90,9 @@ class GameList(models.Model):
             "rating_count": self.rating_count
         }
 
+    def __str__(self):
+        return str(self.game_id) + "/" + str(self.game_name) + "/" + str(self.num_player)
+
 
 class Categories(models.Model):
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
@@ -101,6 +104,9 @@ class Categories(models.Model):
             "category": self.category
         }
 
+    def __str__(self):
+        return str(self.game_id) + "/" + str(self.category)
+
 
 class Genres(models.Model):
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
@@ -111,6 +117,9 @@ class Genres(models.Model):
             "game_id": self.game_id,
             "genre": self.genre
         }
+
+    def __str__(self):
+        return str(self.game_id) + "/" + str(self.genre)
 
 
 class Rating(models.Model):

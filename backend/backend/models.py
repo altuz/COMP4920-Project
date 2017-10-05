@@ -13,6 +13,13 @@ class User(models.Model):
     def __str__(self):
         return self.user_name
 
+    def as_dict(self):
+        return {
+            "user_id": self.user_id,
+            "user_name": self.user_name,
+            "email": self.email,
+            "privacy" : self.privacy
+        }
 
 # user_id, session
 class Session(models.Model):

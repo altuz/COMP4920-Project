@@ -13,6 +13,7 @@ import operator
 
 
 # Retrieves user profile along with game list and wish list
+# TESTED
 @api_view(['GET'])
 def user_prof(request):
     game_list = ""
@@ -73,6 +74,7 @@ def follow_user(request):
 
 
 # Helper function for get game/wishlist
+# TESTED
 def get_list(username, type):
     # retrieve database objects
     try:
@@ -100,6 +102,7 @@ def get_list(username, type):
 
 
 # Get a user's game list
+# TESTED
 @api_view(['POST'])
 def get_gamelist(request):
     json_obj = None
@@ -129,6 +132,7 @@ def get_gamelist(request):
 
 
 # Get a user's wish list
+# TESTED
 @api_view(['POST'])
 def get_wishlist(request):
     json_obj = None
@@ -158,6 +162,7 @@ def get_wishlist(request):
 
 
 # Adding a game to a user's wish or played list
+# TESTED
 @api_view(['POST'])
 def update_userlist(request):
     json_obj = None
@@ -192,6 +197,7 @@ def update_userlist(request):
 
 # curl -d "param1=value1&param2=value2" -X POST http://localhost:3000/data
 @api_view(['POST'])
+# TESTED
 def user_login(request):
     obj = None
     user_entry = None
@@ -243,6 +249,7 @@ def user_login(request):
 
 
 @api_view(['POST'])
+# TESTED
 def check_session(request):
     json_obj = None
     # decode json
@@ -270,6 +277,7 @@ def check_session(request):
         return HttpResponse('{"message":"does not exist or session invalid", "user":{}}')
 
 @api_view(['POST'])
+# TESTED
 def user_logout(request):
     response = HttpResponse('{"message":"success"}')
     response.delete_cookie('session_id')

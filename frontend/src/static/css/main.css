@@ -198,7 +198,7 @@ input {
 
 .search-page-icon {
   height: 80px;
-  bottom: 2px;
+  margin-right: 20px;
 }
 
 .search-bar {
@@ -214,4 +214,12 @@ input {
     font-size: 70px;
     font-weight: 400;
     text-align: center;
+}
+
+
+.searchbar-input{
+  width: 500px;
+  height: 30px;
+  border-radius: 3px;
+  border: 1px solid #4f5968;
 }

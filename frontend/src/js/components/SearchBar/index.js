@@ -4,18 +4,13 @@ class SearchBar extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      username: ''
+      gamename:''
     }
   }
 
-  handleSearch (e) {
-    this.setState({ username: e.target.value })
-  }
-
-  handleGoClick () {
-    if (!this.props.github.isFetchingUser) {
-      this.props.actions.fetchUser(this.state)
-    }
+  handleChange (e) {
+    this.setState({ [e.target.name]: e.target.value });
+    console.log(this.state.gamename);
   }
 
   render () {
@@ -23,16 +18,12 @@ class SearchBar extends Component {
       <div className='searchbar-container'>
         <form onSubmit={e => e.preventDefault()}>
           <input
+            className='searchbar-input'
             type='text'
-            size='40'
-            placeholder='Game name'
-            onChange={this.handleSearch.bind(this)}
+            placeholder='Search By game name'
+            onChange={this.handleChange.bind(this)}
+            name='gamename'
             value={this.state.username} />
-          <button
-            type='submit'
-            onClick={this.handleGoClick.bind(this)}>
-            Search
-          </button>
         </form>
       </div>
     )

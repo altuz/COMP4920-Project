@@ -22,31 +22,31 @@ def user_prof(request):
     try:
         user_entry = User.objects.get(user_name = request.GET['username'])
         user_prof = '''
-            { 
-                "username" : "%s",
-                "user_id" : "%s"
-            }
+            {{ 
+                "username" : "{}",
+                "user_id" : "{}"
+            }}
         '''.format(user_entry.user_name, user_entry.user_id)
     except:
         HttpResponse('{ "user" : {}, "gamelist" : {}, "wishlist" : {} }')
     # Get game list
     try:
-        game_list = get_gamelist(request.GET['username'], True)
+        game_list = get_list(request.GET['username'], True)
     except:
         print("No games")
     # Get wish list
     try:
-        wish_list = get_gamelist(request.GET['username'], False)
+        wish_list = get_list(request.GET['username'], False)
     except:
         print("No wishes")
 
     ret_json = '''
-        {
-            "user" : %s,
-            "gamelist" : [%s],
-            "wishlist" : [%s]
-        }
-    '''.format(user_prof, game_list, wish_list)
+        {{
+            "user" : "{}",
+            "gamelist" : [{}],
+            "wishlist" : [{}]
+        }}
+    '''.format(request.GET['username'], game_list, wish_list)
     return HttpResponse(ret_json)
 
 
@@ -78,7 +78,7 @@ def get_list(username, type):
     try:
         # check if player exist
         # find gamelist related to player
-        player = User.objects.get(username)
+        player = User.objects.get(user_name = username)
         gamelist = None
         if type is True:
             gamelist = PlayerLibrary.objects.filter(user_name=player, played=True)
@@ -90,10 +90,12 @@ def get_list(username, type):
             game = entries.game_id
             g_id = game.game_id
             g_name = game.game_name
-            g_json = '{"game_name":"%s", "game_id":"%s"}'.format(g_name, g_id)
+            g_json = '{{"game_name":"{}", "game_id":"{}"}}'.format(g_name, g_id)
             json_list.append(g_json)
+        print(','.join(json_list))
         return ','.join(json_list)
     except Exception as e:
+        print(e)
         raise e
 
 
@@ -114,19 +116,20 @@ def get_gamelist(request):
         game_list = get_list(json_obj['user']['username'], True)
         # construct json object
         ret_json = '''
-            {
+            {{
                 "message":"success",
                 "gamelist": [
-                    %s
+                    {}
                 ]
-            }
-        '''.format(','.join(game_list))
+            }}
+        '''.format(game_list)
         return HttpResponse(ret_json)
     except:
         return HttpResponse('{"message":"does not exist, "gamelist":[]"}')
 
 
 # Get a user's wish list
+@api_view(['POST'])
 def get_wishlist(request):
     json_obj = None
     # decode json
@@ -139,16 +142,16 @@ def get_wishlist(request):
     try:
         # check if player exist
         # find gamelist related to player
-        game_list = get_list(json_obj['user']['username'], True)
+        game_list = get_list(json_obj['user']['username'], False)
         # construct json object
         ret_json = '''
-            {
+            {{
                 "message":"success",
                 "wishlist": [
-                    %s
+                    {}
                 ]
-            }
-        '''.format(','.join(game_list))
+            }}
+        '''.format(game_list)
         return HttpResponse(ret_json)
     except:
         return HttpResponse('{"message":"does not exist, "wishlist":[]"}')
@@ -170,8 +173,8 @@ def update_userlist(request):
         # Unsuccessful if either check throws does not exist
         player  = User.objects.get(user_name = json_obj['user']['username'])
         game    = GameList.objects.get(game_id = json_obj['user']['gameid'])
-        played  = request.POST.get('played', False)
-        wishes  = request.POST.get('wish', True)
+        played  = json_obj['user']['played']
+        wishes  = json_obj['user']['wish']
         new_entry = PlayerLibrary(user_name = player, game_id = game, wish_list = wishes, played = played)
         new_entry.save()
         return HttpResponse('''
@@ -221,17 +224,17 @@ def user_login(request):
     # response.set_cookie('session_id', user_session);
     # response.set_cookie('username', obj['user']['username'])
     ret_json = '''
-        {
+        {{
             "message" : "success",
-            "user" : {
-                "user_name" : "%s",
-                "email" : "%s"
-            },
-            "cookie" : {
-                "user_name" : "%s",
-                "session" : "%s"
-            }
-        }
+            "user" : {{
+                "user_name" : "{}",
+                "email" : "{}"
+            }},
+            "cookie" : {{
+                "user_name" : "{}",
+                "session" : "{}"
+            }}
+        }}
     '''.format(user_dict['user_name'], user_dict['email'], user_dict['user_name'], user_session)
     new_session = Session(user_id = user_entry, session_id = user_session)
     new_session.save()
@@ -252,7 +255,17 @@ def check_session(request):
     try:
         user_entry = User.objects.get(user_name = json_obj['user']['username'])
         session_entry = Session.objects.get(user_id = user_entry, session_id = json_obj['user']['session_id'])
-        response = HttpResponse(objs_to_json(user_entry))
+        user_dict = user_entry.as_dict()
+        response = '''
+                {{
+                    "message" : "success",
+                    "user" : {{
+                        "user_name" : "{}",
+                        "email" : "{}"
+                    }},
+                }}
+        '''.format(user_dict['user_name'], user_dict['email'])
+        return HttpResponse(response)
     except:
         return HttpResponse('{"message":"does not exist or session invalid", "user":{}}')
 
@@ -261,7 +274,6 @@ def user_logout(request):
     response = HttpResponse('{"message":"success"}')
     response.delete_cookie('session_id')
     response.delete_cookie('username')
-    #TODO: delete db entry
     json_obj = None
     # decode json
     try:

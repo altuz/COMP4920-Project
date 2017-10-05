@@ -49,9 +49,9 @@ export default class Login extends React.Component {
 				return (
 				<div className='user-icon-container'>
 					<img src='static/images/user.svg' className='user-icon'/>
-					<div className='user-detail'>
+					<div className='user-detail logout-user-detail'>
 						Hi,{user.user_name}<br/>
-						<a href='#0' onClick={this.handleClick.bind(this)} className='login logout'>Click to logout</a>
+						<a href='#0' onClick={this.handleClick.bind(this)} className='login logout logout-font'>Click to logout</a>
 					</div>
 				</div>
 			);

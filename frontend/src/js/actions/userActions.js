@@ -6,7 +6,9 @@ export function login(user) {
         user
     })
     .then((response)=>{
+        console.log(response.data);
         if(response.data.message==='success'){
+          localStorage.setItem('cookie', JSON.stringify(response.data.cookie));
             dispatch( {
               type: 'SET_USER',
               payload:response.data.user,
@@ -14,7 +16,7 @@ export function login(user) {
         }
     })
     .catch((err)=>{
-      console.log("error");
+      console.log(err);
     })
     }
 }
@@ -23,6 +25,12 @@ export function logout(){
   return {
     type: 'DELETE_USER',
   }
+}
+
+export function searchGame(keyword){
+    console.log("hehe");
+    const url='http://localhost:8000/backend/search_game/?q='+ keyword + "&category=''";
+    return axios.get(url);
 }
 
 // export function setUserName(name) {

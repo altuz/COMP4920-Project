@@ -219,7 +219,26 @@ input {
 
 .searchbar-input{
   width: 500px;
-  height: 30px;
+  height: 40px;
+  font-size: 20px;
   border-radius: 3px;
   border: 1px solid #4f5968;
+}
+
+.logout-font {
+  font-size: 15px;
+}
+
+.user-detail {
+  margin-left: 60px;
+  padding-top:15px;
+  height: 50px;
+  font-weight: 700;
+}
+
+.logout-user-detail {
+  margin-left: 60px;
+  padding-top:5px;
+  height: 50px;
+  font-weight: 700;
 }

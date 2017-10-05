@@ -11,7 +11,7 @@ export default class Main extends React.Component {
                 SteamR
             </div>
              <div className='input-group search-bar'>
-             todo: bootstrap-react-autosuggest
+             <SearchBar />
              </div>
             </div>
     );

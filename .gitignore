@@ -4,3 +4,5 @@ backend/backend/*.pyc
 backend/backend/__pycache__
 backend/backend/migrations
 .idea/
+backend/steam_data/
+backend/steam_spy_data/

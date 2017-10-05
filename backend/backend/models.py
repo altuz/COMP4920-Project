@@ -20,6 +20,7 @@ class User(models.Model):
             "email": self.email,
             "privacy" : self.privacy
         }
+
 # user_id, session
 class Session(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
@@ -51,19 +52,23 @@ class PlayerLibrary(models.Model):
 class GameList(models.Model):
     game_id = models.IntegerField(primary_key=True, db_index=True)
     game_name = models.TextField(db_index=True)
-    num_player = models.IntegerField()
+    num_player = models.IntegerField(null=True)
     image_url = models.TextField()
     game_description = models.TextField(db_index=True)
-    average_rating = models.FloatField()
-    rating_count = models.IntegerField()
-
+    support_language = models.TextField(null=True)
+    required_age = models.IntegerField()
+    developer = models.TextField(null=True)
+    publisher = models.TextField(null=True)
+    linux = models.BooleanField()
+    mac = models.BooleanField()
+    windows = models.BooleanField()
+    price = models.FloatField(null=True)
+    average_rating = models.FloatField(null=True)
+    rating_count = models.IntegerField(null=True)
 
     class Meta:
         # order the table by number of player descending order, faster for search
         order_with_respect_to = 'num_player'
-
-    def __str__(self):
-        return str(self.game_id) + "/" + str(self.game_name) + "/#player: " + str(self.num_player)
 
     # dict for use with game_search
     def as_dict(self):
@@ -73,17 +78,25 @@ class GameList(models.Model):
             "num_player": self.num_player,
             "image_url": self.image_url,
             "game_description": self.game_description,
+            "support_language": self.support_language,
+            "required_age": self.required_age,
+            "developer": self.developer,
+            "publisher": self.publisher,
+            "linux": self.linux,
+            "mac": self.mac,
+            "windows": self.windows,
+            "price": self.price,
             "average_rating": self.average_rating,
             "rating_count": self.rating_count
         }
 
+    def __str__(self):
+        return str(self.game_id) + "/" + str(self.game_name) + "/" + str(self.num_player)
+
 
 class Categories(models.Model):
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
-    category = models.CharField(max_length=20, db_index=True)
-
-    def __str__(self):
-        return str(self.game_id) + "/" + str(self.category)
+    category = models.TextField(db_index=True)
 
     def as_dict(self):
         return {
@@ -91,6 +104,22 @@ class Categories(models.Model):
             "category": self.category
         }
 
+    def __str__(self):
+        return str(self.game_id) + "/" + str(self.category)
+
+
+class Genres(models.Model):
+    game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
+    genre = models.TextField(db_index=True)
+
+    def as_dict(self):
+        return {
+            "game_id": self.game_id,
+            "genre": self.genre
+        }
+
+    def __str__(self):
+        return str(self.game_id) + "/" + str(self.genre)
 
 
 class Rating(models.Model):

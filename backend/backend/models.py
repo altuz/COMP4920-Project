@@ -57,7 +57,7 @@ class GameList(models.Model):
     average_rating = models.FloatField()
     rating_count = models.IntegerField()
 
-    
+
     class Meta:
         # order the table by number of player descending order, faster for search
         order_with_respect_to = 'num_player'

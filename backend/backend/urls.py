@@ -22,7 +22,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^backend/login/', backend.views.user_login),
     url(r'^backend/register/', backend.views.user_register),
-    url(r'^backend/edit_list/', backend.views.update_userlist),
+    url(r'^backend/edit_list/', backend.views.edit_list),
     url(r'^backend/search_game/', backend.views.search_game),
     url(r'^backend/game_list/', backend.views.get_gamelist),
     url(r'^backend/wish_list/', backend.views.get_wishlist),

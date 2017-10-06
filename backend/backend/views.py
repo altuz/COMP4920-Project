@@ -388,6 +388,7 @@ def activate_user(request, key):
 # Search for games
 # For testing - note: %20 is a space, %2C is a comma in URL character encoding
 # curl -X GET "http://localhost:8000/backend/search_game/?q=for%20left&category=strategy%2CRTS"
+# curl -X GET "http://localhost:8000/backend/search_game/?q=soldier&category="
 @api_view(['GET'])
 def search_game(request):
     """
@@ -487,3 +488,25 @@ def rate_and_review(request):
             }
         ''')
 
+# Gives 5 game recommendations for the given user
+# For testing:
+# curl -X GET "http://localhost:8000/backend/recommend_v1/?userid=TEST_acc"
+@api_view(['GET'])
+def get_recommendations_v1(request):
+    # TODO problem if more than one user has same username, replace below with user_id
+    username = request.GET.get('username') # Get the target user
+    user_entry_dict = User.objects.get(user_name=username).as_dict()
+
+    game_list_dict = PlayerLibrary.objects.get(user_name=user_entry_dict['user_id']).as_dict()
+
+    # Algorithm 1
+    # -----------
+
+    # Step 1: Iterate through above dict, fill another dict with genre count (get genre table working)
+
+    # Step 2: Iterate through genre_dict, add top game of that genre to recommend_dict
+    # if less than 5 genres, recommend more from first until list of 5 is compiled
+
+    # Convert recommend_dict to JSON format and return list of recommended games
+
+    return HttpResponse('{"message":"input invalid", "recommendations":{}}')

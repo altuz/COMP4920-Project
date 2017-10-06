@@ -48,6 +48,14 @@ class PlayerLibrary(models.Model):
     def __str__(self):
         return str(self.user_name) + '/' + str(self.game_id)
 
+    def as_dict(self):
+        return {
+            "user_name": self.user_name,
+            "game_id": self.game_id,
+            "wish_list": self.wish_list,
+            "played": self.played
+        }
+
 
 class GameList(models.Model):
     game_id = models.IntegerField(primary_key=True, db_index=True)

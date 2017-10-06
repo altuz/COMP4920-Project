@@ -1,8 +1,27 @@
 import React from "react";
 // import { connect } from "react-redux";
+import { getDiscover } from '../../actions/userActions.js';
+
 
 
 export default class Main extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      q:'',
+      results:[],
+      fetched : false,
+    }
+  }
+
+  componentWillMount() {
+    getDiscover()
+    .then((res)=>{
+      console.log(res);
+    })
+  }
+
+
   render() {
     return(
       <div >

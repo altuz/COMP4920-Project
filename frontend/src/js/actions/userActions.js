@@ -27,10 +27,20 @@ export function logout(){
   }
 }
 
-export function searchGame(keyword){
+export function searchGame(keyword,isFetched){
     console.log("hehe");
     const url='http://localhost:8000/backend/search_game/?q='+ keyword + "&category=";
-    return axios.get(url);
+    return function(dispatch){
+    axios.get(url)
+        .then((res)=>{
+          console.log("research result",res);
+          dispatch( {
+            type: 'FETCH_RESULT',
+            payload:res.data,
+          })
+          isFetched();
+        });
+    }
 }
 
 export function clearResult(){
@@ -39,6 +49,11 @@ export function clearResult(){
       type:'CLEAR_RESULT',
     })
   }
+}
+
+export function getDiscover() {
+  const url='http://localhost:8000/backend/search_game/?q=&category=';
+  return axios.get(url);
 }
 
 // export function setUserName(name) {
@@ -53,15 +68,4 @@ export function clearResult(){
 //     type: 'SET_USER_AGE',
 //     payload: age,
 //   }
-// }
-// return function(dispatch){
-//   axios.get(url)
-//       .then((res)=>{
-//         console.log("research result",res);
-//         dispatch( {
-//           type: 'FETCH_RESULT',
-//           payload:res.data,
-//         })
-//
-//       });
 // }

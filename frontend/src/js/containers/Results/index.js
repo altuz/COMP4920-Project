@@ -16,10 +16,7 @@ const option = {
 })
 export default class Results extends React.Component {
   constructor (props) {
-    super(props)
-    this.state = {
-      results:this.props.location.state,
-    }
+    super(props);
   }
 
   imageFormatter(cell,row){
@@ -29,12 +26,12 @@ export default class Results extends React.Component {
   };
 
   render() {
-    console.log(this)
     return(
       <div>
-        <BootstrapTable data={this.state.results} options={ option } hover pagination>
-        <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
-        <TableHeaderColumn isKey dataField='game_name' >Game Name</TableHeaderColumn>
+        <BootstrapTable data={this.props.results} options={ option } hover pagination>
+          <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
+          <TableHeaderColumn isKey dataField='game_name' >Game Name</TableHeaderColumn>
+          <TableHeaderColumn dataField='publisher' >Released By</TableHeaderColumn>
         </BootstrapTable>
       </div>
 

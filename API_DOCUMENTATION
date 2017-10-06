@@ -51,6 +51,34 @@ Output:
 
 }
 
+Function: Get top 'n' number of games
+Url: backend/get_top_games/
+Type: GET
+Input: n=number_of_games_requested
+Output:
+{
+    "results":
+    [ // List of results of this format
+        {
+            "game_id": 1,
+            "game_name": "Left 4 dead",
+            "num_player": 23
+            ... other stats
+        },
+        {
+            "game_id": 3,
+            "game_name": "Age of MEme-pires 2",
+            "num_player": 23
+            ... other stats
+        }
+        ...
+        ...
+        // empty if no matches
+
+    ]
+
+}
+
 Function: Get User's Played Game List
 Url: backend/game_list/
 Type: POST

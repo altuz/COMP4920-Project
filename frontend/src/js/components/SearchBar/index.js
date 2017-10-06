@@ -1,13 +1,16 @@
 import React, { Component } from 'react'
-import { searchGame } from '../../actions/userActions.js';
+import { searchGame,clearResult } from '../../actions/userActions.js';
+import { Redirect } from 'react-router-dom';
+import { withRouter } from 'react-router';
 
 
-
-export default class SearchBar extends React.Component {
+class SearchBar extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      q:''
+      q:'',
+      results:[],
+      fetched : false,
     }
   }
 
@@ -20,10 +23,12 @@ export default class SearchBar extends React.Component {
     searchGame(this.state.q)
     .then((res)=>{
       console.log(res);
+      this.setState({
+        results:res.data.results,
+        fetched:true,
+      });
+
     })
-    .catch((err)=>{
-      console.log(err);
-    });
   }
 
   render () {
@@ -38,7 +43,17 @@ export default class SearchBar extends React.Component {
             name='q'
             value={this.state.username} />
         </form>
+        {this.state.fetched &&
+         <Redirect to={{
+           pathname:'/results',
+           state:this.state.results,
+         }} />
+        }
       </div>
     )
   }
 }
+
+export default withRouter(SearchBar);
+
+

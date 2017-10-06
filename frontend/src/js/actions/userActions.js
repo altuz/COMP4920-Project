@@ -29,8 +29,16 @@ export function logout(){
 
 export function searchGame(keyword){
     console.log("hehe");
-    const url='http://localhost:8000/backend/search_game/?q='+ keyword + "&category=''";
+    const url='http://localhost:8000/backend/search_game/?q='+ keyword + "&category=";
     return axios.get(url);
+}
+
+export function clearResult(){
+  return function(dispatch){
+    dispatch( {
+      type:'CLEAR_RESULT',
+    })
+  }
 }
 
 // export function setUserName(name) {
@@ -45,4 +53,15 @@ export function searchGame(keyword){
 //     type: 'SET_USER_AGE',
 //     payload: age,
 //   }
+// }
+// return function(dispatch){
+//   axios.get(url)
+//       .then((res)=>{
+//         console.log("research result",res);
+//         dispatch( {
+//           type: 'FETCH_RESULT',
+//           payload:res.data,
+//         })
+//
+//       });
 // }

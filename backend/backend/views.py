@@ -83,9 +83,9 @@ def get_list(username, type):
         player = User.objects.get(user_name = username)
         gamelist = None
         if type is True:
-            gamelist = PlayerLibrary.objects.filter(user_name=player, played=True)
+            gamelist = PlayerLibrary.objects.filter(user_id=player, played=True)
         else:
-            gamelist = PlayerLibrary.objects.filter(user_name=player, played=False, wish_list=True)
+            gamelist = PlayerLibrary.objects.filter(user_id=player, played=False, wish_list=True)
         json_list = []
         # convert to json list
         for entries in gamelist:
@@ -199,7 +199,7 @@ def update_userlist(request):
         game    = GameList.objects.get(game_id = json_obj['user']['gameid'])
         played  = json_obj['user']['played']
         wishes  = json_obj['user']['wish']
-        new_entry = PlayerLibrary(user_name = player, game_id = game, wish_list = wishes, played = played)
+        new_entry = PlayerLibrary(user_id = player, game_id = game, wish_list = wishes, played = played)
         new_entry.save()
         return HttpResponse('''
             {

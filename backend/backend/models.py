@@ -12,7 +12,7 @@ class User(models.Model):
     num_games = models.IntegerField()
 
     def __str__(self):
-        return self.user_name
+        return str(self.user_id) + "/" + str(self.user_name)
 
     def as_dict(self):
         return {
@@ -49,7 +49,7 @@ class PlayerLibrary(models.Model):
         unique_together = ('user_id', 'game_id')
 
     def __str__(self):
-        return str(self.user_name) + '/' + str(self.game_id)
+        return str(self.user_id) + '/' + str(self.game_id)
 
     def as_dict(self):
         return {
@@ -162,6 +162,8 @@ class Follow(models.Model):
             "follow_id": self.follow_id
         }
 
+    def __str__(self):
+        return str(self.user_id) + "/follows-->/" + str(self.follow_id)
 
 class Register(models.Model):
     user_name = models.CharField(primary_key=True, max_length=15)
@@ -170,6 +172,8 @@ class Register(models.Model):
     privacy = models.BooleanField()
     key = models.TextField(db_index=True)
 
+    def __str__(self):
+        return str(self.user_name) + "/" + str(self.email) + "/" + str(self.pass_word) + "/" + str(self.privacy) + "/" + str(self.key)
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

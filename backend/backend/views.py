@@ -83,9 +83,9 @@ def get_list(username, type):
         player = User.objects.get(user_name = username)
         gamelist = None
         if type is True:
-            gamelist = PlayerLibrary.objects.filter(user_name=player, played=True)
+            gamelist = PlayerLibrary.objects.filter(user_id=player, played=True)
         else:
-            gamelist = PlayerLibrary.objects.filter(user_name=player, played=False, wish_list=True)
+            gamelist = PlayerLibrary.objects.filter(user_id=player, played=False, wish_list=True)
         json_list = []
         # convert to json list
         for entries in gamelist:
@@ -160,6 +160,25 @@ def get_wishlist(request):
     except:
         return HttpResponse('{"message":"does not exist, "wishlist":[]"}')
 
+# Check if in users game list as played and/or wishlist
+# Testing code: Has sample url to test
+# curl -X GET "http://localhost:8000/backend/check_in_userlist/?userid=76561197960530222&gameid=578080&played=true&wishlist=false"
+@api_view(['GET'])
+def check_in_userlist(request):
+    try:
+        user_id = int(request.GET.get('userid'))
+        game_id = int(request.GET.get('gameid'))
+        played = (request.GET.get('played') == "true")
+        wish_list = (request.GET.get('wishlist') == "true")
+
+        test = PlayerLibrary.objects.get(user_id=user_id,
+                                  game_id=game_id,
+                                  played=played,
+                                  wish_list=wish_list)
+        return HttpResponse('{"message":"Success"}')
+    except:
+        return HttpResponse('{"message":"Invalid Request"}')
+
 
 # Adding a game to a user's wish or played list
 # TESTED
@@ -180,7 +199,7 @@ def update_userlist(request):
         game    = GameList.objects.get(game_id = json_obj['user']['gameid'])
         played  = json_obj['user']['played']
         wishes  = json_obj['user']['wish']
-        new_entry = PlayerLibrary(user_name = player, game_id = game, wish_list = wishes, played = played)
+        new_entry = PlayerLibrary(user_id = player, game_id = game, wish_list = wishes, played = played)
         new_entry.save()
         return HttpResponse('''
             {
@@ -392,7 +411,7 @@ def activate_user(request, key):
 # Search for games
 # For testing - note: %20 is a space, %2C is a comma in URL character encoding
 # curl -X GET "http://localhost:8000/backend/search_game/?q=for%20left&category=strategy%2CRTS"
-# curl -X GET "http://localhost:8000/backend/search_game/?q=soldier&category=Multi%2DPlayer" 
+# curl -X GET "http://localhost:8000/backend/search_game/?q=soldier&category=Multi%2DPlayer"
 # curl -X GET "http://localhost:8000/backend/search_game/?q=&category=Multi%2DPlayer%2CCo%2Dop&genre=Action%2CAdventure"
 @api_view(['GET'])
 def search_game(request):
@@ -557,21 +576,19 @@ def rate_and_review(request):
 
 # Gives 5 game recommendations for the given user
 # For testing:
-# curl -X GET "http://localhost:8000/backend/recommend_v1/?userid=TEST_acc"
-
 # TODO refactor below testing html for later
-# curl -X GET "http://localhost:8000/backend/recommend_v1/?username=Axy"
+# curl -X GET "http://localhost:8000/backend/recommend_v1/?userid=a%20regular"
 
 @api_view(['GET'])
 def get_recommendations_v1(request):
     # TODO problem if more than one user has same username, replace below with user_id, need to get others to refactor code
-    username = request.GET.get('username') # Get the target user
-    user_entry_dict = User.objects.get(user_name=username).as_dict()
-
-    game_list_dict = PlayerLibrary.objects.get(user_name=user_entry_dict['user_id']).as_dict()
-    for game in game_list_dict:
-        print(game)
-    # Algorithm 1
+    # username = request.GET.get('username') # Get the target user
+    # user_entry_dict = User.objects.get(user_name=username).as_dict()
+    #
+    # game_list_dict = PlayerLibrary.objects.get(user_name=user_entry_dict['user_id']).as_dict()
+    # for game in game_list_dict:
+    #     print(game)
+    # # Algorithm 1
     # -----------
 
     # Step 1: Iterate through above dict, fill another dict with genre count (get genre table working)
@@ -580,5 +597,11 @@ def get_recommendations_v1(request):
     # if less than 5 genres, recommend more from first until list of 5 is compiled
 
     # Convert recommend_dict to JSON format and return list of recommended games
+
+    # Output Gibberish to Ryan for now ----
+    results = GameList.objects.all()[:5]
+    results_list = [obj.as_dict() for obj in results]  # create a results_list to be converted to JSON format
+    return HttpResponse(json.dumps({"results": results_list}), content_type='application/json')
+    # ---- end gibberish output
 
     return HttpResponse('{"message":"input invalid", "recommendations":{}}')

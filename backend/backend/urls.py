@@ -33,5 +33,6 @@ urlpatterns = [
     url(r'^backend/activate/(/w+)', backend.views.activate_user),
     url(r'^backend/rating/', backend.views.rate_and_review),
     url(r'^backend/recommend_v1/', backend.views.get_recommendations_v1),
-    url(r'^backend/get_top_games/', backend.views.get_top_games)
+    url(r'^backend/get_top_games/', backend.views.get_top_games),
+    url(r'^backend/check_in_userlist/', backend.views.check_in_userlist)
 ]

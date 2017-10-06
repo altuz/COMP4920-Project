@@ -79,6 +79,16 @@ Output:
 
 }
 
+Function: Check User's list
+Url: backend/check_in_userlist/
+Type: GET
+Input: url parameters with userid=the_users_id, gameid=target_gameid, played=string_lowercase_true_or_false, wishlist=string_lowercase_true_or_false
+Sample url: http://localhost:8000/backend/check_in_userlist/?userid=76561197960530222&gameid=578080&played=true&wishlist=false
+Output:
+{"message":"Success"}
+- or -
+{"message":"Invalid Request"}
+
 Function: Get User's Played Game List
 Url: backend/game_list/
 Type: POST

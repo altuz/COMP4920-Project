@@ -67,6 +67,13 @@ DB Link: https://drive.google.com/open?id=0B1v0wP8Fb4XHdnZGM1BLS2xGWmM
 Scraper Link:
 ```sh
 Link: https://drive.google.com/open?id=0B1v0wP8Fb4XHNTRsZEFydzRRN2c
+
+Instruction:
+
+Python 2.7+
+    pip install requests beautifulsoup4 unicodecsv
+
+lxml [Windows](http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml), [other os](http://lxml.de/installation.html)
 ```
 
 ### NOTE TO SELF

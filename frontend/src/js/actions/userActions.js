@@ -52,7 +52,7 @@ export function clearResult(){
 }
 
 export function getDiscover() {
-  const url='http://localhost:8000/backend/search_game/?q=&category=';
+  const url='http://localhost:8000/backend/get_top_games/?n=100';
   return axios.get(url);
 }
 

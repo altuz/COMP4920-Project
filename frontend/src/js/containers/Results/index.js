@@ -25,13 +25,39 @@ export default class Results extends React.Component {
     )
   };
 
+
+  priceFormatter(cell,row){
+    if(cell){
+      return (
+          <div>
+            ${cell}
+          </div>
+
+      )
+    }
+    return (
+        <div>free</div>
+    );
+  };
+
+  rateFormatter(cell,row){
+    return(
+        <div>
+          {cell}%
+        </div>
+    )
+  }
+
   render() {
     return(
       <div>
         <BootstrapTable data={this.props.results} options={ option } hover pagination>
           <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
           <TableHeaderColumn isKey dataField='game_name' >Game Name</TableHeaderColumn>
-          <TableHeaderColumn dataField='publisher' >Released By</TableHeaderColumn>
+          <TableHeaderColumn dataField='publisher' width='200px' >Released By</TableHeaderColumn>
+          <TableHeaderColumn dataField='price' dataFormat={this.priceFormatter} width='80px'>Price</TableHeaderColumn>
+          <TableHeaderColumn dataField='average_rating' dataFormat={this.rateFormatter}>Rating</TableHeaderColumn>
+          <TableHeaderColumn dataField='num_player'>Owners</TableHeaderColumn>
         </BootstrapTable>
       </div>
 

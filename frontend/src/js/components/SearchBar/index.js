@@ -2,16 +2,28 @@ import React, { Component } from 'react'
 import { searchGame,clearResult } from '../../actions/userActions.js';
 import { Redirect } from 'react-router-dom';
 import { withRouter } from 'react-router';
+import { connect } from 'react-redux';
 
-
+@connect((store)=>{
+  return {
+    results: store.games.results,
+  }
+})
 class SearchBar extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       q:'',
-      results:[],
       fetched : false,
     }
+    this.isFetched = this.isFetched.bind(this);
+  }
+
+
+  isFetched(){
+    this.setState({
+      fetched: true,
+    })
   }
 
   handleChange (e) {
@@ -20,18 +32,11 @@ class SearchBar extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
-    searchGame(this.state.q)
-    .then((res)=>{
-      console.log(res);
-      this.setState({
-        results:res.data.results,
-        fetched:true,
-      });
-
-    })
+    this.props.dispatch(searchGame(this.state.q,this.isFetched));
   }
 
   render () {
+    console.log(this.props.results);
     return (
       <div className='searchbar-container'>
         <form onSubmit={this.handleSubmit.bind(this)}>
@@ -46,7 +51,7 @@ class SearchBar extends React.Component {
         {this.state.fetched &&
          <Redirect to={{
            pathname:'/results',
-           state:this.state.results,
+           state: this.props.results,
          }} />
         }
       </div>

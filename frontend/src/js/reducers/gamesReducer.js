@@ -1,9 +1,10 @@
 export default function reducer(state={
-    results: [],
+    results: JSON.parse(localStorage.getItem('results'))||[],
   }, action) {
 
     switch (action.type) {
       case "FETCH_RESULT": {
+        localStorage.setItem('results', JSON.stringify(action.payload.results));
         return {
           ...state,
           results: action.payload.results,

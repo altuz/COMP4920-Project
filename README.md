@@ -59,5 +59,15 @@ Initialise DataBase, script running order
 5. insert_spy_data.py: update database base on all locally downloaded steam spy data
 ```
 
+DB file:
+```sh
+DB Link: https://drive.google.com/open?id=0B1v0wP8Fb4XHdnZGM1BLS2xGWmM
+```
+
+Scraper Link:
+```sh
+Link: https://drive.google.com/open?id=0B1v0wP8Fb4XHNTRsZEFydzRRN2c
+```
+
 ### NOTE TO SELF
 If it goes well and we choose to publically release or make this repo public DON'T put config.py (database details) onto git

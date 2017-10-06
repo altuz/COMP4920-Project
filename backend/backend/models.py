@@ -9,6 +9,7 @@ class User(models.Model):
     email = models.CharField(max_length=30)
     pass_word = models.CharField(max_length=30)
     privacy = models.BooleanField()
+    num_games = models.IntegerField()
 
     def __str__(self):
         return self.user_name
@@ -18,7 +19,8 @@ class User(models.Model):
             "user_id": self.user_id,
             "user_name": self.user_name,
             "email": self.email,
-            "privacy" : self.privacy
+            "privacy" : self.privacy,
+            "num_games": self.num_games
         }
 
 # user_id, session
@@ -35,25 +37,27 @@ class Session(models.Model):
 
 # PlayerLibrary, user_name, game_id, wish_list, played
 class PlayerLibrary(models.Model):
-    user_name = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
+    user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
     wish_list = models.BooleanField()
     played = models.BooleanField()
+    played_hrs = models.IntegerField(null=True)
 
     # meta data is anything that's not a field such as ordering option
     class Meta:  # may need to use indexes
         # user_name and game_id together has to be unique
-        unique_together = ('user_name', 'game_id')
+        unique_together = ('user_id', 'game_id')
 
     def __str__(self):
         return str(self.user_name) + '/' + str(self.game_id)
 
     def as_dict(self):
         return {
-            "user_name": self.user_name,
+            "user_id": self.user_id,
             "game_id": self.game_id,
             "wish_list": self.wish_list,
-            "played": self.played
+            "played": self.played,
+            "played_hrs": self.played_hrs
         }
 
 
@@ -133,7 +137,7 @@ class Genres(models.Model):
 class Rating(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
-    rate = models.IntegerField()
+    rate = models.BooleanField()
     comment = models.TextField(null=True)  # comment can be null
     rated_time = models.DateTimeField(auto_now_add=True)  # add current time stamp
 

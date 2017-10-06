@@ -43,6 +43,7 @@ export function signup(user){
     .then((response)=>{
         console.log(response.data);
         if(response.data.message==='success'){
+          //localStorage.setItem('cookie', JSON.stringify(response.data.cookie));
             dispatch( {
               type: 'SET_USER',
               payload:response.data.user,
@@ -57,9 +58,10 @@ export function signup(user){
 
 export function getProfile(username){
   console.log("get profile run");
-  const url = 'http://localhost:8000/backend/user_prof/'+ username ;
+  const url = 'http://localhost:8000/backend/user_prof/username='+ username ;
   return axios.get(url);
 }
+
 // export function setUserName(name) {
 //   return {
 //     type: 'SET_USER_NAME',

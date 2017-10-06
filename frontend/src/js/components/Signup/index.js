@@ -34,7 +34,7 @@ export default class SignupForm extends React.Component {
         );
     }
 
-    //check password 
+    //check password
     checkPassword(passwordconfirm)
     {
         if (this.state.password === passwordconfirm)

@@ -5,6 +5,7 @@ import Nav from "./Nav";
 import Search from "../../containers/Search";
 import Discover from "../../containers/Discover";
 import Profile from "../../containers/Profile";
+import Results from "../Results";
 
 
 export default class Main extends React.Component {
@@ -17,7 +18,8 @@ export default class Main extends React.Component {
                 <Route exact path='/' render={() => <Redirect to='/search'/>} />
                 <Route path='/discover' component={Discover} />
                 <Route path='/search' component={Search} />
-                <Route path='/profile' component={Profile}/>
+                <Route path='/profile' component={Profile} />
+                <Route path='/results' component={Results} />
             </Switch>
         </div>
       </div>

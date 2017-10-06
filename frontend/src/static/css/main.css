@@ -71,7 +71,7 @@ input {
 
 .content {
   margin: 55px 0 0 230px;
-  padding: 30px 60px;
+  padding: 20px;
 }
 
 .sidebar {
@@ -241,4 +241,9 @@ input {
   padding-top:5px;
   height: 50px;
   font-weight: 700;
+}
+
+
+.img_col{
+  padding:0;
 }

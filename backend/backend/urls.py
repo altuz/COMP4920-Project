@@ -31,5 +31,6 @@ urlpatterns = [
     url(r'^backend/logout/', backend.views.user_logout),
     url(r'^backend/user_prof/', backend.views.user_prof),
     url(r'^backend/activate/(/w+)', backend.views.activate_user),
-    url(r'^backend/rating/', backend.views.rate_and_review)
+    url(r'^backend/rating/', backend.views.rate_and_review),
+    url(r'^backend/recommend_v1/', backend.views.get_recommendations_v1)
 ]

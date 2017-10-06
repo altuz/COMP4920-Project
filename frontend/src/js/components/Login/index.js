@@ -44,7 +44,6 @@ export default class Login extends React.Component {
 
 	  render() {
 			const { user,fetched } = this.props;
-			console.log(fetched);
 			if(fetched) {
 				return (
 				<div className='user-icon-container'>

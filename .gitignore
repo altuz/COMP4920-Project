@@ -6,3 +6,4 @@ backend/backend/migrations
 .idea/
 backend/steam_data/
 backend/steam_spy_data/
+backend/mysqlite.db

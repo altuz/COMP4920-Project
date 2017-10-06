@@ -52,9 +52,38 @@ export function clearResult(){
 }
 
 export function getDiscover() {
-  const url='http://localhost:8000/backend/search_game/?q=&category=';
+  const url='http://localhost:8000/backend/get_top_games/?n=100';
   return axios.get(url);
 }
+
+
+export function signup(user){
+  console.log(user);
+  return function(dispatch){
+    axios.post('http://localhost:8000/backend/register/',{
+        user
+    })
+    .then((response)=>{
+        console.log(response.data);
+        if(response.data.message==='success'){
+            dispatch( {
+              type: 'SET_USER',
+              payload:response.data.user,
+            })
+        }
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+    }
+}
+
+export function getProfile(username){
+  console.log("get profile run");
+  const url = 'http://localhost:8000/backend/user_prof/username='+ username ;
+  return axios.get(url);
+}
+
 
 // export function setUserName(name) {
 //   return {

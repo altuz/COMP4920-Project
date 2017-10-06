@@ -352,30 +352,34 @@ def user_register(request):
 
     if obj is not None:
         # check user existence
-        exist_user = User(user_name=obj['user_name'])
-        if exist_user is not None:
-            return HttpResponse(msg_to_json("user already exist"))
-
-        # create new user for the register table and get info from the request
-        key = blake2b("%s,%s,%s" % (obj['user_name'], obj['email'], obj['pass_word']))  # key send to the user
-        link = "http://domainName.com/activate/" + key
-
-        # send activation email
         try:
-            server = smtplib.SMTP('smtp.gmail.com:587')
-            server.starttls()
-            server.login('yun553966858@gmail.com', 'asdqwienvlasdkf')
-            message = 'Subject: {}\n\n{}'.format("SteamR Registration",
-                                                 "User Name: %s\nActivation Link: %s\n" % (obj['user_name'], link))
-            server.sendmail('SteamR Team', obj['email'], message)
-            server.quit()
-        except smtplib.SMTPException:
-            return HttpResponse(msg_to_json("fail to send email"))
+            exist_user = User.objects.get(user_name=obj['user']['user_name'])
+        #print(exist_user)
+            return HttpResponse(msg_to_json("user already exist"))
+        except:
+            # create new user for the register table and get info from the request
+            user_name=obj['user']['user_name']
+            password = obj['user']['pass_word']
+            key = blake2b((user_name + password).encode('utf-8')).hexdigest()  # key send to the user
+            link = "http://domainName.com/activate/" + key
 
-        new_register = Register(user_name=obj['user_name'], email=obj['email'],
-                                pass_word=obj['pass_word'], privacy=obj['privacy'], key=key)
-        new_register.save()
-        return HttpResponse(msg_to_json("register created successfully"))
+            # send activation email
+            try:
+                server = smtplib.SMTP('smtp.gmail.com:587')
+                server.starttls()
+                server.login('yun553966858@gmail.com', 'asdqwienvlasdkf')
+                message = 'Subject: {}\n\n{}'.format("SteamR Registration",
+                                                 "User Name: %s\nActivation Link: %s\n" % (obj['user']['user_name'], link))
+                server.sendmail('SteamR Team', obj['user']['email'], message)
+                server.quit()
+            except smtplib.SMTPException:
+                return HttpResponse(msg_to_json("fail to send email"))
+
+            new_register = Register(user_name=obj['user']['user_name'], email=obj['user']['email'],
+                                pass_word=obj['user']['pass_word'], privacy=obj['user']['privacy'], key=key)
+            new_register.save()
+            print(new_register)
+            return HttpResponse(msg_to_json("register created successfully"))
     else:
         return HttpResponse(msg_to_json("json loading failed"))
 

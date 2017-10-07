@@ -393,19 +393,21 @@ def activate_user(request, key):
     :param key: activation key
     :return: if activation key exist create the user account in the table and return true, else return json no exist
     """
-    exist_register = Register(key=key)
-    if exist_register is None:
-        return HttpResponse(msg_to_json("no exist"))
+    try:
+        exist_register = Register.objects.get(key=request.GET['key'])
 
-    # create the new user
-    new_user = User(user_name=exist_register.user_name, email=exist_register.email,
+
+         # create the new user
+        new_user = User(user_name=exist_register.user_name, email=exist_register.email,
                     pass_word=exist_register.pass_word, privacy=exist_register.privacy)
-    new_user.save()
+        new_user.save()
 
-    # delete entry in the register table
-    exist_register.delete()
+        # delete entry in the register table
+        exist_register.delete()
     
-    return HttpResponse(msg_to_json("used activated"))
+        return HttpResponse(msg_to_json("used activated"))
+    except:
+        return HttpResponse(msg_to_json("request failed"))
 
 
 # Search for games

@@ -238,6 +238,17 @@ def login(request):
         except:
             return HttpResponse('{"message":"does not exist", "user":{}}')
 
+    # Get game list
+    try:
+        game_list = get_list(request.GET['username'], True)
+    except:
+        print("No games")
+    # Get wish list
+    try:
+        wish_list = get_list(request.GET['username'], False)
+    except:
+        print("No wishes")
+
     # Session
     # user_id
     # session_id
@@ -257,9 +268,11 @@ def login(request):
             "cookie" : {{
                 "user_name" : "{}",
                 "session" : "{}"
-            }}
+            }},
+            "gamelist" : [{}],
+            "wishlist" : [{}]
         }}
-    '''.format(user_dict['user_name'], user_dict['email'], user_dict['user_name'], user_session)
+    '''.format(user_dict['user_name'], user_dict['email'], user_dict['user_name'], user_session, game_list, wish_list)
     new_session = Session(user_id = user_entry, session_id = user_session)
     new_session.save()
     response = HttpResponse(ret_json)

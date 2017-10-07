@@ -606,3 +606,30 @@ def recommend_v1(request):
     # ---- end gibberish output
 
     return HttpResponse('{"message":"input invalid", "recommendations":{}}')
+# given json contain username, email, and password
+@api_view(['POST'])
+def edit_profile(request):
+    print("user edit function is running ...")
+    print("")
+    obj = None
+    try:
+        obj = json.loads(request.body.decode())
+    except:
+        print("Error when loading the Json")
+        pass
+    if obj is not None:
+        # get new email and password
+        username = obj['edit']['email']
+        user = User.objects.get(user_name =username)
+        try:
+            email = obj['edit']['email']
+            user.email = email
+            user.save()
+        #pass new value of email and password
+        except:
+            try:
+                password = obj['edit']['password']
+                user.pass_word = password
+                user.save()
+            except:
+                return HttpResponse('{"message": error happen")

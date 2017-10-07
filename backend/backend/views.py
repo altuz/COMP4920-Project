@@ -376,7 +376,7 @@ def register(request):
             user_name=obj['user']['user_name']
             password = obj['user']['pass_word']
             key = blake2b((user_name + password).encode('utf-8')).hexdigest()  # key send to the user
-            link = "http://domainName.com/activate/" + key
+            link = "http://localhost:8090/activate/" + key
 
             # send activation email
             try:
@@ -620,8 +620,9 @@ def recommend_v1(request):
     results_list = [obj.as_dict() for obj in results]  # create a results_list to be converted to JSON format
     return HttpResponse(json.dumps({"results": results_list}), content_type='application/json')
     # ---- end gibberish output
-
     return HttpResponse('{"message":"input invalid", "recommendations":{}}')
+
+
 # given json contain username, email, and password
 @api_view(['POST'])
 def edit_profile(request):
@@ -630,22 +631,42 @@ def edit_profile(request):
     obj = None
     try:
         obj = json.loads(request.body.decode())
+        print("decode success")
     except:
         print("Error when loading the Json")
         pass
+
     if obj is not None:
-        # get new email and password
-        username = obj['edit']['email']
-        user = User.objects.get(user_name =username)
+        # get user data
+        username = obj['edit']['username']
+        e = obj['edit']['email']
+        p= obj['edit']['password']
+
+        print("get the username:" +username)
+        print("get the email:" + e)
+        print("get the password:" + p)
         try:
-            email = obj['edit']['email']
-            user.email = email
-            user.save()
-        #pass new value of email and password
-        except:
+            user = User.objects.get(user_name=obj['edit']['username'])
             try:
-                password = obj['edit']['password']
-                user.pass_word = password
+                email = obj['edit']['email']
+                user.email = email
                 user.save()
+                try:
+                    password = obj['edit']['password']
+                    user.pass_word = password
+                    user.save()
+                    return HttpResponse('{"message": "change password and email"}')
+                except:
+                    return HttpResponse('{"message": "change email"}')
+            #pass new value of email and password
             except:
-                return HttpResponse('{"message": "error happen"}')
+                try:
+                    password = obj['edit']['password']
+                    user.pass_word = password
+                    user.save()
+                    return HttpResponse('{"message": "change password"}')
+                except:
+                    return HttpResponse('{"message": "no change occurs"}')
+            return HttpResponse('{"message": "no change occurs"}')
+        except:
+            return HttpResponse('{"message": "no user"}')

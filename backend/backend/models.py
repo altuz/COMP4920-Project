@@ -6,10 +6,10 @@ from rest_framework import serializers
 class User(models.Model):
     user_id = models.AutoField(primary_key=True, db_index=True)
     user_name = models.CharField(max_length=15, db_index=True)
-    email = models.CharField(max_length=30)
-    pass_word = models.CharField(max_length=30)
-    privacy = models.BooleanField()
-    num_games = models.IntegerField()
+    email = models.CharField(max_length=30, db_index=True)
+    pass_word = models.CharField(max_length=30, db_index=True)
+    privacy = models.BooleanField(db_index=True)
+    num_games = models.IntegerField(db_index=True)
 
     def __str__(self):
         return str(self.user_id) + "/" + str(self.user_name)
@@ -39,9 +39,9 @@ class Session(models.Model):
 class PlayerLibrary(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
-    wish_list = models.BooleanField()
-    played = models.BooleanField()
-    played_hrs = models.IntegerField(null=True)
+    wish_list = models.BooleanField(db_index=True)
+    played = models.BooleanField(db_index=True)
+    played_hrs = models.IntegerField(null=True, db_index=True)
 
     # meta data is anything that's not a field such as ordering option
     class Meta:  # may need to use indexes
@@ -64,19 +64,19 @@ class PlayerLibrary(models.Model):
 class GameList(models.Model):
     game_id = models.IntegerField(primary_key=True, db_index=True)
     game_name = models.TextField(db_index=True)
-    num_player = models.IntegerField(null=True)
-    image_url = models.TextField()
+    num_player = models.IntegerField(null=True, db_index=True)
+    image_url = models.TextField(db_index=True)
     game_description = models.TextField(db_index=True)
-    support_language = models.TextField(null=True)
-    required_age = models.IntegerField()
-    developer = models.TextField(null=True)
-    publisher = models.TextField(null=True)
-    linux = models.BooleanField()
-    mac = models.BooleanField()
-    windows = models.BooleanField()
-    price = models.FloatField(null=True)
-    average_rating = models.FloatField(null=True)
-    rating_count = models.IntegerField(null=True)
+    support_language = models.TextField(null=True, db_index=True)
+    required_age = models.IntegerField(db_index=True)
+    developer = models.TextField(null=True, db_index=True)
+    publisher = models.TextField(null=True, db_index=True)
+    linux = models.BooleanField(db_index=True)
+    mac = models.BooleanField(db_index=True)
+    windows = models.BooleanField(db_index=True)
+    price = models.FloatField(null=True, db_index=True)
+    average_rating = models.FloatField(null=True, db_index=True)
+    rating_count = models.IntegerField(null=True, db_index=True)
 
     class Meta:
         # order the table by number of player descending order, faster for search
@@ -138,9 +138,9 @@ class Genres(models.Model):
 class Rating(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_index=True)
     game_id = models.ForeignKey('GameList', on_delete=models.CASCADE, db_index=True)
-    rate = models.BooleanField()
-    comment = models.TextField(null=True)  # comment can be null
-    rated_time = models.DateTimeField(auto_now_add=True)  # add current time stamp
+    rate = models.BooleanField(db_index=True)
+    comment = models.TextField(null=True, db_index=True)  # comment can be null
+    rated_time = models.DateTimeField(auto_now_add=True, db_index=True)  # add current time stamp
 
     def as_dict(self):
         return {
@@ -166,10 +166,10 @@ class Follow(models.Model):
         return str(self.user_id) + "/follows-->/" + str(self.follow_id)
 
 class Register(models.Model):
-    user_name = models.CharField(primary_key=True, max_length=15)
-    email = models.CharField(max_length=30)
-    pass_word = models.CharField(max_length=30)
-    privacy = models.BooleanField()
+    user_name = models.CharField(primary_key=True, max_length=15, db_index=True)
+    email = models.CharField(max_length=30, db_index=True)
+    pass_word = models.CharField(max_length=30, db_index=True)
+    privacy = models.BooleanField(db_index=True)
     key = models.TextField(db_index=True)
 
     def __str__(self):

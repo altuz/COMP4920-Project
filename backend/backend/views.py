@@ -243,12 +243,12 @@ def login(request):
     wish_list = ""
     # Get game list
     try:
-        game_list = get_list(request.GET['username'], True)
+        game_list = get_list(obj['user']['username'], True)
     except:
         print("No games")
     # Get wish list
     try:
-        wish_list = get_list(request.GET['username'], False)
+        wish_list = get_list(obj['user']['username'], False)
     except:
         print("No wishes")
 

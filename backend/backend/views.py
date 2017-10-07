@@ -11,7 +11,6 @@ import json
 import time
 import operator
 
-
 # Retrieves user profile along with game list and wish list
 # TESTED
 @api_view(['GET'])
@@ -183,7 +182,7 @@ def check_in_userlist(request):
 # Adding a game to a user's wish or played list
 # TESTED
 @api_view(['POST'])
-def update_userlist(request):
+def edit_list(request):
     json_obj = None
     try:
         json_obj = json.loads(request.body.decode())
@@ -217,7 +216,7 @@ def update_userlist(request):
 # curl -d "param1=value1&param2=value2" -X POST http://localhost:3000/data
 @api_view(['POST'])
 # TESTED
-def user_login(request):
+def login(request):
     obj = None
     user_entry = None
     #Check if user is activated
@@ -269,7 +268,7 @@ def user_login(request):
 
 @api_view(['POST'])
 # TESTED
-def check_session(request):
+def session_check(request):
     json_obj = None
     # decode json
     try:
@@ -297,7 +296,7 @@ def check_session(request):
 
 @api_view(['POST'])
 # TESTED
-def user_logout(request):
+def logout(request):
     response = HttpResponse('{"message":"success"}')
     response.delete_cookie('session_id')
     response.delete_cookie('username')
@@ -335,7 +334,7 @@ def msg_to_json(msg):
 
 # user Registration
 @api_view(['POST'])
-def user_register(request):
+def register(request):
     """
     post method function, get user information and put him in register table
     :param request: the request object
@@ -386,7 +385,7 @@ def user_register(request):
 
 # activate user, put user into user table
 @api_view(['GET'])
-def activate_user(request, key):
+def activate(request, key):
     """
     function that try to sign up a registered user (activate a user)
     :param request:
@@ -545,7 +544,7 @@ def get_average_rating(request):
 # curl -d '{"rating": {"username":"IHMS","gameid":4, "rate":4, "comment":"mada mada"} }' -X POST "http://localhost:8000/backend/rating/"
 # curl http://localhost:8000/backend/login/ -X POST -d '{"user":{"username":"IHMS","password":"123456"}}'
 @api_view(['POST'])
-def rate_and_review(request):
+def rating(request):
     json_obj = None
     try:
         json_obj = json.loads(request.body.decode())
@@ -582,7 +581,7 @@ def rate_and_review(request):
 # curl -X GET "http://localhost:8000/backend/recommend_v1/?userid=a%20regular"
 
 @api_view(['GET'])
-def get_recommendations_v1(request):
+def recommend_v1(request):
     # TODO problem if more than one user has same username, replace below with user_id, need to get others to refactor code
     # username = request.GET.get('username') # Get the target user
     # user_entry_dict = User.objects.get(user_name=username).as_dict()

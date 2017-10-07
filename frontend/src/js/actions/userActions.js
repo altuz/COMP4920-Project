@@ -78,11 +78,6 @@ export function signup(user){
     }
 }
 
-export function getProfile(username){
-  console.log("get profile run");
-  const url = 'http://localhost:8000/backend/user_prof/username='+ username ;
-  return axios.get(url);
-}
 
 
 // export function setUserName(name) {

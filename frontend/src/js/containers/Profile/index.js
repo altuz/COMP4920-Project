@@ -51,16 +51,5 @@ export default class Profile extends React.Component {
 			</div>
 			);
 		}
-		else
-		{
-			return(
-				<div className="content">
-					<p> Please Login</p>
-				</div>
-				);
-		}
-
-
-
 	}
 }

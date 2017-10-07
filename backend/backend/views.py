@@ -645,4 +645,4 @@ def edit_profile(request):
                 user.pass_word = password
                 user.save()
             except:
-                return HttpResponse('{"message": error happen")
+                return HttpResponse('{"message": "error happen"}')

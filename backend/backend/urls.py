@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'^backend/session_check/', backend.views.session_check),
     url(r'^backend/logout/', backend.views.logout),
     url(r'^backend/user_prof/', backend.views.user_prof), 
-    url(r'^backend/activate/(/w+)', backend.views.activate), 
+    url(r'^backend/activate/(\w+)', backend.views.activate), 
     url(r'^backend/rating/', backend.views.rating),
     url(r'^backend/recommend_v1/', backend.views.recommend_v1),
     url(r'^backend/get_top_games/', backend.views.get_top_games),

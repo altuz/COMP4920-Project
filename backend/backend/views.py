@@ -238,6 +238,20 @@ def login(request):
         except:
             return HttpResponse('{"message":"does not exist", "user":{}}')
 
+    # Initialise values
+    game_list = ""
+    wish_list = ""
+    # Get game list
+    try:
+        game_list = get_list(obj['user']['username'], True)
+    except:
+        print("No games")
+    # Get wish list
+    try:
+        wish_list = get_list(obj['user']['username'], False)
+    except:
+        print("No wishes")
+
     # Session
     # user_id
     # session_id
@@ -257,9 +271,11 @@ def login(request):
             "cookie" : {{
                 "user_name" : "{}",
                 "session" : "{}"
-            }}
+            }},
+            "gamelist" : [{}],
+            "wishlist" : [{}]
         }}
-    '''.format(user_dict['user_name'], user_dict['email'], user_dict['user_name'], user_session)
+    '''.format(user_dict['user_name'], user_dict['email'], user_dict['user_name'], user_session, game_list, wish_list)
     new_session = Session(user_id = user_entry, session_id = user_session)
     new_session.save()
     response = HttpResponse(ret_json)
@@ -360,7 +376,7 @@ def register(request):
             user_name=obj['user']['user_name']
             password = obj['user']['pass_word']
             key = blake2b((user_name + password).encode('utf-8')).hexdigest()  # key send to the user
-            link = "http://domainName.com/activate/" + key
+            link = "http://localhost:8090/activate/" + key
 
             # send activation email
             try:
@@ -605,5 +621,53 @@ def recommend_v1(request):
     results_list = [obj.as_dict() for obj in results]  # create a results_list to be converted to JSON format
     return HttpResponse(json.dumps({"results": results_list}), content_type='application/json')
     # ---- end gibberish output
-
     return HttpResponse('{"message":"input invalid", "recommendations":{}}')
+
+
+# given json contain username, email, and password
+@api_view(['POST'])
+def edit_profile(request):
+    print("user edit function is running ...")
+    print("")
+    obj = None
+    try:
+        obj = json.loads(request.body.decode())
+        print("decode success")
+    except:
+        print("Error when loading the Json")
+        pass
+
+    if obj is not None:
+        # get user data
+        username = obj['edit']['username']
+        e = obj['edit']['email']
+        p= obj['edit']['password']
+
+        print("get the username:" +username)
+        print("get the email:" + e)
+        print("get the password:" + p)
+        try:
+            user = User.objects.get(user_name=obj['edit']['username'])
+            try:
+                email = obj['edit']['email']
+                user.email = email
+                user.save()
+                try:
+                    password = obj['edit']['password']
+                    user.pass_word = password
+                    user.save()
+                    return HttpResponse('{"message": "change password and email"}')
+                except:
+                    return HttpResponse('{"message": "change email"}')
+            #pass new value of email and password
+            except:
+                try:
+                    password = obj['edit']['password']
+                    user.pass_word = password
+                    user.save()
+                    return HttpResponse('{"message": "change password"}')
+                except:
+                    return HttpResponse('{"message": "no change occurs"}')
+            return HttpResponse('{"message": "no change occurs"}')
+        except:
+            return HttpResponse('{"message": "no user"}')

@@ -194,7 +194,7 @@ def edit_list(request):
         # Checks if player exist in database
         # Checks if game exist in database
         # Unsuccessful if either check throws does not exist
-        player  = User.objects.get(user_name = json_obj['user']['username'])
+        player  = User.objects.get(user_name = json_obj['user']['userid'])
         game    = GameList.objects.get(game_id = json_obj['user']['gameid'])
         played  = json_obj['user']['played']
         wishes  = json_obj['user']['wish']

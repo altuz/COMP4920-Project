@@ -238,6 +238,9 @@ def login(request):
         except:
             return HttpResponse('{"message":"does not exist", "user":{}}')
 
+    # Initialise values
+    game_list = ""
+    wish_list = ""
     # Get game list
     try:
         game_list = get_list(request.GET['username'], True)

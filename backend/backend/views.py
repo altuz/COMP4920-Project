@@ -424,81 +424,82 @@ def search_game(request):
     print("search game function is running ...")
     print("")
     # TODO check if try-catch is slow
-    try:
-        query = request.GET.get('q')
-        category = request.GET.get('category')
-        genre = request.GET.get('genre')
+    # try:
+    query = request.GET.get('q')
+    category = request.GET.get('category')
+    genre = request.GET.get('genre')
 
-        # Step 1: Filter by keyword
-        if query:
-            query_list = query.split(" ")
-            results = GameList.objects.filter(
-                reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
-            )# Returns a QuerySet
-        else:
-            results = GameList.objects.all() # Return all the results if no key words are given
+    # Step 1: Filter by keyword
+    if query:
+        query_list = query.split(" ")
+        results = GameList.objects.filter(
+            reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
+        )# Returns a QuerySet
+    else:
+        results = GameList.objects.all() # Return all the results if no key words are given
 
-        # Step 2: Filter by category
-        if category:
-            category_list = category.split(",")
-            catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
-            catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches and assign a 'mathes' column to store count
-            catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
+    # Step 2: Filter by category
+    if category:
+        category_list = category.split(",")
+        catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
+        catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches and assign a 'mathes' column to store count
+        catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
 
-            results = results.filter(game_id__in=catObjs.values('game_id')) # Filter previous results from previous filter
+        results = results.filter(game_id__in=catObjs.values('game_id')) # Filter previous results from previous filter
 
-        # Step 3: Filter by genre
-        # TODO need to test more, for multiply genres
-        if genre:
-            genre_list = genre.split(",")
-            genreObjsUnion = Genres.objects.filter(reduce(operator.or_, (Q(genre__iexact=g) for g in genre_list)))
-            genreObjs = genreObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches and assign a 'mathes' column to store count
-            genreObjs = genreObjs.filter(matches__exact=len(genre_list)) # Filter to get ONLY games that match ALL given genre tags
+    # Step 3: Filter by genre
+    # TODO need to test more, for multiply genres
+    if genre:
+        genre_list = genre.split(",")
+        genreObjsUnion = Genres.objects.filter(reduce(operator.or_, (Q(genre__iexact=g) for g in genre_list)))
+        genreObjs = genreObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches and assign a 'mathes' column to store count
+        genreObjs = genreObjs.filter(matches__exact=len(genre_list)) # Filter to get ONLY games that match ALL given genre tags
 
-            results = results.filter(game_id__in=genreObjs.values('game_id'))  # Filter previous results from previous filter
+        results = results.filter(game_id__in=genreObjs.values('game_id'))  # Filter previous results from previous filter
 
-        # print("new method " + str(len(results)))
+    # print("new method " + str(len(results)))
 
-        # ---- Version 1 ----
-        # if category: # Add category filter
-        #     category_list = category.split(",")
-        #
-        #     catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
-        #     catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches
-        #     catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
-        #
-        #     if query:
-        #         query_list = query.split()
-        #         results = GameList.objects.filter(reduce(operator.and_, (Q(game_name__icontains=q) for q in query_list)),
-        #                                           game_id__in=catObjs.values('game_id'))
-        #     else:
-        #         results = GameList.objects.filter(game_id__in=catObjs.values('game_id')) # All games of those categories
-        # else: # No category filter
-        #     if query:
-        #         query_list = query.split()
-        #         results = GameList.objects.filter(
-        #             reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
-        #         )# Returns a QuerySet
-        #     else:
-        #         results = GameList.objects.all() # TODO discuss with group what they want with empty query, atm returns everything
-        # print("old method " + str(len(results)))
-        # ---- End Version 1
+    # ---- Version 1 ----
+    # if category: # Add category filter
+    #     category_list = category.split(",")
+    #
+    #     catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
+    #     catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches
+    #     catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
+    #
+    #     if query:
+    #         query_list = query.split()
+    #         results = GameList.objects.filter(reduce(operator.and_, (Q(game_name__icontains=q) for q in query_list)),
+    #                                           game_id__in=catObjs.values('game_id'))
+    #     else:
+    #         results = GameList.objects.filter(game_id__in=catObjs.values('game_id')) # All games of those categories
+    # else: # No category filter
+    #     if query:
+    #         query_list = query.split()
+    #         results = GameList.objects.filter(
+    #             reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
+    #         )# Returns a QuerySet
+    #     else:
+    #         results = GameList.objects.all() # TODO discuss with group what they want with empty query, atm returns everything
+    # print("old method " + str(len(results)))
+    # ---- End Version 1
 
-        # debugging -----
-        # for result in results:
-        #     game = result.as_dict()
-        #     print(game['game_name'])
-        #
-        # print("list of genres")
-        # genres = Genres.objects.values('genre').distinct()
-        # for genre in genres:
-        #     print(genre)
-        # ---- end debugging
-        # Put 'results' querySet into dict format to convert into JSON dict
-        results_list = [obj.as_dict() for obj in results]
-        return HttpResponse(json.dumps({"results": results_list}), content_type='application/json')
-    except:
-        return HttpResponse('{"message":"input invalid", "search-games":{}}')
+    # debugging -----
+    # for result in results:
+    #     game = result.as_dict()
+    #     print(game['game_name'])
+    #
+    # print("list of genres")
+    # genres = Genres.objects.values('genre').distinct()
+    # for genre in genres:
+    #     print(genre)
+    # ---- end debugging
+    # Put 'results' querySet into dict format to convert into JSON dict
+    results_list = [obj.as_dict() for obj in results]
+    outputJSON = json.dumps({"results": results_list},ensure_ascii=False).encode('utf16')
+    return HttpResponse(outputJSON, content_type='application/json')
+    # except:
+    #     return HttpResponse('{"message":"input invalid", "search-games":{}}')
 
 # Get the top "n" number of games
 # curl -X GET "http://localhost:8000/backend/get_top_games/?n=100"
@@ -513,7 +514,8 @@ def get_top_games(request):
         #     obj = result.as_dict()
         #     print(obj['game_name'] + " / " + str(obj['num_player']))
         # # ---- end debugging
-        return HttpResponse(json.dumps({"results": results_list}), content_type='application/json')
+        outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf16')
+        return HttpResponse(outputJSON, content_type='application/json')
     except:
         return HttpResponse('{"message":"input invalid", "get-top-games":{}}')
 
@@ -578,17 +580,16 @@ def rating(request):
 # Gives 5 game recommendations for the given user
 # For testing:
 # TODO refactor below testing html for later
-# curl -X GET "http://localhost:8000/backend/recommend_v1/?userid=a%20regular"
+# curl -X GET "http://localhost:8000/backend/recommend_v1/?userid=76561197960530222"
 
 @api_view(['GET'])
 def recommend_v1(request):
     # TODO problem if more than one user has same username, replace below with user_id, need to get others to refactor code
-    # username = request.GET.get('username') # Get the target user
-    # user_entry_dict = User.objects.get(user_name=username).as_dict()
-    #
-    # game_list_dict = PlayerLibrary.objects.get(user_name=user_entry_dict['user_id']).as_dict()
-    # for game in game_list_dict:
-    #     print(game)
+    user_id = request.GET.get('userid') # Get the target user
+    game_set = PlayerLibrary.objects.filter(user_id=user_id)
+    for game in game_set:
+        print(game)
+
     # # Algorithm 1
     # -----------
 

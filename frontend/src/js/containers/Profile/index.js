@@ -3,7 +3,12 @@ import {Button, Media, Tab, Tabs, Nav} from 'react-bootstrap';
 import Edit  from "./EditProfile"
 import { connect } from 'react-redux';
 
-
+@connect((store) => {
+	return {
+		user: store.user.user,
+		fetched: store.user.fetched,
+	};
+})
 
 export default class Profile extends React.Component {
 	constructor(props){

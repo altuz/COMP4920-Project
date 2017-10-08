@@ -11,43 +11,46 @@ import json
 import time
 import operator
 
-# Retrieves user profile along with game list and wish list
-# TESTED
-@api_view(['GET'])
-def user_prof(request):
+
+def user_prof_helper(username):
     game_list = ""
     wish_list = ""
     user_prof = ""
     # Get user
     try:
-        user_entry = User.objects.get(user_name = request.GET['username'])
+        user_entry = User.objects.get(user_name=username)
         user_prof = '''
-            {{ 
-                "username" : "{}",
-                "user_id" : "{}"
-            }}
-        '''.format(user_entry.user_name, user_entry.user_id)
+                {{ 
+                    "username" : "{}",
+                    "user_id" : "{}"
+                }}
+            '''.format(user_entry.user_name, user_entry.user_id)
     except:
         HttpResponse('{ "user" : {}, "gamelist" : {}, "wishlist" : {} }')
     # Get game list
     try:
-        game_list = get_list(request.GET['username'], True)
+        game_list = get_list(username, True)
     except:
         print("No games")
     # Get wish list
     try:
-        wish_list = get_list(request.GET['username'], False)
+        wish_list = get_list(username, False)
     except:
         print("No wishes")
 
     ret_json = '''
-        {{
-            "user" : "{}",
-            "gamelist" : [{}],
-            "wishlist" : [{}]
-        }}
-    '''.format(request.GET['username'], game_list, wish_list)
+            {{
+                "user" : "{}",
+                "gamelist" : [{}],
+                "wishlist" : [{}]
+            }}
+        '''.format(username, game_list, wish_list)
     return HttpResponse(ret_json)
+# Retrieves user profile along with game list and wish list
+# TESTED
+@api_view(['GET'])
+def user_prof(request):
+    return user_prof_helper(request.GET['username'])
 
 
 # Follow user
@@ -86,13 +89,17 @@ def get_list(username, type):
         else:
             gamelist = PlayerLibrary.objects.filter(user_id=player, played=False, wish_list=True)
         json_list = []
+        print(gamelist)
         # convert to json list
         for entries in gamelist:
-            game = entries.game_id
-            g_id = game.game_id
-            g_name = game.game_name
-            g_json = '{{"game_name":"{}", "game_id":"{}"}}'.format(g_name, g_id)
-            json_list.append(g_json)
+            try:
+                game = entries.game_id
+                g_id = game.game_id
+                g_name = game.game_name
+                g_json = '{{"game_name":"{}", "game_id":"{}"}}'.format(g_name, g_id)
+                json_list.append(g_json)
+            except:
+                continue
         print(','.join(json_list))
         return ','.join(json_list)
     except Exception as e:
@@ -102,6 +109,7 @@ def get_list(username, type):
 
 # Get a user's game list
 # TESTED
+# curl -d '{"user":{"username" : "a regular"}}' -X POST "http://localhost:8000/backend/game_list/"
 @api_view(['POST'])
 def get_gamelist(request):
     json_obj = None
@@ -131,6 +139,7 @@ def get_gamelist(request):
 
 
 # Get a user's wish list
+# curl -d '{"user":{"username" : "a regular"}}' -X POST "http://localhost:8000/backend/wish_list/"
 # TESTED
 @api_view(['POST'])
 def get_wishlist(request):
@@ -181,6 +190,7 @@ def check_in_userlist(request):
 
 # Adding a game to a user's wish or played list
 # TESTED
+# curl -d '{"user":{"username" : "a regular", "gameid" : "", "played" : False, "wish" : True}}' -X POST "http://localhost:8000/backend/edit_list/"
 @api_view(['POST'])
 def edit_list(request):
     json_obj = None
@@ -194,18 +204,15 @@ def edit_list(request):
         # Checks if player exist in database
         # Checks if game exist in database
         # Unsuccessful if either check throws does not exist
-        player  = User.objects.get(user_name = json_obj['user']['userid'])
+        player  = User.objects.get(user_name = json_obj['user']['username'])
         game    = GameList.objects.get(game_id = json_obj['user']['gameid'])
         played  = json_obj['user']['played']
         wishes  = json_obj['user']['wish']
         new_entry = PlayerLibrary(user_id = player, game_id = game, wish_list = wishes, played = played)
         new_entry.save()
-        return HttpResponse('''
-            {
-                "message":"Successful"
-            }    
-        ''')
-    except:
+        return user_prof_helper(json_obj['user']['username'])
+    except Exception as e:
+        print(e)
         return HttpResponse('''
             {
                 "message":"Invalid Request"
@@ -243,12 +250,12 @@ def login(request):
     wish_list = ""
     # Get game list
     try:
-        game_list = get_list(request.GET['username'], True)
+        game_list = get_list(obj['user']['username'], True)
     except:
         print("No games")
     # Get wish list
     try:
-        wish_list = get_list(request.GET['username'], False)
+        wish_list = get_list(obj['user']['username'], False)
     except:
         print("No wishes")
 
@@ -419,7 +426,7 @@ def activate(request, key):
 
         # delete entry in the register table
         exist_register.delete()
-    
+
         return HttpResponse(msg_to_json("used activated"))
     except:
         return HttpResponse(msg_to_json("request failed"))
@@ -440,81 +447,45 @@ def search_game(request):
     print("search game function is running ...")
     print("")
     # TODO check if try-catch is slow
-    try:
-        query = request.GET.get('q')
-        category = request.GET.get('category')
-        genre = request.GET.get('genre')
+    # try:
+    query = request.GET.get('q')
+    category = request.GET.get('category')
+    genre = request.GET.get('genre')
 
-        # Step 1: Filter by keyword
-        if query:
-            query_list = query.split(" ")
-            results = GameList.objects.filter(
-                reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
-            )# Returns a QuerySet
-        else:
-            results = GameList.objects.all() # Return all the results if no key words are given
+    # Step 1: Filter by keyword
+    if query:
+        query_list = query.split(" ")
+        results = GameList.objects.filter(
+            reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
+        )# Returns a QuerySet
+    else:
+        results = GameList.objects.all() # Return all the results if no key words are given
 
-        # Step 2: Filter by category
-        if category:
-            category_list = category.split(",")
-            catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
-            catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches and assign a 'mathes' column to store count
-            catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
+    # Step 2: Filter by category
+    if category:
+        category_list = category.split(",")
+        catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
+        catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches and assign a 'mathes' column to store count
+        catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
 
-            results = results.filter(game_id__in=catObjs.values('game_id')) # Filter previous results from previous filter
+        results = results.filter(game_id__in=catObjs.values('game_id')) # Filter previous results from previous filter
 
-        # Step 3: Filter by genre
-        # TODO need to test more, for multiply genres
-        if genre:
-            genre_list = genre.split(",")
-            genreObjsUnion = Genres.objects.filter(reduce(operator.or_, (Q(genre__iexact=g) for g in genre_list)))
-            genreObjs = genreObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches and assign a 'mathes' column to store count
-            genreObjs = genreObjs.filter(matches__exact=len(genre_list)) # Filter to get ONLY games that match ALL given genre tags
+    # Step 3: Filter by genre
+    # TODO need to test more, for multiply genres
+    if genre:
+        genre_list = genre.split(",")
+        genreObjsUnion = Genres.objects.filter(reduce(operator.or_, (Q(genre__iexact=g) for g in genre_list)))
+        genreObjs = genreObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches and assign a 'mathes' column to store count
+        genreObjs = genreObjs.filter(matches__exact=len(genre_list)) # Filter to get ONLY games that match ALL given genre tags
 
-            results = results.filter(game_id__in=genreObjs.values('game_id'))  # Filter previous results from previous filter
+        results = results.filter(game_id__in=genreObjs.values('game_id'))  # Filter previous results from previous filter
 
-        # print("new method " + str(len(results)))
-
-        # ---- Version 1 ----
-        # if category: # Add category filter
-        #     category_list = category.split(",")
-        #
-        #     catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
-        #     catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches
-        #     catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
-        #
-        #     if query:
-        #         query_list = query.split()
-        #         results = GameList.objects.filter(reduce(operator.and_, (Q(game_name__icontains=q) for q in query_list)),
-        #                                           game_id__in=catObjs.values('game_id'))
-        #     else:
-        #         results = GameList.objects.filter(game_id__in=catObjs.values('game_id')) # All games of those categories
-        # else: # No category filter
-        #     if query:
-        #         query_list = query.split()
-        #         results = GameList.objects.filter(
-        #             reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
-        #         )# Returns a QuerySet
-        #     else:
-        #         results = GameList.objects.all() # TODO discuss with group what they want with empty query, atm returns everything
-        # print("old method " + str(len(results)))
-        # ---- End Version 1
-
-        # debugging -----
-        # for result in results:
-        #     game = result.as_dict()
-        #     print(game['game_name'])
-        #
-        # print("list of genres")
-        # genres = Genres.objects.values('genre').distinct()
-        # for genre in genres:
-        #     print(genre)
-        # ---- end debugging
-        # Put 'results' querySet into dict format to convert into JSON dict
-        results_list = [obj.as_dict() for obj in results]
-        return HttpResponse(json.dumps({"results": results_list}), content_type='application/json')
-    except:
-        return HttpResponse('{"message":"input invalid", "search-games":{}}')
+    # Put 'results' querySet into dict format to convert into JSON dict
+    results_list = [obj.as_dict() for obj in results]
+    outputJSON = json.dumps({"results": results_list},ensure_ascii=False).encode('utf16')
+    return HttpResponse(outputJSON, content_type='application/json')
+    # except:
+    #     return HttpResponse('{"message":"input invalid", "search-games":{}}')
 
 # Get the top "n" number of games
 # curl -X GET "http://localhost:8000/backend/get_top_games/?n=100"
@@ -529,7 +500,8 @@ def get_top_games(request):
         #     obj = result.as_dict()
         #     print(obj['game_name'] + " / " + str(obj['num_player']))
         # # ---- end debugging
-        return HttpResponse(json.dumps({"results": results_list}), content_type='application/json')
+        outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf16')
+        return HttpResponse(outputJSON, content_type='application/json')
     except:
         return HttpResponse('{"message":"input invalid", "get-top-games":{}}')
 
@@ -657,8 +629,8 @@ def recommend_v1(request):
     outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf-16')
     return HttpResponse(outputJSON, content_type='application/json')
 
-
 # given json contain username, email, and password
+# curl -d '{"edit":{"username" : "a regular", "email" : "edittest@gmail.com", "password" : "editpass"}}' -X POST "http://localhost:8000/backenist/"
 @api_view(['POST'])
 def edit_profile(request):
     print("user edit function is running ...")
@@ -677,11 +649,11 @@ def edit_profile(request):
         e = obj['edit']['email']
         p= obj['edit']['password']
 
-        print("get the username:" +username)
+        print("get the username:" + username)
         print("get the email:" + e)
         print("get the password:" + p)
         try:
-            user = User.objects.get(user_name=obj['edit']['username'])
+            user = User.objects.get(user_name=username)
             try:
                 email = obj['edit']['email']
                 user.email = email

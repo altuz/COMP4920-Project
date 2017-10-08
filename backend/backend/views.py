@@ -6,6 +6,7 @@ from hashlib import blake2b
 from django.db.models import Q
 from functools import reduce
 from django.db.models import Count
+import django
 import smtplib
 import json
 import time
@@ -46,6 +47,8 @@ def user_prof_helper(username):
             }}
         '''.format(username, game_list, wish_list)
     return HttpResponse(ret_json)
+
+
 # Retrieves user profile along with game list and wish list
 # TESTED
 @api_view(['GET'])
@@ -372,6 +375,7 @@ def register(request):
     except:
         print("Error when loading the Json")
         pass
+    print(obj)
 
     if obj is not None:
         # check user existence
@@ -381,10 +385,10 @@ def register(request):
             return HttpResponse(msg_to_json("user already exist"))
         except:
             # create new user for the register table and get info from the request
-            user_name=obj['user']['user_name']
+            user_name = obj['user']['user_name']
             password = obj['user']['pass_word']
             key = blake2b((user_name + password).encode('utf-8')).hexdigest()  # key send to the user
-            link = "http://localhost:8090/backend/activate/?key=" + key
+            link = "http://localhost:8090/#/activate/" + key
 
             # send activation email
             try:
@@ -416,20 +420,21 @@ def activate(request, key):
     :param key: activation key
     :return: if activation key exist create the user account in the table and return true, else return json no exist
     """
+
+    exist_register = Register.objects.get(key=key)
+
+    # create the new user
+    new_user = User(user_name=exist_register.user_name, email=exist_register.email,
+                    pass_word=exist_register.pass_word, privacy=exist_register.privacy, num_games=0)
+    new_user.save()
+
+    # delete entry in the register table
+    exist_register.delete()
+
     try:
-        exist_register = Register.objects.get(key=request.GET['key'])
-
-
-         # create the new user
-        new_user = User(user_name=exist_register.user_name, email=exist_register.email,
-                    pass_word=exist_register.pass_word, privacy=exist_register.privacy)
-        new_user.save()
-
-        # delete entry in the register table
-        exist_register.delete()
-
         return HttpResponse(msg_to_json("used activated"))
-    except:
+    except django.db.utils.IntegrityError as e:
+        print(e)
         return HttpResponse(msg_to_json("request failed"))
 
 

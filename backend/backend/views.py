@@ -505,7 +505,7 @@ def get_top_games(request):
     except:
         return HttpResponse('{"message":"input invalid", "get-top-games":{}}')
 
-
+# Commit
 # Return average rating of a given a game_id #TODO or game name?
 # TODO need to test,
 # TODO might replace with storing average rating and number of ratings in table

@@ -41,9 +41,17 @@ export default class Profile extends React.Component {
     if(this.state.curr_game.length>0){
       const game=this.state.curr_game[0];
       return(
-          <div className='col-md-4'>
-            <img src={game.image_url}/>
-            <div dangerouslySetInnerHTML={this.rawMarkup()}></div>
+          <div className='row'>
+            <div className='col-md-4'>
+              <img className='description-img' src={game.image_url}/>
+              <div dangerouslySetInnerHTML={this.rawMarkup()}></div>
+            </div>
+            <div className='col-md-8'>
+              <div className='row'>
+                <div><Button className = "btn btn-primary" >Add to Game List</Button></div>
+                <div><Button className = "btn btn-primary" >Add to Wish List</Button></div>
+              </div>
+            </div>
           </div>
       );
     }

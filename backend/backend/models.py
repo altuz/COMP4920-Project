@@ -49,7 +49,7 @@ class PlayerLibrary(models.Model):
         unique_together = ('user_id', 'game_id')
 
     def __str__(self):
-        return str(self.user_id) + '/' + str(self.game_id)
+        return str(self.user_id) + '/' + str(self.game_id) + '\n'
 
     def as_dict(self):
         return {

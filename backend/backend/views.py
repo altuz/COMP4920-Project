@@ -86,13 +86,17 @@ def get_list(username, type):
         else:
             gamelist = PlayerLibrary.objects.filter(user_id=player, played=False, wish_list=True)
         json_list = []
+        print(gamelist)
         # convert to json list
         for entries in gamelist:
-            game = entries.game_id
-            g_id = game.game_id
-            g_name = game.game_name
-            g_json = '{{"game_name":"{}", "game_id":"{}"}}'.format(g_name, g_id)
-            json_list.append(g_json)
+            try:
+                game = entries.game_id
+                g_id = game.game_id
+                g_name = game.game_name
+                g_json = '{{"game_name":"{}", "game_id":"{}"}}'.format(g_name, g_id)
+                json_list.append(g_json)
+            except:
+                continue
         print(','.join(json_list))
         return ','.join(json_list)
     except Exception as e:

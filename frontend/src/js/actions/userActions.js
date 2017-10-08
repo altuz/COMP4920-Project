@@ -87,6 +87,12 @@ export function edit_profile(edit){
 }
 
 
+export function getReccomendation1(username){
+  const url='http://localhost:8000/backend/recommendation_v1/?username='+username;
+  return axios.get(url);
+}
+
+
 
 // export function setUserName(name) {
 //   return {

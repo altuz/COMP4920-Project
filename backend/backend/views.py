@@ -383,7 +383,7 @@ def register(request):
             user_name=obj['user']['user_name']
             password = obj['user']['pass_word']
             key = blake2b((user_name + password).encode('utf-8')).hexdigest()  # key send to the user
-            link = "http://localhost:8090/activate/" + key
+            link = "http://localhost:8090/backend/activate/?key=" + key
 
             # send activation email
             try:
@@ -435,7 +435,7 @@ def activate(request, key):
 # Search for games
 # For testing - note: %20 is a space, %2C is a comma in URL character encoding
 # curl -X GET "http://localhost:8000/backend/search_game/?q=for%20left&category=strategy%2CRTS"
-# curl -X GET "http://localhost:8000/backend/search_game/?q=soldier&category=Multi%2DPlayer"
+# curl -X GET "http://localhost:8000/backend/search_game/?q=soldier&category=Multi%2DPlayer&genre="
 # curl -X GET "http://localhost:8000/backend/search_game/?q=&category=Multi%2DPlayer%2CCo%2Dop&genre=Action%2CAdventure"
 @api_view(['GET'])
 def search_game(request):
@@ -501,21 +501,44 @@ def get_top_games(request):
         return HttpResponse('{"message":"input invalid", "get-top-games":{}}')
 
 # Returns the game corresponding to given input gameid
-# @param    gameid or target game
+# @param    gameid of target game, if userid is provided, returns true/false for if in that users game/wishlist
 # @return   game with all it's contents
 # Testing
-# curl -X GET "http://localhost:8000/backend/get_game_info/?gameid=10"
+# curl -X GET "http://localhost:8000/backend/get_game_info/?gameid=578080&userid=76561197960530222"
 @api_view(['GET'])
-def get_game_info(reqeust):
-    try:
-        game_id = int(reqeust.GET.get('gameid'))
+def get_game_info(request):
+    print("get_game_info function is running\n...")
+    # Step 1: get the target game info
+    try: # Case game exists
+        game_id = int(request.GET.get('gameid'))
         target_game = [GameList.objects.get(game_id=game_id).as_dict()]
-        outputJSON = json.dumps({"game_info": target_game}, ensure_ascii=False).encode('utf16')
-        print("matching game found")
-        return HttpResponse(outputJSON, content_type='application/json')
+    except: # Case no matching game
+        return HttpResponse('{"message":"invalid gameid", "get_game_info":{}')
+
+    # Step 2: check if user paramter given, if given user logged in
+    player_obj = None
+    try: # if given loggen in user, check if on their game list
+        player_obj = User.objects.get(user_id=request.GET.get('userid'))
     except:
-        print("no matching game")
-        return HttpResponse('{"message":"invalid gameid", "get_game_info":{}}')
+        # if no user
+        print("output type1: No user logged in")
+        outputJSON = json.dumps({"game_info": target_game, "in_game_list": "","in_wish_list": ""},
+                                ensure_ascii=False).encode('utf16')
+
+    if player_obj:
+        game_set = PlayerLibrary.objects.filter(user_id=player_obj, game_id=game_id)
+        if game_set:
+            print("output type2: Game is in player library")
+            wish_list = game_set[0].wish_list # Should only have one entry, get entry 0
+            played = game_set[0].played # Should only have one entry, get entry 0
+            outputJSON = json.dumps({"game_info": target_game, "in_game_list": played, "in_wish_list": wish_list},
+                                    ensure_ascii=False).encode('utf16')
+        else:
+            print("output type3: Game is NOT in player library")
+            outputJSON = json.dumps({"game_info": target_game, "in_game_list": False, "in_wish_list": False},
+                                    ensure_ascii=False).encode('utf16')
+
+    return HttpResponse(outputJSON, content_type='application/json')
 
 # Return average rating of a given a game_id #TODO or game name?
 # TODO need to test,

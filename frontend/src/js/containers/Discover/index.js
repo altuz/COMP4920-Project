@@ -1,35 +1,21 @@
 import React from "react";
-// import { connect } from "react-redux";
-import { getDiscover } from '../../actions/userActions.js';
+import { withRouter } from 'react-router';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 
-
-const option = {
-  onRowClick: function(row, columnIndex, rowIndex) {
-    console.log(row)
-    alert(`You click row id: ${row.game_name}, column index: ${columnIndex}, row index: ${rowIndex}`);
-  },
-};
-
-export default class Main extends React.Component {
+@connect((store) => {
+  return {
+    discover: store.games.discover,
+  }
+})
+class Main extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      q:'',
-      results:[],
-      fetched : false,
     }
   }
 
-  componentWillMount() {
-    getDiscover()
-    .then((res)=>{
-      this.setState({
-        results:res.data.results,
-        fetched: true,
-      })
-    })
-  }
 
   imageFormatter(cell,row){
     return (
@@ -52,21 +38,45 @@ export default class Main extends React.Component {
   };
 
   rateFormatter(cell,row){
-    return(
+    if(cell){
+      return(
+          <div>
+            {cell}%
+          </div>
+      )
+    }
+    return (
         <div>
-          {cell}%
+         No Rating
         </div>
+    );
+  };
+
+  nameFormatter(cell,row,enumObject, index){
+    return (
+      <div>
+      <Link className='game_name' to ={{
+        pathname: `/games/${row.game_id}`,
+        state: {index}
+      }}>
+        {cell}
+      </Link>
+      </div>
     )
+
   }
 
+
+
   render() {
-    if(this.state.fetched){
-      console.log(this.state.results);
+
+
+    if(this.props.discover.length>0){
       return(
           <div >
-            <BootstrapTable data={this.state.results} options={ option } hover pagination>
+            <BootstrapTable data={this.props.discover}  hover pagination>
               <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
-              <TableHeaderColumn isKey dataField='game_name' >Game Name</TableHeaderColumn>
+              <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>
               <TableHeaderColumn dataField='publisher' width='200px' >Released By</TableHeaderColumn>
               <TableHeaderColumn dataField='price' dataFormat={this.priceFormatter} width='80px'>Price</TableHeaderColumn>
               <TableHeaderColumn dataField='average_rating' dataFormat={this.rateFormatter}>Rating</TableHeaderColumn>
@@ -78,3 +88,15 @@ export default class Main extends React.Component {
     return null;
   }
 }
+
+
+const HomeRoute = withRouter(Main);
+export default HomeRoute;
+
+
+// onRowClick: function(row, columnIndex, rowIndex) {
+//   console.log(this)
+//   console.log(row)
+//   console.log(`You click row id: ${row.game_name}, column index: ${columnIndex}, row index: ${rowIndex}`);
+//   this.props.history.push(`/results/${row.game_id}`);
+// },

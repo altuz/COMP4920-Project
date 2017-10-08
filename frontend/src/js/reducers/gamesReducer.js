@@ -1,5 +1,7 @@
 export default function reducer(state={
     results: JSON.parse(localStorage.getItem('results'))||[],
+    discover: JSON.parse(localStorage.getItem('discover'))||[],
+    curr: JSON.parse(localStorage.getItem('curr'))||null,
   }, action) {
 
     switch (action.type) {
@@ -16,18 +18,18 @@ export default function reducer(state={
           results:[],
         }
       }
-      case "FETCH_TWEETS_FULFILLED": {
+      case "SET_DISCOVER": {
+        localStorage.setItem('discover', JSON.stringify(action.payload.results));
         return {
           ...state,
-          fetching: false,
-          fetched: true,
-          tweets: action.payload,
+          discover: action.payload.results,
         }
       }
-      case "ADD_TWEET": {
+      case "SET_CURR_GAME": {
+        localStorage.setItem('curr', JSON.stringify(action.payload));
         return {
           ...state,
-          tweets: [...state.tweets, action.payload],
+          curr: action.payload,
         }
       }
       case "UPDATE_TWEET": {

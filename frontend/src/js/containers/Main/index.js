@@ -6,6 +6,7 @@ import Search from "../../containers/Search";
 import Discover from "../../containers/Discover";
 import Profile from "../../containers/Profile";
 import Results from "../Results";
+import SubResult from "../Results/SubResult.js";
 
 
 export default class Main extends React.Component {
@@ -15,11 +16,12 @@ export default class Main extends React.Component {
         <Nav path={this.props.location.pathname}/>
         <div className='content'>
             <Switch>
-                <Route exact path='/' render={() => <Redirect to='/search'/>} />
+                <Route exact path='/' render={() => <Redirect to='/discover'/>} />
                 <Route path='/discover' component={Discover} />
                 <Route path='/search' component={Search} />
                 <Route path='/profile' component={Profile} />
                 <Route path='/results' component={Results} />
+              <Route path='/games/:gameID' component={SubResult} />
             </Switch>
         </div>
       </div>

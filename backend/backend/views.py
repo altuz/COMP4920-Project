@@ -606,12 +606,12 @@ def rating(request):
 # Gives 5 game recommendations for the given user
 # For testing:
 # TODO refactor below testing html for later
-# curl -X GET "http://localhost:8000/backend/recommend_v1/?userid=76561197960530222"
+# curl -X GET "http://localhost:8000/backend/recommend_v1/?username=a%20regular"
 @api_view(['GET'])
 def recommend_v1(request):
     # Return error if user can't be found
     try:
-        player = User.objects.get(user_id=request.GET.get('userid')) # Get the target user
+        player = User.objects.get(user_name=request.GET.get('username')) # Get the target user
     except:
         return HttpResponse('{"message":"invalid user", "recommend":{}}')
 

@@ -214,7 +214,7 @@ Output:
 
 Function: Recommender_v1
 Url: backend/recommend_v1
-Input: userid=user_id_of_target_user
+Input: username=username_of_target_user
 Output:
 {
     "results":

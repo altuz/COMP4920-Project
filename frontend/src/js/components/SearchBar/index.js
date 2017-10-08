@@ -43,7 +43,7 @@ class SearchBar extends React.Component {
           <input
             className='searchbar-input'
             type='text'
-            placeholder='Search By game name'
+            placeholder='Search By game name eg: dota'
             onChange={this.handleChange.bind(this)}
             name='q'
             value={this.state.username} />

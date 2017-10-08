@@ -62,6 +62,10 @@ export function getDiscover() {
   return axios.get(url);
 }
 
+export function getGameInfo(gameID){
+  const url='http://localhost:8000/backend/get_game_info/?gameid='+gameID;
+  return axios.get(url);
+}
 
 export function signup(user){
   console.log(user);

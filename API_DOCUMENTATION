@@ -19,7 +19,7 @@ Output:
 Function: Edit User Played/Wishlist
 Url: backend/edit_list/
 Type: POST
-Input: {"user" : { "userid" : "xxx", "game_id" : "yyy", "wish" : "True/False", "played" : "True/False"}
+Input: {"user" : { "username" : "xxx", "game_id" : "yyy", "wish" : "True/False", "played" : "True/False"}
 userid=x, game_id=y, wish=True/False, played=True/False
 Output:
 {

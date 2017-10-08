@@ -2,10 +2,22 @@ import React from "react";
 import {Button, Media, Tab, Tabs, Nav} from 'react-bootstrap';
 import Edit  from "./EditProfile"
 import { connect } from 'react-redux';
+import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+
+
+const option = {
+  onRowClick: function(row, columnIndex, rowIndex) {
+    console.log(row)
+    alert(`You click row id: ${row.game_name}, column index: ${columnIndex}, row index: ${rowIndex}`);
+  },
+};
+
 
 @connect((store) => {
 	return {
 		user: store.user.user,
+		gamelist: store.user.game_list,
+		wishlist: store.user.wish_list,
 		fetched: store.user.fetched,
 	};
 })
@@ -23,6 +35,11 @@ export default class Profile extends React.Component {
 		this.setState({ isedit: true });
 	}
 
+	imageFormatter(cell,row){
+        return (
+            <img style={{height:35}} src={cell}/>
+        )
+    };
 
 
 	render () {
@@ -49,9 +66,21 @@ export default class Profile extends React.Component {
     				</div>
     				<Tabs defaultActiveKey={1} className="String" id="uncontrolled-tab-example">
     					<Tab eventKey={1} title="Playlist">
-    						<li>Tab 1 content</li>
+    						<div>
+    						    <BootstrapTable data={this.props.gamelist} options={ option } hover pagination>
+                                    <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
+                                    <TableHeaderColumn isKey dataField='game_name' >Game Name</TableHeaderColumn>
+                                </BootstrapTable>
+    						</div>
     					</Tab>
-   						<Tab eventKey={2} title="Wishlist">Tab 2 content</Tab>
+   						<Tab eventKey={2} title="Wishlist">
+   						    <div>
+    						    <BootstrapTable data={this.props.wishlist} options={ option } hover pagination>
+                                    <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
+                                    <TableHeaderColumn isKey dataField='game_name' >Game Name</TableHeaderColumn>
+                                </BootstrapTable>
+    						</div>
+   						</Tab>
    					</Tabs>
 			</div>
 			);

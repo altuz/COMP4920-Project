@@ -45,6 +45,12 @@ export default function reducer(state={
           fetched:false,
         }
       }
+      case "UPDATE_GAMELIST": {
+        return {
+          ...state,
+          game_list: action.payload,
+        }
+      }
     }
 
     return state

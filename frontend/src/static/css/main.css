@@ -254,9 +254,10 @@ input {
 
 .wishbutton{
   margin-top:20px;
+  width: 180px;
 }
 
 .gamebutton {
-
+  width: 180px;
 }
 

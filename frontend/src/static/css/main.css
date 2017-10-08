@@ -259,3 +259,7 @@ input {
 .gamebutton {
 
 }
+
+.Tabulation ul > li > a{
+    color:black;
+}

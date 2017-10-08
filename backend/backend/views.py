@@ -473,46 +473,10 @@ def search_game(request):
 
             results = results.filter(game_id__in=genreObjs.values('game_id'))  # Filter previous results from previous filter
 
-        # print("new method " + str(len(results)))
-
-        # ---- Version 1 ----
-        # if category: # Add category filter
-        #     category_list = category.split(",")
-        #
-        #     catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
-        #     catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches
-        #     catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
-        #
-        #     if query:
-        #         query_list = query.split()
-        #         results = GameList.objects.filter(reduce(operator.and_, (Q(game_name__icontains=q) for q in query_list)),
-        #                                           game_id__in=catObjs.values('game_id'))
-        #     else:
-        #         results = GameList.objects.filter(game_id__in=catObjs.values('game_id')) # All games of those categories
-        # else: # No category filter
-        #     if query:
-        #         query_list = query.split()
-        #         results = GameList.objects.filter(
-        #             reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
-        #         )# Returns a QuerySet
-        #     else:
-        #         results = GameList.objects.all() # TODO discuss with group what they want with empty query, atm returns everything
-        # print("old method " + str(len(results)))
-        # ---- End Version 1
-
-        # debugging -----
-        # for result in results:
-        #     game = result.as_dict()
-        #     print(game['game_name'])
-        #
-        # print("list of genres")
-        # genres = Genres.objects.values('genre').distinct()
-        # for genre in genres:
-        #     print(genre)
-        # ---- end debugging
         # Put 'results' querySet into dict format to convert into JSON dict
         results_list = [obj.as_dict() for obj in results]
-        return HttpResponse(json.dumps({"results": results_list}), content_type='application/json')
+        outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf16')
+        return HttpResponse(outputJSON, content_type='application/json')
     except:
         return HttpResponse('{"message":"input invalid", "search-games":{}}')
 
@@ -524,15 +488,27 @@ def get_top_games(request):
         number = int(request.GET.get('n'))
         results = GameList.objects.all()[:number]
         results_list = [obj.as_dict() for obj in results] # create a results_list to be converted to JSON format
-        # # debugging ----
-        # for result in results:
-        #     obj = result.as_dict()
-        #     print(obj['game_name'] + " / " + str(obj['num_player']))
-        # # ---- end debugging
-        return HttpResponse(json.dumps({"results": results_list}), content_type='application/json')
+        outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf16')
+        return HttpResponse(outputJSON, content_type='application/json')
     except:
         return HttpResponse('{"message":"input invalid", "get-top-games":{}}')
 
+# Returns the game corresponding to given input gameid
+# @param    gameid or target game
+# @return   game with all it's contents
+# Testing
+# curl -X GET "http://localhost:8000/backend/get_game_info/?gameid=10"
+@api_view(['GET'])
+def get_game_info(reqeust):
+    try:
+        game_id = int(reqeust.GET.get('gameid'))
+        target_game = [GameList.objects.get(game_id=game_id).as_dict()]
+        outputJSON = json.dumps({"game_info": target_game}, ensure_ascii=False).encode('utf16')
+        print("matching game found")
+        return HttpResponse(outputJSON, content_type='application/json')
+    except:
+        print("no matching game")
+        return HttpResponse('{"message":"invalid gameid", "get_game_info":{}}')
 
 # Return average rating of a given a game_id #TODO or game name?
 # TODO need to test,
@@ -597,9 +573,13 @@ def rating(request):
 # curl -X GET "http://localhost:8000/backend/recommend_v1/?userid=76561197960530222"
 @api_view(['GET'])
 def recommend_v1(request):
+    # Return error if user can't be found
+    try:
+        player = User.objects.get(user_id=request.GET.get('userid')) # Get the target user
+    except:
+        return HttpResponse('{"message":"invalid user", "recommend":{}}')
 
-    player = User.objects.get(user_id=request.GET.get('userid')) # Get the target user
-    game_set = None
+    # game_set = None # Don't really need this since exception below would return
     try:
         game_set = PlayerLibrary.objects.filter(user_id=player)
     except:
@@ -642,7 +622,7 @@ def recommend_v1(request):
         print(genre)
         top_5_genres.append(genre)
 
-    # Filter all games list by genre, exclude duplicates when adding to recommend list
+    # Filter all games list by similar genre of user, exclude duplicates when adding to recommend list
     print("Recommendations")
     recommend_set = []
     for genre in top_5_genres:
@@ -656,7 +636,6 @@ def recommend_v1(request):
     results_list = [obj.as_dict() for obj in results]  # create a results_list to be converted to JSON format
     outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf-16')
     return HttpResponse(outputJSON, content_type='application/json')
-
 
 # given json contain username, email, and password
 @api_view(['POST'])

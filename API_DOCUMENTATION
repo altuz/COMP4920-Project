@@ -76,8 +76,27 @@ Output:
         // empty if no matches
 
     ]
-
 }
+
+Function: Get game info for specific game_id
+Url: backend/get_game_info
+Type: GET
+Input: gameid=gameid_of_target_game
+Output:
+--> Case target game is found
+{
+    "game_info":
+    [ // List of one object
+        {
+            "game_id": 1,
+            "game_name": "Left 4 dead",
+            "num_player": 23
+            ... other stats
+        }
+    ]
+}
+--> Case target game is NOT found
+'{"message":"invalid gameid", "get_game_info":{}}'
 
 Function: Check User's list
 Url: backend/check_in_userlist/

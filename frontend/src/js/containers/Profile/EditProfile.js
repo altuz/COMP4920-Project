@@ -72,7 +72,7 @@ export default class EditProfile extends React.Component {
     				<form onSubmit={this.handleSubmit}  method ="post">
     					<div className ="form-group">
     						<label for="email" className="control-label">Email: </label>
-    						<input onChange={this.onChange} type="email" name="email" className="form-control"/>
+    						<input onChange={this.onChange} type="email" name="email" className="form-control" placeholder={user.email}/>
     					</div>
     					<div className ="form-group">
     						<label for="password" className="control-label">Password: </label>

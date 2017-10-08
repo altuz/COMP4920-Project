@@ -80,7 +80,6 @@ class GameList(models.Model):
 
     class Meta:
         # order the table by number of player descending order, faster for search
-        # order_with_respect_to = 'num_player'
         ordering = ['-num_player']
 
     # dict for use with game_search

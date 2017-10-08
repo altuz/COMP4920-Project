@@ -22,7 +22,7 @@ export default class EditProfile extends React.Component {
 		const { user,fetched } = this.props;
 		console.log(fetched);
 		return(
-			<div className = "content">
+			<div>
 					<div className ="media-left">
 						<img src = "http://www.ravalyogimatrimony.com/Content/images/default-profile-pic.png" alt = "profile picture"/>
 					</div>

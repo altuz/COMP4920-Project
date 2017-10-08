@@ -39,7 +39,7 @@ export default class Profile extends React.Component {
 			//get data
 			console.log(user.user_name);
 			return(
-			<div className = "content">
+			<div>
 					<div className ="media-left">
 						<img src = "http://www.ravalyogimatrimony.com/Content/images/default-profile-pic.png" alt = "profile picture"/>
 					</div>

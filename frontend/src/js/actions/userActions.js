@@ -61,6 +61,30 @@ export function getDiscover() {
   return axios.get(url);
 }
 
+
+export function signup(user){
+  console.log(user);
+  return function(dispatch){
+    axios.post('http://localhost:8000/backend/register/',{
+        user
+    })
+    .then((response)=>{
+        console.log(response.data);
+        if(response.data.message==='success'){
+            dispatch( {
+              type: 'SET_USER',
+              payload:response.data.user,
+            })
+        }
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+    }
+}
+
+
+
 // export function setUserName(name) {
 //   return {
 //     type: 'SET_USER_NAME',

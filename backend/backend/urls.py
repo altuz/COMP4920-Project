@@ -20,18 +20,20 @@ import backend.views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^backend/login/', backend.views.user_login),
-    url(r'^backend/register/', backend.views.user_register),
-    url(r'^backend/edit_list/', backend.views.update_userlist),
+    url(r'^backend/login/', backend.views.login),
+    url(r'^backend/register/', backend.views.register),
+    url(r'^backend/edit_list/', backend.views.edit_list),
     url(r'^backend/search_game/', backend.views.search_game),
     url(r'^backend/game_list/', backend.views.get_gamelist),
     url(r'^backend/wish_list/', backend.views.get_wishlist),
     url(r'^backend/follow_user/', backend.views.follow_user),
-    url(r'^backend/session_check/', backend.views.check_session),
-    url(r'^backend/logout/', backend.views.user_logout),
-    url(r'^backend/user_prof/', backend.views.user_prof),
-    url(r'^backend/activate/(/w+)', backend.views.activate_user),
-    url(r'^backend/rating/', backend.views.rate_and_review),
-    url(r'^backend/recommend_v1/', backend.views.get_recommendations_v1),
-    url(r'^backend/get_top_games/', backend.views.get_top_games)
+    url(r'^backend/session_check/', backend.views.session_check),
+    url(r'^backend/logout/', backend.views.logout),
+    url(r'^backend/user_prof/', backend.views.user_prof), 
+    url(r'^backend/activate/(\w+)', backend.views.activate), 
+    url(r'^backend/rating/', backend.views.rating),
+    url(r'^backend/recommend_v1/', backend.views.recommend_v1),
+    url(r'^backend/get_top_games/', backend.views.get_top_games),
+    url(r'^backend/check_in_userlist/', backend.views.check_in_userlist),
+    url(r'^backend/edit_profile/', backend.views.edit_profile)
 ]

@@ -20,7 +20,7 @@ Function: Edit User Played/Wishlist
 Url: backend/edit_list/
 Type: POST
 Input: {"user" : { "username" : "xxx", "game_id" : "yyy", "wish" : "True/False", "played" : "True/False"}
-username=x, game_id=y, wish=True/False, played=True/False
+userid=x, game_id=y, wish=True/False, played=True/False
 Output:
 {
     "message":"Successful/Invalid Request"
@@ -78,6 +78,16 @@ Output:
     ]
 
 }
+
+Function: Check User's list
+Url: backend/check_in_userlist/
+Type: GET
+Input: url parameters with userid=the_users_id, gameid=target_gameid, played=string_lowercase_true_or_false, wishlist=string_lowercase_true_or_false
+Sample url: http://localhost:8000/backend/check_in_userlist/?userid=76561197960530222&gameid=578080&played=true&wishlist=false
+Output:
+{"message":"Success"}
+- or -
+{"message":"Invalid Request"}
 
 Function: Get User's Played Game List
 Url: backend/game_list/
@@ -171,4 +181,30 @@ Input: {"rating": {"username":"IHMS","gameid":4, "rate":4, "comment":"mada mada"
 Output:
 {
     "message":"error/success"
+}
+
+Function: Recommender_v1
+Url: backend/recommend_v1
+Input: userid=user_id_of_target_user
+Output:
+{
+    "results":
+    [ // List of results of this format
+        {
+            "game_id": 1,
+            "game_name": "Left 4 dead",
+            "num_player": 23
+            ... other stats
+        },
+        {
+            "game_id": 3,
+            "game_name": "Age of MEme-pires 2",
+            "num_player": 23
+            ... other stats
+        }
+        ...
+        ...
+        //  Returns top 5 games ever if user has no games
+
+    ]
 }

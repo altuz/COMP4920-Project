@@ -1,65 +1,60 @@
 import React from "react";
-import {Button, Media, Tab, Nav} from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import {EditProfile} from "./EditProfile"
+import {Button, Media, Tab, Tabs, Nav} from 'react-bootstrap';
+import Edit  from "./EditProfile"
+import { connect } from 'react-redux';
+
+@connect((store) => {
+	return {
+		user: store.user.user,
+		fetched: store.user.fetched,
+	};
+})
 
 export default class Profile extends React.Component {
 	constructor(props){
 		super(props);
-		this.state ={
-			user :{
-				username:'',
-            	email:'',
-            	password:''
-        },
-         	isedit:false,
+		this.state= {
+            isedit: false,
 		};
 		this.requestedit = this.requestedit.bind(this);
 	}
+
 	requestedit(){
 		this.setState({ isedit: true });
 	}
 
 
+
 	render () {
 		if (this.state.isedit){
 			return (
-				<div className = "content">
-				<EditProfile />
-				</div>
-				);
+			<Edit />
+			);
 		}
-		return(
+
+		//get the profile data from backend
+		const { user,fetched } = this.props;
+		console.log(fetched);
+		if(fetched) {
+			//get data
+			console.log(user.user_name);
+			return(
 			<div className = "content">
-				<form>
 					<div className ="media-left">
 						<img src = "http://www.ravalyogimatrimony.com/Content/images/default-profile-pic.png" alt = "profile picture"/>
 					</div>
 					<div className = "media-body">
-					<p> Username :</p>
-    				<p> Email : </p>
-    				<input type = "submit" value = "Edit Profile" name = "edit" onClick={this.requestedit}/>
-					</div>
-				</form>
-				<ul className="nav nav-tabs">
-  					<li className ="active"><a data-toggle ="tab" href="#playlist">Play List</a></li>
-  					<li><a data-toggle ="tab" href="#wishlist">Wishlist</a></li>
-				</ul>
-				<div className ="tab-content">
-					<div id ="playlist" className = "tab-pane fade in active">
-						<li><a href="#">1</a></li>
-    					<li><a href="#">2</a></li>
-    					<li><a href="#">3</a></li>
-    					<li><a href="#">4</a></li>
-					</div>
-				<div id ="wishlist" className = "tab-pane fade">
-						<li><a href="#">1</a></li>
-    					<li><a href="#">2</a></li>
-    					<li><a href="#">3</a></li>
-    					<li><a href="#">4</a></li>
-				</div>
+					<p> Username : {user.user_name} </p>
+    				<Button className = "btn btn-primary" type ="submit"  name = "Submit" onClick={this.requestedit}>Edit</Button>
+    				</div>
+    				<Tabs defaultActiveKey={1} className="String" id="uncontrolled-tab-example">
+    					<Tab eventKey={1} title="Playlist">
+    						<li>Tab 1 content</li>
+    					</Tab>
+   						<Tab eventKey={2} title="Wishlist">Tab 2 content</Tab>
+   					</Tabs>
 			</div>
-		</div>
 			);
+		}
 	}
 }

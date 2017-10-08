@@ -12,43 +12,45 @@ import time
 import operator
 
 
-# Retrieves user profile along with game list and wish list
-# TESTED
-@api_view(['GET'])
-def user_prof(request):
+def user_prof_helper(username):
     game_list = ""
     wish_list = ""
     user_prof = ""
     # Get user
     try:
-        user_entry = User.objects.get(user_name = request.GET['username'])
+        user_entry = User.objects.get(user_name=username)
         user_prof = '''
-            {{ 
-                "username" : "{}",
-                "user_id" : "{}"
-            }}
-        '''.format(user_entry.user_name, user_entry.user_id)
+                {{ 
+                    "username" : "{}",
+                    "user_id" : "{}"
+                }}
+            '''.format(user_entry.user_name, user_entry.user_id)
     except:
         HttpResponse('{ "user" : {}, "gamelist" : {}, "wishlist" : {} }')
     # Get game list
     try:
-        game_list = get_list(request.GET['username'], True)
+        game_list = get_list(username, True)
     except:
         print("No games")
     # Get wish list
     try:
-        wish_list = get_list(request.GET['username'], False)
+        wish_list = get_list(username, False)
     except:
         print("No wishes")
 
     ret_json = '''
-        {{
-            "user" : "{}",
-            "gamelist" : [{}],
-            "wishlist" : [{}]
-        }}
-    '''.format(request.GET['username'], game_list, wish_list)
+            {{
+                "user" : "{}",
+                "gamelist" : [{}],
+                "wishlist" : [{}]
+            }}
+        '''.format(username, game_list, wish_list)
     return HttpResponse(ret_json)
+# Retrieves user profile along with game list and wish list
+# TESTED
+@api_view(['GET'])
+def user_prof(request):
+    return user_prof_helper(request.GET['username'])
 
 
 # Follow user
@@ -83,17 +85,21 @@ def get_list(username, type):
         player = User.objects.get(user_name = username)
         gamelist = None
         if type is True:
-            gamelist = PlayerLibrary.objects.filter(user_name=player, played=True)
+            gamelist = PlayerLibrary.objects.filter(user_id=player, played=True)
         else:
-            gamelist = PlayerLibrary.objects.filter(user_name=player, played=False, wish_list=True)
+            gamelist = PlayerLibrary.objects.filter(user_id=player, played=False, wish_list=True)
         json_list = []
+        print(gamelist)
         # convert to json list
         for entries in gamelist:
-            game = entries.game_id
-            g_id = game.game_id
-            g_name = game.game_name
-            g_json = '{{"game_name":"{}", "game_id":"{}"}}'.format(g_name, g_id)
-            json_list.append(g_json)
+            try:
+                game = entries.game_id
+                g_id = game.game_id
+                g_name = game.game_name
+                g_json = '{{"game_name":"{}", "game_id":"{}"}}'.format(g_name, g_id)
+                json_list.append(g_json)
+            except:
+                continue
         print(','.join(json_list))
         return ','.join(json_list)
     except Exception as e:
@@ -103,6 +109,7 @@ def get_list(username, type):
 
 # Get a user's game list
 # TESTED
+# curl -d '{"user":{"username" : "a regular"}}' -X POST "http://localhost:8000/backend/game_list/"
 @api_view(['POST'])
 def get_gamelist(request):
     json_obj = None
@@ -132,6 +139,7 @@ def get_gamelist(request):
 
 
 # Get a user's wish list
+# curl -d '{"user":{"username" : "a regular"}}' -X POST "http://localhost:8000/backend/wish_list/"
 # TESTED
 @api_view(['POST'])
 def get_wishlist(request):
@@ -160,11 +168,31 @@ def get_wishlist(request):
     except:
         return HttpResponse('{"message":"does not exist, "wishlist":[]"}')
 
+# Check if in users game list as played and/or wishlist
+# Testing code: Has sample url to test
+# curl -X GET "http://localhost:8000/backend/check_in_userlist/?userid=76561197960530222&gameid=578080&played=true&wishlist=false"
+@api_view(['GET'])
+def check_in_userlist(request):
+    try:
+        user_id = int(request.GET.get('userid'))
+        game_id = int(request.GET.get('gameid'))
+        played = (request.GET.get('played') == "true")
+        wish_list = (request.GET.get('wishlist') == "true")
+
+        test = PlayerLibrary.objects.get(user_id=user_id,
+                                  game_id=game_id,
+                                  played=played,
+                                  wish_list=wish_list)
+        return HttpResponse('{"message":"Success"}')
+    except:
+        return HttpResponse('{"message":"Invalid Request"}')
+
 
 # Adding a game to a user's wish or played list
 # TESTED
+# curl -d '{"user":{"username" : "a regular", "gameid" : "", "played" : False, "wish" : True}}' -X POST "http://localhost:8000/backend/edit_list/"
 @api_view(['POST'])
-def update_userlist(request):
+def edit_list(request):
     json_obj = None
     try:
         json_obj = json.loads(request.body.decode())
@@ -180,14 +208,11 @@ def update_userlist(request):
         game    = GameList.objects.get(game_id = json_obj['user']['gameid'])
         played  = json_obj['user']['played']
         wishes  = json_obj['user']['wish']
-        new_entry = PlayerLibrary(user_name = player, game_id = game, wish_list = wishes, played = played)
+        new_entry = PlayerLibrary(user_id = player, game_id = game, wish_list = wishes, played = played)
         new_entry.save()
-        return HttpResponse('''
-            {
-                "message":"Successful"
-            }    
-        ''')
-    except:
+        return user_prof_helper(json_obj['user']['username'])
+    except Exception as e:
+        print(e)
         return HttpResponse('''
             {
                 "message":"Invalid Request"
@@ -198,7 +223,7 @@ def update_userlist(request):
 # curl -d "param1=value1&param2=value2" -X POST http://localhost:3000/data
 @api_view(['POST'])
 # TESTED
-def user_login(request):
+def login(request):
     obj = None
     user_entry = None
     #Check if user is activated
@@ -220,6 +245,20 @@ def user_login(request):
         except:
             return HttpResponse('{"message":"does not exist", "user":{}}')
 
+    # Initialise values
+    game_list = ""
+    wish_list = ""
+    # Get game list
+    try:
+        game_list = get_list(obj['user']['username'], True)
+    except:
+        print("No games")
+    # Get wish list
+    try:
+        wish_list = get_list(obj['user']['username'], False)
+    except:
+        print("No wishes")
+
     # Session
     # user_id
     # session_id
@@ -239,9 +278,11 @@ def user_login(request):
             "cookie" : {{
                 "user_name" : "{}",
                 "session" : "{}"
-            }}
+            }},
+            "gamelist" : [{}],
+            "wishlist" : [{}]
         }}
-    '''.format(user_dict['user_name'], user_dict['email'], user_dict['user_name'], user_session)
+    '''.format(user_dict['user_name'], user_dict['email'], user_dict['user_name'], user_session, game_list, wish_list)
     new_session = Session(user_id = user_entry, session_id = user_session)
     new_session.save()
     response = HttpResponse(ret_json)
@@ -250,7 +291,7 @@ def user_login(request):
 
 @api_view(['POST'])
 # TESTED
-def check_session(request):
+def session_check(request):
     json_obj = None
     # decode json
     try:
@@ -278,7 +319,7 @@ def check_session(request):
 
 @api_view(['POST'])
 # TESTED
-def user_logout(request):
+def logout(request):
     response = HttpResponse('{"message":"success"}')
     response.delete_cookie('session_id')
     response.delete_cookie('username')
@@ -316,7 +357,7 @@ def msg_to_json(msg):
 
 # user Registration
 @api_view(['POST'])
-def user_register(request):
+def register(request):
     """
     post method function, get user information and put him in register table
     :param request: the request object
@@ -333,62 +374,68 @@ def user_register(request):
 
     if obj is not None:
         # check user existence
-        exist_user = User(user_name=obj['user_name'])
-        if exist_user is not None:
-            return HttpResponse(msg_to_json("user already exist"))
-
-        # create new user for the register table and get info from the request
-        key = blake2b("%s,%s,%s" % (obj['user_name'], obj['email'], obj['pass_word']))  # key send to the user
-        link = "http://domainName.com/activate/" + key
-
-        # send activation email
         try:
-            server = smtplib.SMTP('smtp.gmail.com:587')
-            server.starttls()
-            server.login('yun553966858@gmail.com', 'asdqwienvlasdkf')
-            message = 'Subject: {}\n\n{}'.format("SteamR Registration",
-                                                 "User Name: %s\nActivation Link: %s\n" % (obj['user_name'], link))
-            server.sendmail('SteamR Team', obj['email'], message)
-            server.quit()
-        except smtplib.SMTPException:
-            return HttpResponse(msg_to_json("fail to send email"))
+            exist_user = User.objects.get(user_name=obj['user']['user_name'])
+        #print(exist_user)
+            return HttpResponse(msg_to_json("user already exist"))
+        except:
+            # create new user for the register table and get info from the request
+            user_name=obj['user']['user_name']
+            password = obj['user']['pass_word']
+            key = blake2b((user_name + password).encode('utf-8')).hexdigest()  # key send to the user
+            link = "http://localhost:8090/activate/" + key
 
-        new_register = Register(user_name=obj['user_name'], email=obj['email'],
-                                pass_word=obj['pass_word'], privacy=obj['privacy'], key=key)
-        new_register.save()
-        return HttpResponse(msg_to_json("register created successfully"))
+            # send activation email
+            try:
+                server = smtplib.SMTP('smtp.gmail.com:587')
+                server.starttls()
+                server.login('yun553966858@gmail.com', 'asdqwienvlasdkf')
+                message = 'Subject: {}\n\n{}'.format("SteamR Registration",
+                                                 "User Name: %s\nActivation Link: %s\n" % (obj['user']['user_name'], link))
+                server.sendmail('SteamR Team', obj['user']['email'], message)
+                server.quit()
+            except smtplib.SMTPException:
+                return HttpResponse(msg_to_json("fail to send email"))
+
+            new_register = Register(user_name=obj['user']['user_name'], email=obj['user']['email'],
+                                pass_word=obj['user']['pass_word'], privacy=obj['user']['privacy'], key=key)
+            new_register.save()
+            print(new_register)
+            return HttpResponse(msg_to_json("register created successfully"))
     else:
         return HttpResponse(msg_to_json("json loading failed"))
 
 
 # activate user, put user into user table
 @api_view(['GET'])
-def activate_user(request, key):
+def activate(request, key):
     """
     function that try to sign up a registered user (activate a user)
     :param request:
     :param key: activation key
     :return: if activation key exist create the user account in the table and return true, else return json no exist
     """
-    exist_register = Register(key=key)
-    if exist_register is None:
-        return HttpResponse(msg_to_json("no exist"))
+    try:
+        exist_register = Register.objects.get(key=request.GET['key'])
 
-    # create the new user
-    new_user = User(user_name=exist_register.user_name, email=exist_register.email,
+
+         # create the new user
+        new_user = User(user_name=exist_register.user_name, email=exist_register.email,
                     pass_word=exist_register.pass_word, privacy=exist_register.privacy)
-    new_user.save()
+        new_user.save()
 
-    # delete entry in the register table
-    exist_register.delete()
-    
-    return HttpResponse(msg_to_json("used activated"))
+        # delete entry in the register table
+        exist_register.delete()
+
+        return HttpResponse(msg_to_json("used activated"))
+    except:
+        return HttpResponse(msg_to_json("request failed"))
 
 
 # Search for games
 # For testing - note: %20 is a space, %2C is a comma in URL character encoding
 # curl -X GET "http://localhost:8000/backend/search_game/?q=for%20left&category=strategy%2CRTS"
-# curl -X GET "http://localhost:8000/backend/search_game/?q=soldier&category=Multi%2DPlayer" 
+# curl -X GET "http://localhost:8000/backend/search_game/?q=soldier&category=Multi%2DPlayer"
 # curl -X GET "http://localhost:8000/backend/search_game/?q=&category=Multi%2DPlayer%2CCo%2Dop&genre=Action%2CAdventure"
 @api_view(['GET'])
 def search_game(request):
@@ -400,81 +447,45 @@ def search_game(request):
     print("search game function is running ...")
     print("")
     # TODO check if try-catch is slow
-    try:
-        query = request.GET.get('q')
-        category = request.GET.get('category')
-        genre = request.GET.get('genre')
+    # try:
+    query = request.GET.get('q')
+    category = request.GET.get('category')
+    genre = request.GET.get('genre')
 
-        # Step 1: Filter by keyword
-        if query:
-            query_list = query.split(" ")
-            results = GameList.objects.filter(
-                reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
-            )# Returns a QuerySet
-        else:
-            results = GameList.objects.all() # Return all the results if no key words are given
+    # Step 1: Filter by keyword
+    if query:
+        query_list = query.split(" ")
+        results = GameList.objects.filter(
+            reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
+        )# Returns a QuerySet
+    else:
+        results = GameList.objects.all() # Return all the results if no key words are given
 
-        # Step 2: Filter by category
-        if category:
-            category_list = category.split(",")
-            catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
-            catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches and assign a 'mathes' column to store count
-            catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
+    # Step 2: Filter by category
+    if category:
+        category_list = category.split(",")
+        catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
+        catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches and assign a 'mathes' column to store count
+        catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
 
-            results = results.filter(game_id__in=catObjs.values('game_id')) # Filter previous results from previous filter
+        results = results.filter(game_id__in=catObjs.values('game_id')) # Filter previous results from previous filter
 
-        # Step 3: Filter by genre
-        # TODO need to test more, for multiply genres
-        if genre:
-            genre_list = genre.split(",")
-            genreObjsUnion = Genres.objects.filter(reduce(operator.or_, (Q(genre__iexact=g) for g in genre_list)))
-            genreObjs = genreObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches and assign a 'mathes' column to store count
-            genreObjs = genreObjs.filter(matches__exact=len(genre_list)) # Filter to get ONLY games that match ALL given genre tags
+    # Step 3: Filter by genre
+    # TODO need to test more, for multiply genres
+    if genre:
+        genre_list = genre.split(",")
+        genreObjsUnion = Genres.objects.filter(reduce(operator.or_, (Q(genre__iexact=g) for g in genre_list)))
+        genreObjs = genreObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches and assign a 'mathes' column to store count
+        genreObjs = genreObjs.filter(matches__exact=len(genre_list)) # Filter to get ONLY games that match ALL given genre tags
 
-            results = results.filter(game_id__in=genreObjs.values('game_id'))  # Filter previous results from previous filter
+        results = results.filter(game_id__in=genreObjs.values('game_id'))  # Filter previous results from previous filter
 
-        # print("new method " + str(len(results)))
-
-        # ---- Version 1 ----
-        # if category: # Add category filter
-        #     category_list = category.split(",")
-        #
-        #     catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
-        #     catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches
-        #     catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
-        #
-        #     if query:
-        #         query_list = query.split()
-        #         results = GameList.objects.filter(reduce(operator.and_, (Q(game_name__icontains=q) for q in query_list)),
-        #                                           game_id__in=catObjs.values('game_id'))
-        #     else:
-        #         results = GameList.objects.filter(game_id__in=catObjs.values('game_id')) # All games of those categories
-        # else: # No category filter
-        #     if query:
-        #         query_list = query.split()
-        #         results = GameList.objects.filter(
-        #             reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
-        #         )# Returns a QuerySet
-        #     else:
-        #         results = GameList.objects.all() # TODO discuss with group what they want with empty query, atm returns everything
-        # print("old method " + str(len(results)))
-        # ---- End Version 1
-
-        # debugging -----
-        # for result in results:
-        #     game = result.as_dict()
-        #     print(game['game_name'])
-        #
-        # print("list of genres")
-        # genres = Genres.objects.values('genre').distinct()
-        # for genre in genres:
-        #     print(genre)
-        # ---- end debugging
-        # Put 'results' querySet into dict format to convert into JSON dict
-        results_list = [obj.as_dict() for obj in results]
-        return HttpResponse(json.dumps({"results": results_list}), content_type='application/json')
-    except:
-        return HttpResponse('{"message":"input invalid", "search-games":{}}')
+    # Put 'results' querySet into dict format to convert into JSON dict
+    results_list = [obj.as_dict() for obj in results]
+    outputJSON = json.dumps({"results": results_list},ensure_ascii=False).encode('utf16')
+    return HttpResponse(outputJSON, content_type='application/json')
+    # except:
+    #     return HttpResponse('{"message":"input invalid", "search-games":{}}')
 
 # Get the top "n" number of games
 # curl -X GET "http://localhost:8000/backend/get_top_games/?n=100"
@@ -489,11 +500,12 @@ def get_top_games(request):
         #     obj = result.as_dict()
         #     print(obj['game_name'] + " / " + str(obj['num_player']))
         # # ---- end debugging
-        return HttpResponse(json.dumps({"results": results_list}), content_type='application/json')
+        outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf16')
+        return HttpResponse(outputJSON, content_type='application/json')
     except:
         return HttpResponse('{"message":"input invalid", "get-top-games":{}}')
 
-
+# Commit
 # Return average rating of a given a game_id #TODO or game name?
 # TODO need to test,
 # TODO might replace with storing average rating and number of ratings in table
@@ -520,7 +532,7 @@ def get_average_rating(request):
 # curl -d '{"rating": {"username":"IHMS","gameid":4, "rate":4, "comment":"mada mada"} }' -X POST "http://localhost:8000/backend/rating/"
 # curl http://localhost:8000/backend/login/ -X POST -d '{"user":{"username":"IHMS","password":"123456"}}'
 @api_view(['POST'])
-def rate_and_review(request):
+def rating(request):
     json_obj = None
     try:
         json_obj = json.loads(request.body.decode())
@@ -553,28 +565,115 @@ def rate_and_review(request):
 
 # Gives 5 game recommendations for the given user
 # For testing:
-# curl -X GET "http://localhost:8000/backend/recommend_v1/?userid=TEST_acc"
-
 # TODO refactor below testing html for later
-# curl -X GET "http://localhost:8000/backend/recommend_v1/?username=Axy"
-
+# curl -X GET "http://localhost:8000/backend/recommend_v1/?userid=76561197960530222"
 @api_view(['GET'])
-def get_recommendations_v1(request):
-    # TODO problem if more than one user has same username, replace below with user_id, need to get others to refactor code
-    username = request.GET.get('username') # Get the target user
-    user_entry_dict = User.objects.get(user_name=username).as_dict()
+def recommend_v1(request):
 
-    game_list_dict = PlayerLibrary.objects.get(user_name=user_entry_dict['user_id']).as_dict()
-    for game in game_list_dict:
-        print(game)
-    # Algorithm 1
-    # -----------
+    player = User.objects.get(user_id=request.GET.get('userid')) # Get the target user
+    game_set = None
+    try:
+        game_set = PlayerLibrary.objects.filter(user_id=player)
+    except:
+        # If no games, for now, return top 5 current games
+        # TODO discuss with group if they want this
+        results = GameList.objects.all()[:5]
+        results_list = [obj.as_dict() for obj in results]  # create a results_list to be converted to JSON format
+        outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf-16')
+        return HttpResponse(outputJSON, content_type='application/json')
 
-    # Step 1: Iterate through above dict, fill another dict with genre count (get genre table working)
+    # Step 1: Get all player games
+    player_games = []
+    for entries in game_set:
+        try: # To handle the weird db issue atm where we ignore if game is not there
+            game_obj = entries.game_id
+            game_id = game_obj.game_id
+            player_games.append(game_id)
+        except:
+            continue
 
-    # Step 2: Iterate through genre_dict, add top game of that genre to recommend_dict
-    # if less than 5 genres, recommend more from first until list of 5 is compiled
+    # Step 2: Get all related genres
+    genre_count = {}
+    genre_set = Genres.objects.filter(game_id__in=player_games)
+    for game_genre in genre_set:
+        genre = game_genre.genre
+        if genre in genre_count:
+            genre_count[genre] += 1
+        else:
+            genre_count[genre] = 1
 
-    # Convert recommend_dict to JSON format and return list of recommended games
+    # Step 3: Sort and get the top 5 genres
+    top_5_genres = []
+    sorted_keys = [(k, genre_count[k]) for k in sorted(genre_count, key=genre_count.get, reverse=True)] # [:2] # Just for debugging
+    # debugging
+    # for genre, count in sorted_keys:
+    #     print(genre + "/" + str(count))
 
-    return HttpResponse('{"message":"input invalid", "recommendations":{}}')
+    for i in range(0,5):
+        genre, count = sorted_keys[i % len(sorted_keys)]
+        print(genre)
+        top_5_genres.append(genre)
+
+    # Filter all games list by genre, exclude duplicates when adding to recommend list
+    print("Recommendations")
+    recommend_set = []
+    for genre in top_5_genres:
+        target_games = Genres.objects.filter(genre=genre)
+        results = GameList.objects.filter(game_id__in=target_games.values('game_id')).exclude(game_id__in=recommend_set)
+        result_top_dict = results[0].as_dict()
+        recommend_set.append(result_top_dict['game_id'])
+
+    # Output results
+    results = GameList.objects.filter(game_id__in=recommend_set)
+    results_list = [obj.as_dict() for obj in results]  # create a results_list to be converted to JSON format
+    outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf-16')
+    return HttpResponse(outputJSON, content_type='application/json')
+
+# given json contain username, email, and password
+# curl -d '{"edit":{"username" : "a regular", "email" : "edittest@gmail.com", "password" : "editpass"}}' -X POST "http://localhost:8000/backenist/"
+@api_view(['POST'])
+def edit_profile(request):
+    print("user edit function is running ...")
+    print("")
+    obj = None
+    try:
+        obj = json.loads(request.body.decode())
+        print("decode success")
+    except:
+        print("Error when loading the Json")
+        pass
+
+    if obj is not None:
+        # get user data
+        username = obj['edit']['username']
+        e = obj['edit']['email']
+        p= obj['edit']['password']
+
+        print("get the username:" + username)
+        print("get the email:" + e)
+        print("get the password:" + p)
+        try:
+            user = User.objects.get(user_name=username)
+            try:
+                email = obj['edit']['email']
+                user.email = email
+                user.save()
+                try:
+                    password = obj['edit']['password']
+                    user.pass_word = password
+                    user.save()
+                    return HttpResponse('{"message": "change password and email"}')
+                except:
+                    return HttpResponse('{"message": "change email"}')
+            #pass new value of email and password
+            except:
+                try:
+                    password = obj['edit']['password']
+                    user.pass_word = password
+                    user.save()
+                    return HttpResponse('{"message": "change password"}')
+                except:
+                    return HttpResponse('{"message": "no change occurs"}')
+            return HttpResponse('{"message": "no change occurs"}')
+        except:
+            return HttpResponse('{"message": "no user"}')

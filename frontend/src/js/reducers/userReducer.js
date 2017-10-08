@@ -37,6 +37,8 @@ export default function reducer(state={
       case "DELETE_USER": {
         localStorage.removeItem('user_info');
         localStorage.removeItem('cookie');
+        localStorage.removeItem('game_list');
+        localStorage.removeItem('wish_list');
         return {
           ...state,
           user: {},

@@ -5,7 +5,7 @@ import { getGameInfo } from '../../actions/userActions'
 
 @connect((store) => {
   return {
-    discover: store.games.discover,
+    user_fetched: store.user.fetched,
   }
 })
 export default class Profile extends React.Component {
@@ -35,15 +35,32 @@ export default class Profile extends React.Component {
     return { __html: rawMarkup };
   }
 
+  renderButton = () => {
+      if(this.props.user_fetched) {
+        return (
+            <div>
+              <Button className = "btn btn-primary gamebutton" >Add to Game List</Button>
+              <br/>
+              <Button className = "btn btn-primary wishbutton" >Add to Wish List</Button>
+            </div>
+        )
+      }
+  }
+
 
   render () {
 
     if(this.state.curr_game.length>0){
       const game=this.state.curr_game[0];
       return(
-          <div>
-            <img src={game.image_url}/>
-            <div dangerouslySetInnerHTML={this.rawMarkup()}></div>
+          <div className='row'>
+            <div className='col-md-7'>
+              <img className='description-img' src={game.image_url}/>
+              <div dangerouslySetInnerHTML={this.rawMarkup()}></div>
+            </div>
+            <div className='col-md-5'>
+                {this.renderButton()}
+            </div>
           </div>
       );
     }

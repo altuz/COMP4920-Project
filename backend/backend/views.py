@@ -96,7 +96,8 @@ def get_list(username, type):
                 game = entries.game_id
                 g_id = game.game_id
                 g_name = game.game_name
-                g_json = '{{"game_name":"{}", "game_id":"{}"}}'.format(g_name, g_id)
+                g_picture = game.image_url
+                g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}"}}'.format(g_name, g_id, g_picture)
                 json_list.append(g_json)
             except:
                 continue
@@ -685,33 +686,26 @@ def edit_profile(request):
         # get user data
         username = obj['edit']['username']
         e = obj['edit']['email']
-        p= obj['edit']['password']
+        p = obj['edit']['password']
+        print("e" + e)
+        print("p" + p)
 
-        print("get the username:" + username)
-        print("get the email:" + e)
-        print("get the password:" + p)
+        user_entry = User.objects.get(user_name=username)
+
+        if e is '':
+            e = user_entry.email
+
+        if p is '':
+            p = user_entry.pass_word
+
+        user_entry.email = e
+        user_entry.pass_word = p
+        print("new email" + user_entry.email)
+        print("new pass" + user_entry.pass_word)
         try:
-            user = User.objects.get(user_name=username)
-            try:
-                email = obj['edit']['email']
-                user.email = email
-                user.save()
-                try:
-                    password = obj['edit']['password']
-                    user.pass_word = password
-                    user.save()
-                    return HttpResponse('{"message": "change password and email"}')
-                except:
-                    return HttpResponse('{"message": "change email"}')
-            #pass new value of email and password
-            except:
-                try:
-                    password = obj['edit']['password']
-                    user.pass_word = password
-                    user.save()
-                    return HttpResponse('{"message": "change password"}')
-                except:
-                    return HttpResponse('{"message": "no change occurs"}')
-            return HttpResponse('{"message": "no change occurs"}')
-        except:
-            return HttpResponse('{"message": "no user"}')
+            user_entry.save()
+            return HttpResponse('{"message" : "edit success"}')
+        except Exception as e:
+            print(e)
+
+    return HttpResponse('{"message": "no user"}')

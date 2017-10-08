@@ -39,7 +39,6 @@ export default class LoginForm extends React.Component {
 		}
 		this.setState({isSubmitting:true});
 		this.props.dispatch(login(user));
-
 	}
 
 

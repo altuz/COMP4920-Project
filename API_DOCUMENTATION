@@ -13,7 +13,17 @@ Output:
         "pass_word":"123456",
         "privacy":true
         // empty if fail
-    }
+    },
+    "gamelist" : [
+        {"game_name" : "abc", "game_id" : "123", "thumbnail" : "url.com", "description" : "xyz"},
+        ....
+        ....
+    ],
+    "wishlist": [
+        {"game_name" : "abc", "game_id" : "123"},
+        ....
+        ....
+    ]
 }
 
 Function: Edit User Played/Wishlist
@@ -22,9 +32,7 @@ Type: POST
 Input: {"user" : { "username" : "xxx", "game_id" : "yyy", "wish" : "True/False", "played" : "True/False"}
 userid=x, game_id=y, wish=True/False, played=True/False
 Output:
-{
-    "message":"Successful/Invalid Request"
-}
+Outputs the new played and wish list, same outout as backend/user_prof
 
 Function: Search Game
 Url: backend/search_game/
@@ -118,7 +126,7 @@ Output:
 {
     "message":"error/success"
     "gamelist": [
-        {"game_name" : "abc", "game_id" : "123"},
+        {"game_name" : "abc", "game_id" : "123", "thumbnail" : "url.com", "description" : "xyz"},
         ....
         ....
     ]
@@ -132,7 +140,7 @@ Output:
 {
     "message":"error/success"
     "wishlist": [
-        {"game_name" : "abc", "game_id" : "123"},
+        {"game_name" : "abc", "game_id" : "123", "thumbnail" : "url.com", "description" : "xyz"},
         ....
         ....
     ]
@@ -184,7 +192,7 @@ Output:
 {
     "user" : {"user_name" : "xxx", "user_id" : "xxx"},
     "gamelist" : [
-        {"game_name" : "abc", "game_id" : "123"},
+        {"game_name" : "abc", "game_id" : "123", "thumbnail" : "url.com", "description" : "xyz"},
         ....
         ....
     ]

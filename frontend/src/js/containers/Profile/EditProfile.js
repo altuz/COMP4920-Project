@@ -39,7 +39,7 @@ export default class EditProfile extends React.Component {
 	handleSubmit(e){
 		e.preventDefault();
 		var edit ={
-			username:user.user_name,
+			username:this.props.user.user_name,
 			email: this.state.email,
 			password:this.state.password
 		}
@@ -49,7 +49,7 @@ export default class EditProfile extends React.Component {
 
 	back(){
 	    this.setState({isSubmitting:true});
-	    window.location.href='/#/discover';
+	    window.location.href='/#/profile';
 	}
 
 

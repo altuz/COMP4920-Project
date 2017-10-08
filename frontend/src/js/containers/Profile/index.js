@@ -2,6 +2,7 @@ import React from "react";
 import {Button, Media, Tab, Tabs, Nav} from 'react-bootstrap';
 import Edit  from "./EditProfile"
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
 
@@ -34,6 +35,20 @@ export default class Profile extends React.Component {
 	requestedit(){
 		this.setState({ isedit: true });
 	}
+
+	nameFormatter(cell,row,enumObject, index){
+        return (
+            <div>
+                <Link className='game_name' to ={{
+                    pathname: `/games/${row.game_id}`,
+                    state: {index}
+                }}>
+                {cell}
+                </Link>
+            </div>
+    )
+
+  }
 
 	imageFormatter(cell,row){
         return (
@@ -68,17 +83,17 @@ export default class Profile extends React.Component {
     				<Tabs defaultActiveKey={1} className="String" id="uncontrolled-tab-example">
     					<Tab eventKey={1} title="Playlist">
     						<div>
-    						    <BootstrapTable data={this.props.gamelist} options={ option } hover pagination>
-                                    <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
-                                    <TableHeaderColumn isKey dataField='game_name'>Game Name</TableHeaderColumn>
+    						    <BootstrapTable data={this.props.gamelist} hover pagination>
+                                    <TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
+                                    <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>
                                 </BootstrapTable>
     						</div>
     					</Tab>
    						<Tab eventKey={2} title="Wishlist">
    						    <div>
-    						    <BootstrapTable data={this.props.wishlist} options={ option } hover pagination>
-                                    <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
-                                    <TableHeaderColumn isKey dataField='game_name' >Game Name</TableHeaderColumn>
+    						    <BootstrapTable data={this.props.wishlist} hover pagination>
+                                    <TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
+                                    <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>
                                 </BootstrapTable>
     						</div>
    						</Tab>

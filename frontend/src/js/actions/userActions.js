@@ -73,18 +73,6 @@ export function signup(user){
     axios.post('http://localhost:8000/backend/register/',{
         user
     })
-    .then((response)=>{
-        console.log(response.data);
-        if(response.data.message==='success'){
-            dispatch( {
-              type: 'SET_USER',
-              payload:response.data.user,
-            })
-        }
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
     }
 }
 

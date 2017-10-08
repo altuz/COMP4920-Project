@@ -388,7 +388,7 @@ def register(request):
             user_name = obj['user']['user_name']
             password = obj['user']['pass_word']
             key = blake2b((user_name + password).encode('utf-8')).hexdigest()  # key send to the user
-            link = "http://localhost:8090/backend/activate/?key=" + key
+            link = "http://localhost:8090/#/activate/" + key
 
             # send activation email
             try:

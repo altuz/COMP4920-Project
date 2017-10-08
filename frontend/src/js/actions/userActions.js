@@ -6,7 +6,6 @@ export function login(user) {
         user
     })
     .then((response)=>{
-        console.log(response);
         if(response.data.message==='success'){
           console.log(response);
           localStorage.setItem('cookie', JSON.stringify(response.data.cookie));
@@ -19,8 +18,13 @@ export function login(user) {
     .catch((err)=>{
       console.log(err);
     });
-
-
+    axios.get('http://localhost:8000/backend/get_top_games/?n=100')
+        .then((res2)=>{
+          dispatch({
+            type: 'SET_DISCOVER',
+            payload:res2.data,
+          })
+        })
     }
 }
 
@@ -84,14 +88,7 @@ export function signup(user){
     }
 }
 
-export function edit_profile(edit){
-    console.log(edit);
-    return function (dispatch){
-        axios.post('http://localhost:8000/backend/edit_profile/',{
-        edit
-        })
-    }
-}
+
 
 // export function setUserName(name) {
 //   return {

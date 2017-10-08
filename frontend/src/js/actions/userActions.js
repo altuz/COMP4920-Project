@@ -7,10 +7,11 @@ export function login(user) {
     })
     .then((response)=>{
         if(response.data.message==='success'){
+          console.log(response);
           localStorage.setItem('cookie', JSON.stringify(response.data.cookie));
             dispatch( {
               type: 'SET_USER',
-              payload:response.data.user,
+              payload:response.data,
             })
         }
     })

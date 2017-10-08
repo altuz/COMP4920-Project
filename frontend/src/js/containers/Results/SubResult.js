@@ -16,21 +16,20 @@ export default class Profile extends React.Component {
   }
 
   componentWillMount() {
-    this.props.dispatch({
-      type:'SET_CURR_GAME',
-      payload: this.props.discover[this.state.gameIndex],
-    })
+    console.log(this.props.match);
+      // this.props.dispatch({
+      //   type:'SET_CURR_GAME',
+      //   payload: this.props.discover[this.state.gameIndex],
+      // })
   }
 
 
 
   render () {
-    const game = this.props.discover[this.state.gameIndex];
-    console.log(game);
     return(
       <div>
-       <img src={game.image_url}/>
-        fuck you
+       {/*<img src={game.image_url}/>*/}
+        {/*{game.game_description}*/}
       </div>
     );
   }

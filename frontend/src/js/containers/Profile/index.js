@@ -42,6 +42,7 @@ export default class Profile extends React.Component {
     };
 
 
+
 	render () {
 		if (this.state.isedit){
 			return (
@@ -69,7 +70,7 @@ export default class Profile extends React.Component {
     						<div>
     						    <BootstrapTable data={this.props.gamelist} options={ option } hover pagination>
                                     <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
-                                    <TableHeaderColumn isKey dataField='game_name' >Game Name</TableHeaderColumn>
+                                    <TableHeaderColumn isKey dataField='game_name'>Game Name</TableHeaderColumn>
                                 </BootstrapTable>
     						</div>
     					</Tab>

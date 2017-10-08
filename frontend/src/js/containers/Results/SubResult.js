@@ -41,7 +41,7 @@ export default class Profile extends React.Component {
     if(this.state.curr_game.length>0){
       const game=this.state.curr_game[0];
       return(
-          <div>
+          <div className='col-md-4'>
             <img src={game.image_url}/>
             <div dangerouslySetInnerHTML={this.rawMarkup()}></div>
           </div>

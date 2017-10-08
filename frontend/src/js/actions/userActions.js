@@ -88,7 +88,14 @@ export function signup(user){
     }
 }
 
-
+export function edit_profile(edit){
+    console.log(edit);
+    return function (dispatch){
+        axios.post('http://localhost:8000/backend/edit_profile/',{
+        edit
+        })
+    }
+}
 
 // export function setUserName(name) {
 //   return {

@@ -46,6 +46,7 @@ export default class Profile extends React.Component {
     this.props.dispatch(add_to_game_list(this.props.user.user_name,this.state.curr_game[0].game_id));
     this.setState({
       in_my_game: true,
+      in_my_wish: false,
     })
 
   }
@@ -55,6 +56,7 @@ export default class Profile extends React.Component {
     this.props.dispatch(add_to_wish_list(this.props.user.user_name,this.state.curr_game[0].game_id));
     this.setState({
       in_my_wish: true,
+      in_my_game: false,
     })
   }
 
@@ -78,8 +80,6 @@ export default class Profile extends React.Component {
       return (
           <div>
             <Button className = "btn btn-default gamebutton" >Remove From Game List</Button>
-            <br/>
-            <Button className = "btn btn-primary wishbutton" onClick={this.add_to_wish_list}>Add to Wish List</Button>
           </div>
       )
     }
@@ -87,15 +87,6 @@ export default class Profile extends React.Component {
       return (
           <div>
             <Button className = "btn btn-primary gamebutton" onClick={this.add_to_game_list}>Add to Game List</Button>
-            <br/>
-            <Button className = "btn btn-default wishbutton" >Remove From Wish List</Button>
-          </div>
-      )
-    }
-    if(this.props.user_fetched && this.state.in_my_game && this.state.in_my_wish) {
-      return (
-          <div>
-            <Button className = "btn btn-default gamebutton" >Remove to Game List</Button>
             <br/>
             <Button className = "btn btn-default wishbutton" >Remove From Wish List</Button>
           </div>

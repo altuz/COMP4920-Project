@@ -38,6 +38,10 @@ export function add_to_wish_list(username,gameID){
       user
     }).then((res=>{
       console.log(res);
+      dispatch( {
+        type: 'UPDATE_WISHLIST',
+        payload:res.data.wishlist,
+      })
     }))
   }
 }

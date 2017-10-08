@@ -97,8 +97,7 @@ def get_list(username, type):
                 g_id = game.game_id
                 g_name = game.game_name
                 g_picture = game.image_url
-                g_summary = game.game_description
-                g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}", "description":"{}"}}'.format(g_name, g_id, g_picture, g_summary)
+                g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}"}}'.format(g_name, g_id, g_picture)
                 json_list.append(g_json)
             except:
                 continue

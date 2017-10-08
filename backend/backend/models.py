@@ -131,7 +131,7 @@ class Genres(models.Model):
         }
 
     def __str__(self):
-        return str(self.game_id) + "/" + str(self.genre)
+        return str(self.game_id) + "/" + str(self.genre) + "\n"
 
 
 class Rating(models.Model):

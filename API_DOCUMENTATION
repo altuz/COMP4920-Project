@@ -89,7 +89,7 @@ Output:
 Function: Get game info for specific game_id
 Url: backend/get_game_info
 Type: GET
-Input: gameid=gameid_of_target_game, userid=(empty if no user logged in, and if user logged in, give userid)
+Input: gameid=gameid_of_target_game, username=(empty if no user logged in, and if user logged in, give username)
 Output:
 --> Case target game is found
 {

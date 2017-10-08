@@ -45,6 +45,21 @@ export default function reducer(state={
           fetched:false,
         }
       }
+      case "UPDATE_GAMELIST": {
+        localStorage.setItem('game_list', JSON.stringify(action.payload));
+        return {
+          ...state,
+          game_list: action.payload,
+        }
+      }
+      case "UPDATE_WISHLIST": {
+
+        localStorage.setItem('wish_list', JSON.stringify(action.payload));
+        return {
+          ...state,
+          wish_list: action.payload,
+        }
+      }
     }
 
     return state

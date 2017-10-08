@@ -62,8 +62,8 @@ export function getDiscover() {
   return axios.get(url);
 }
 
-export function getGameInfo(gameID){
-  const url='http://localhost:8000/backend/get_game_info/?gameid='+gameID;
+export function getGameInfo(gameID,username){
+  const url='http://localhost:8000/backend/get_game_info/?gameid='+gameID+'&username='+username;
   return axios.get(url);
 }
 
@@ -92,6 +92,11 @@ export function getRecommendation1(username){
   return axios.get(url);
 }
 
+
+export function Verification(key){
+  const url='http://localhost:8000/backend/activate/'+key;
+  return axios.get(url);
+}
 
 
 // export function setUserName(name) {

@@ -618,6 +618,9 @@ def recommend_v1(request):
     # game_set = None # Don't really need this since exception below would return
     try:
         game_set = PlayerLibrary.objects.filter(user_id=player)
+        # # debugging
+        # for game in game_set:
+        #     print(game)
     except:
         # If no games, for now, return top 5 current games
         # TODO discuss with group if they want this
@@ -655,20 +658,22 @@ def recommend_v1(request):
 
     for i in range(0,5):
         genre, count = sorted_keys[i % len(sorted_keys)]
-        print(genre)
         top_5_genres.append(genre)
 
     # Filter all games list by similar genre of user, exclude duplicates when adding to recommend list
-    print("Recommendations")
+    print("5 Recommendations")
     recommend_set = []
     for genre in top_5_genres:
         target_games = Genres.objects.filter(genre=genre)
-        results = GameList.objects.filter(game_id__in=target_games.values('game_id')).exclude(game_id__in=recommend_set)
+        results = GameList.objects.filter(game_id__in=target_games.values('game_id')).exclude(game_id__in=recommend_set).exclude(game_id__in=player_games)
         result_top_dict = results[0].as_dict()
         recommend_set.append(result_top_dict['game_id'])
 
     # Output results
     results = GameList.objects.filter(game_id__in=recommend_set)
+    # # debugging
+    # for result in results:
+    #     print(result)
     results_list = [obj.as_dict() for obj in results]  # create a results_list to be converted to JSON format
     outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf-16')
     return HttpResponse(outputJSON, content_type='application/json')

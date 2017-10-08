@@ -18,7 +18,7 @@ export function add_to_game_list(username,gameID){
       console.log(res);
       dispatch( {
         type: 'UPDATE_GAMELIST',
-        payload:res.data.gamelist,
+        payload:res.data,
       })
     }))
   }
@@ -40,7 +40,7 @@ export function add_to_wish_list(username,gameID){
       console.log(res);
       dispatch( {
         type: 'UPDATE_WISHLIST',
-        payload:res.data.wishlist,
+        payload:res.data,
       })
     }))
   }

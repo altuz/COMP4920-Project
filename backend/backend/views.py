@@ -210,13 +210,20 @@ def edit_list(request):
         # Unsuccessful if either check throws does not exist
         player  = User.objects.get(user_name = json_obj['user']['username'])
         game    = GameList.objects.get(game_id = json_obj['user']['gameid'])
-        played  = json_obj['user']['played']
-        wishes  = json_obj['user']['wish']
-        new_entry = PlayerLibrary(user_id = player, game_id = game, wish_list = wishes, played = played)
-        new_entry.save()
+        played = json_obj['user']['played']
+        wishes = json_obj['user']['wish']
+
+        try:
+            old_entry = PlayerLibrary.objects.get(user_id = player, game_id = game)
+            old_entry.wish_list = wishes
+            old_entry.played = played
+            old_entry.save()
+        except:
+            new_entry = PlayerLibrary(user_id=player, game_id=game, wish_list=wishes, played=played)
+            new_entry.save()
+
         return user_prof_helper(json_obj['user']['username'])
     except Exception as e:
-        print(e)
         return HttpResponse('''
             {
                 "message":"Invalid Request"

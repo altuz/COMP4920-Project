@@ -93,6 +93,11 @@ export function getReccomendation1(username){
 }
 
 
+export function Verification(key){
+  const url='http://localhost:8000/backend/activate/'+key;
+  return axios.get(url);
+}
+
 
 // export function setUserName(name) {
 //   return {

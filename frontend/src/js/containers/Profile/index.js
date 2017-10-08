@@ -6,14 +6,6 @@ import { Link } from 'react-router-dom';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
 
-const option = {
-  onRowClick: function(row, columnIndex, rowIndex) {
-    console.log(row)
-    alert(`You click row id: ${row.game_name}, column index: ${columnIndex}, row index: ${rowIndex}`);
-  },
-};
-
-
 @connect((store) => {
 	return {
 		user: store.user.user,
@@ -57,7 +49,6 @@ export default class Profile extends React.Component {
     };
 
 
-
 	render () {
 		if (this.state.isedit){
 			return (
@@ -80,7 +71,7 @@ export default class Profile extends React.Component {
 					<p> Username : {user.user_name} </p>
     				<Button className = "btn btn-primary" type ="submit"  name = "Submit" onClick={this.requestedit}>Edit</Button>
     				</div>
-    				<Tabs defaultActiveKey={1} className="String" id="uncontrolled-tab-example">
+    				<Tabs defaultActiveKey={1} className="Tabulation" id="uncontrolled-tab-example">
     					<Tab eventKey={1} title="Playlist">
     						<div>
     						    <BootstrapTable data={this.props.gamelist} hover pagination>

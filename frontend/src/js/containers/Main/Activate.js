@@ -20,7 +20,7 @@ class Activate extends React.Component {
 
   render() {
     return (
-        <div>fuck you, please login</div>
+        <div> Your account has now been activated, please login</div>
     )
   }
 }

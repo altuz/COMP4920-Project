@@ -183,3 +183,28 @@ Output:
     "message":"error/success"
 }
 
+Function: Recommender_v1
+Url: backend/recommend_v1
+Input: userid=user_id_of_target_user
+Output:
+{
+    "results":
+    [ // List of results of this format
+        {
+            "game_id": 1,
+            "game_name": "Left 4 dead",
+            "num_player": 23
+            ... other stats
+        },
+        {
+            "game_id": 3,
+            "game_name": "Age of MEme-pires 2",
+            "num_player": 23
+            ... other stats
+        }
+        ...
+        ...
+        //  Returns top 5 games ever if user has no games
+
+    ]
+}

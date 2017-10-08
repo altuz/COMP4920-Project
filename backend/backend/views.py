@@ -473,43 +473,6 @@ def search_game(request):
 
         results = results.filter(game_id__in=genreObjs.values('game_id'))  # Filter previous results from previous filter
 
-    # print("new method " + str(len(results)))
-
-    # ---- Version 1 ----
-    # if category: # Add category filter
-    #     category_list = category.split(",")
-    #
-    #     catObjsUnion = Categories.objects.filter(reduce(operator.or_, (Q(category__iexact=c) for c in category_list)))
-    #     catObjs = catObjsUnion.values('game_id').annotate(matches=Count('game_id')) # Count subquery matches
-    #     catObjs = catObjs.filter(matches__exact=len(category_list)) # Filter to get ONLY games that match ALL given category tags
-    #
-    #     if query:
-    #         query_list = query.split()
-    #         results = GameList.objects.filter(reduce(operator.and_, (Q(game_name__icontains=q) for q in query_list)),
-    #                                           game_id__in=catObjs.values('game_id'))
-    #     else:
-    #         results = GameList.objects.filter(game_id__in=catObjs.values('game_id')) # All games of those categories
-    # else: # No category filter
-    #     if query:
-    #         query_list = query.split()
-    #         results = GameList.objects.filter(
-    #             reduce(operator.and_,(Q(game_name__icontains=q) for q in query_list))
-    #         )# Returns a QuerySet
-    #     else:
-    #         results = GameList.objects.all() # TODO discuss with group what they want with empty query, atm returns everything
-    # print("old method " + str(len(results)))
-    # ---- End Version 1
-
-    # debugging -----
-    # for result in results:
-    #     game = result.as_dict()
-    #     print(game['game_name'])
-    #
-    # print("list of genres")
-    # genres = Genres.objects.values('genre').distinct()
-    # for genre in genres:
-    #     print(genre)
-    # ---- end debugging
     # Put 'results' querySet into dict format to convert into JSON dict
     results_list = [obj.as_dict() for obj in results]
     outputJSON = json.dumps({"results": results_list},ensure_ascii=False).encode('utf16')
@@ -597,32 +560,67 @@ def rating(request):
 # For testing:
 # TODO refactor below testing html for later
 # curl -X GET "http://localhost:8000/backend/recommend_v1/?userid=76561197960530222"
-
 @api_view(['GET'])
 def recommend_v1(request):
-    # TODO problem if more than one user has same username, replace below with user_id, need to get others to refactor code
-    user_id = request.GET.get('userid') # Get the target user
-    game_set = PlayerLibrary.objects.filter(user_id=user_id)
-    for game in game_set:
-        print(game)
 
-    # # Algorithm 1
-    # -----------
+    player = User.objects.get(user_id=request.GET.get('userid')) # Get the target user
+    game_set = None
+    try:
+        game_set = PlayerLibrary.objects.filter(user_id=player)
+    except:
+        # If no games, for now, return top 5 current games
+        # TODO discuss with group if they want this
+        results = GameList.objects.all()[:5]
+        results_list = [obj.as_dict() for obj in results]  # create a results_list to be converted to JSON format
+        outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf-16')
+        return HttpResponse(outputJSON, content_type='application/json')
 
-    # Step 1: Iterate through above dict, fill another dict with genre count (get genre table working)
+    # Step 1: Get all player games
+    player_games = []
+    for entries in game_set:
+        try: # To handle the weird db issue atm where we ignore if game is not there
+            game_obj = entries.game_id
+            game_id = game_obj.game_id
+            player_games.append(game_id)
+        except:
+            continue
 
-    # Step 2: Iterate through genre_dict, add top game of that genre to recommend_dict
-    # if less than 5 genres, recommend more from first until list of 5 is compiled
+    # Step 2: Get all related genres
+    genre_count = {}
+    genre_set = Genres.objects.filter(game_id__in=player_games)
+    for game_genre in genre_set:
+        genre = game_genre.genre
+        if genre in genre_count:
+            genre_count[genre] += 1
+        else:
+            genre_count[genre] = 1
 
-    # Convert recommend_dict to JSON format and return list of recommended games
+    # Step 3: Sort and get the top 5 genres
+    top_5_genres = []
+    sorted_keys = [(k, genre_count[k]) for k in sorted(genre_count, key=genre_count.get, reverse=True)] # [:2] # Just for debugging
+    # debugging
+    # for genre, count in sorted_keys:
+    #     print(genre + "/" + str(count))
 
-    # Output Gibberish to Ryan for now ----
-    results = GameList.objects.all()[:5]
+    for i in range(0,5):
+        genre, count = sorted_keys[i % len(sorted_keys)]
+        print(genre)
+        top_5_genres.append(genre)
+
+    # Filter all games list by genre, exclude duplicates when adding to recommend list
+    print("Recommendations")
+    recommend_set = []
+    for genre in top_5_genres:
+        target_games = Genres.objects.filter(genre=genre)
+        results = GameList.objects.filter(game_id__in=target_games.values('game_id')).exclude(game_id__in=recommend_set)
+        result_top_dict = results[0].as_dict()
+        recommend_set.append(result_top_dict['game_id'])
+
+    # Output results
+    results = GameList.objects.filter(game_id__in=recommend_set)
     results_list = [obj.as_dict() for obj in results]  # create a results_list to be converted to JSON format
-    return HttpResponse(json.dumps({"results": results_list}), content_type='application/json')
-    # ---- end gibberish output
-    return HttpResponse('{"message":"input invalid", "recommendations":{}}')
-
+    outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf-16')
+    return HttpResponse(outputJSON, content_type='application/json')
 
 # given json contain username, email, and password
 @api_view(['POST'])

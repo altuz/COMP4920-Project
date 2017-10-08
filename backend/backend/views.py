@@ -388,7 +388,7 @@ def register(request):
             user_name = obj['user']['user_name']
             password = obj['user']['pass_word']
             key = blake2b((user_name + password).encode('utf-8')).hexdigest()  # key send to the user
-            link = "http://localhost:8090/backend/activate/?key=" + key
+            link = "http://localhost:8090/#/activate/" + key
 
             # send activation email
             try:
@@ -510,7 +510,7 @@ def get_top_games(request):
 # @param    gameid of target game, if userid is provided, returns true/false for if in that users game/wishlist
 # @return   game with all it's contents
 # Testing
-# curl -X GET "http://localhost:8000/backend/get_game_info/?gameid=578080&userid=76561197960530222"
+# curl -X GET "http://localhost:8000/backend/get_game_info/?gameid=578080&username=a%20regular"
 @api_view(['GET'])
 def get_game_info(request):
     print("get_game_info function is running\n...")
@@ -524,7 +524,7 @@ def get_game_info(request):
     # Step 2: check if user paramter given, if given user logged in
     player_obj = None
     try: # if given loggen in user, check if on their game list
-        player_obj = User.objects.get(user_id=request.GET.get('userid'))
+        player_obj = User.objects.get(user_name=request.GET.get('username'))
     except:
         # if no user
         print("output type1: No user logged in")

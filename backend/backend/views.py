@@ -622,8 +622,8 @@ def recommend_v1(request):
     # ---- end gibberish output
     return HttpResponse('{"message":"input invalid", "recommendations":{}}')
 
+
 # given json contain username, email, and password
-# curl -d '{"edit":{"username" : "a regular", "email" : "edittest@gmail.com", "password" : "editpass"}}' -X POST "http://localhost:8000/backenist/"
 @api_view(['POST'])
 def edit_profile(request):
     print("user edit function is running ...")
@@ -642,12 +642,11 @@ def edit_profile(request):
         e = obj['edit']['email']
         p= obj['edit']['password']
 
-        print("get the username:" + username)
+        print("get the username:" +username)
         print("get the email:" + e)
         print("get the password:" + p)
         try:
-            user = User.objects.get(user_name=username)
-            # pass new value of email and password
+            user = User.objects.get(user_name=obj['edit']['username'])
             try:
                 email = obj['edit']['email']
                 user.email = email
@@ -659,6 +658,7 @@ def edit_profile(request):
                     return HttpResponse('{"message": "change password and email"}')
                 except:
                     return HttpResponse('{"message": "change email"}')
+            #pass new value of email and password
             except:
                 try:
                     password = obj['edit']['password']

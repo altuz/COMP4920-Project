@@ -49,7 +49,7 @@ class PlayerLibrary(models.Model):
         unique_together = ('user_id', 'game_id')
 
     def __str__(self):
-        return str(self.user_id) + '/' + str(self.game_id)
+        return str(self.user_id) + '/' + str(self.game_id) + '\n'
 
     def as_dict(self):
         return {
@@ -80,7 +80,6 @@ class GameList(models.Model):
 
     class Meta:
         # order the table by number of player descending order, faster for search
-        # order_with_respect_to = 'num_player'
         ordering = ['-num_player']
 
     # dict for use with game_search
@@ -132,7 +131,7 @@ class Genres(models.Model):
         }
 
     def __str__(self):
-        return str(self.game_id) + "/" + str(self.genre)
+        return str(self.game_id) + "/" + str(self.genre) + "\n"
 
 
 class Rating(models.Model):

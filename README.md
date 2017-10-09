@@ -78,7 +78,7 @@ lxml [Windows](http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml), [other os](http
 
 Sprint Retrospective Link (Google docs):
 ```sh
-https://docs.google.com/document/d/1ybrlhSn1DO2cbp_bfC83s_AkoA4p-WfEvxZPTM217Bg/edit
+https://docs.google.com/document/d/1ybrlhSn1DO2cbp_bfC83s_AkoA4p-WfEvxZPTM217Bg/edit?usp=sharing
 ```
 
 ### NOTE TO SELF

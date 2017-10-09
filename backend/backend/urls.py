@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^backend/wish_list/', backend.views.get_wishlist),
     url(r'^backend/follow_user/', backend.views.follow_user),
     url(r'^backend/follow_list/', backend.views.follow_list),
+    url(r'^backend/get_reviews/', backend.views.get_reviews),
     url(r'^backend/session_check/', backend.views.session_check),
     url(r'^backend/logout/', backend.views.logout),
     url(r'^backend/user_prof/', backend.views.user_prof),

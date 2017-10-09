@@ -173,6 +173,22 @@ Output:
     ]
 }
 
+Function: Shows a list of reviews for a game
+Url: backend/get_reviews/
+Type: POST
+Input: {"user":{"gameid":"123"}}
+Example: curl -d '{"user":{"gameid" : "639790"}}' -X POST "http://localhost:8000/backend/get_reviews/"
+Output:
+{
+    "message":"success",
+    "gameid":"123",
+    "reviews_list": [
+        {"user_name" : "abc", "rating" : "True", "comment" : "xyz"},
+        ....
+        ....
+    ]
+}
+
 Function: Check session
 Url: backend/session_check/
 Type: POST

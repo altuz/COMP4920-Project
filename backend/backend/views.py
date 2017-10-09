@@ -118,6 +118,50 @@ def follow_list(request):
         print(e)
         return HttpResponse('{"message" : "User does not exist", "success" : "False"}')
 
+# Get reviews for a game
+# example: curl -d '{"user":{"gameid" : "639790"}}' -X POST "http://localhost:8000/backend/get_reviews/"
+# Tested
+@api_view(['POST'])
+def get_reviews(request):
+    json_obj = None
+    try:
+        json_obj = json.loads(request.body.decode())
+    except:
+        print("Error loading json")
+        return HttpResponse('{"message" : "input invalid", "success" : "False"}')
+
+    try:
+        game    = GameList.objects.get(game_id = json_obj['user']['gameid'])
+        reviews = Rating.objects.filter(game_id = game)
+        # Put 'results' querySet into dict format to convert into JSON dict
+        json_list = []
+        for review in reviews:
+            try:
+                reviewer = review.user_id
+                r_name = reviewer.user_name
+                r_bool = review.rate
+                r_comment = review.comment
+                f_json = '{{"user_name" : "{}", "rating" : "{}", "comment" : "{}"}}'.format(r_name, r_bool, r_comment)
+                json_list.append(f_json)
+            except:
+                continue
+        # results_list = [obj.as_dict() for obj in reviews]
+        reviews_json = ",".join(json_list)
+        ret_json = '''
+                {{
+                    "message" : "success",
+                    "gameid" : "{}",
+                    "reviews_list" : [
+                        {}
+                    ]
+                }}
+                '''.format(json_obj['user']['gameid'], reviews_json)
+        return HttpResponse(ret_json)
+    except Exception as e:
+        print(e)
+        return HttpResponse('{"message" : "game does not exist", "success" : "False"}')
+
+
 # Helper function for get game/wishlist
 # TESTED
 def get_list(username, type):

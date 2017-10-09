@@ -484,6 +484,31 @@ def activate(request, key):
         print(e)
         return HttpResponse(msg_to_json("request failed"))
 
+# Search for users
+# Returns all users if no user is given
+# For testing
+# curl -X GET "http://localhost:8000/backend/search_user/?q=a%20regular"
+@api_view(['GET'])
+def search_user(request):
+    print("search user function is running ...")
+    print("")
+    try:
+        query = request.GET.get('q')
+        # Step 1: Filter by keyword
+        if query:
+            query_list = query.split(" ")
+            results = User.objects.filter(
+                reduce(operator.and_, (Q(user_name__icontains=q) for q in query_list))
+            )  # Returns a QuerySet
+        else:
+            results = User.objects.all()  # Return all the results if no key words are given
+
+        # Put 'results' querySet into dict format to convert into JSON dict
+        results_list = [obj.as_dict() for obj in results]
+        outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf16')
+        return HttpResponse(outputJSON, content_type='application/json')
+    except:
+        return HttpResponse('{"message":"input invalid", "search-games":{}}')
 
 # Search for games
 # For testing - note: %20 is a space, %2C is a comma in URL character encoding
@@ -499,7 +524,6 @@ def search_game(request):
     """
     print("search game function is running ...")
     print("")
-    # TODO check if try-catch is slow
     try:
         query = request.GET.get('q')
         category = request.GET.get('category')

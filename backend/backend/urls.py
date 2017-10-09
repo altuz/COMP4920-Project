@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^backend/register/', backend.views.register),
     url(r'^backend/edit_list/', backend.views.edit_list),
     url(r'^backend/search_game/', backend.views.search_game),
+    url(r'^backend/search_user/', backend.views.search_user),
     url(r'^backend/game_list/', backend.views.get_gamelist),
     url(r'^backend/wish_list/', backend.views.get_wishlist),
     url(r'^backend/follow_user/', backend.views.follow_user),

@@ -58,6 +58,8 @@ def user_prof(request):
 
 # Follow user
 # User1 -> User2
+# Tested
+# curl -d '{"user":{"user1" : "a regular", "user2" : "Jarmustard"}}' -X POST "http://localhost:8000/backend/follow_user/"
 @api_view(['POST'])
 def follow_user(request):
     json_obj = None
@@ -69,12 +71,13 @@ def follow_user(request):
         return HttpResponse('{"message" : "input invalid", "success" : "False"}')
     # check if user1 and user2 exists
     try:
-        user_1 = User.objects.get(json_obj['user']['user1'])
-        user_2 = User.objects.get(json_obj['user']['user2'])
-        new_entry = Follow(user_id = user_1, following = user_2)
+        user_1 = User.objects.get(user_name = json_obj['user']['user1'])
+        user_2 = User.objects.get(user_name = json_obj['user']['user2'])
+        new_entry = Follow(user_id = user_1, follow_id = user_2)
         new_entry.save()
         return HttpResponse('{"message" : "Followed", "success" : "True"}')
-    except:
+    except Exception as e:
+        print(e)
         return HttpResponse('{"message" : "User1 or User2 does not exist", "success" : "False"}')
 
 

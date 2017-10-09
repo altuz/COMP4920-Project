@@ -150,6 +150,7 @@ Function: Make user1 follow user2
 Url: backend/follow_user/
 Type: POST
 Input: {"user":{"user1":"xxx", "user2":"yyy"}}
+Example: curl -d '{"user":{"user1" : "a regular", "user2" : "Jarmustard"}}' -X POST "http://localhost:8000/backend/follow_user/"
 Output:
 {
     "message":"message"

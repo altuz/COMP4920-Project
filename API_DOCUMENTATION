@@ -58,6 +58,30 @@ Output:
     ]
 
 }
+Function: Search User
+Url: backend/search_user/
+Type: GET
+Input: q=keywords_separated_by_spaces
+Output:
+{
+    "results":
+    [ // List of results of this format
+        {
+            "user_id": 76561197960530222,
+            "user_name": "a regular",
+            "email": aregular@jmail.com,
+            "privacy" : false,
+            "num_games": 104
+        },
+        {
+            // etc
+        }
+        ...
+        ...
+        // empty if no matches
+    ]
+
+}
 
 Function: Get top 'n' number of games
 Url: backend/get_top_games/
@@ -236,10 +260,11 @@ Output:
     ]
 }
 
-Function: Rate and Review
-Url: backend/rating/
+Function: Send review
+Url: backend/send_review/
 Type: POST
-Input: {"rating": {"username":"IHMS","gameid":4, "rate":4, "comment":"mada mada"} }
+Input: {"review": {"username":"davidmo3576","gameid":"578080", "rate":"True", "comment":"mada mada"}}
+Sample_curl: curl -d '{"review": {"username":"davidmo3576","gameid":"578080", "rate":"True", "comment":"mada mada"}}' -X POST "http://localhost:8000/backend/send_review/"
 Output:
 {
     "message":"error/success"

@@ -98,6 +98,19 @@ export function Verification(key){
   return axios.get(url);
 }
 
+/* export function getRecommendation2(username){
+    const url='http://localhost:8000/backend/recommend_v2/?username='+username;
+    return axios.get(url);
+}*/
+
+/* export function getFriendList(username){
+    const url='http://localhost:8000/backend//?username='+username;
+    return axios.get(url);
+}
+*/
+
+
+
 
 // export function setUserName(name) {
 //   return {

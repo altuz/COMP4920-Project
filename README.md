@@ -76,5 +76,10 @@ Python 2.7+
 lxml [Windows](http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml), [other os](http://lxml.de/installation.html)
 ```
 
+Sprint Retrospective Link (Google docs):
+```sh
+https://docs.google.com/document/d/1ybrlhSn1DO2cbp_bfC83s_AkoA4p-WfEvxZPTM217Bg/edit
+```
+
 ### NOTE TO SELF
 If it goes well and we choose to publically release or make this repo public DON'T put config.py (database details) onto git

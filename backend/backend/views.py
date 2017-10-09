@@ -63,7 +63,7 @@ def user_prof(request):
 @api_view(['POST'])
 def follow_user(request):
     json_obj = None
-    # decond json
+    # decode json
     try:
         json_obj = json.loads(request.body.decode())
     except:
@@ -80,6 +80,43 @@ def follow_user(request):
         print(e)
         return HttpResponse('{"message" : "User1 or User2 does not exist", "success" : "False"}')
 
+# Get user's follow list
+# Tested
+# curl -d '{"user":{"username" : "a 1regular"}}' -X POST "http://localhost:8000/backend/follow_list/"
+@api_view(['POST'])
+def follow_list(request):
+    json_obj = None
+    try:
+        json_obj = json.loads(request.body.decode())
+    except:
+        print("Error loading json")
+        return HttpResponse('{"message" : "input invalid", "success" : "False"}')
+
+    try:
+        follower = User.objects.get(user_name = json_obj['user']['username'])
+        following_list = Follow.objects.filter(user_id = follower)
+        json_list = []
+        for person in following_list:
+            followed = person.follow_id
+            f_name = followed.user_name
+            f_numg = followed.num_games
+            f_json = '{{"user_name" : "{}", "num_games" : "{}"}}'.format(f_name, f_numg)
+            json_list.append(f_json)
+
+        follow_json = ",".join(json_list)
+        ret_json = '''
+        {{
+            "message" : "success",
+            "follower" : "{}",
+            "followed_list" : [
+                {}
+            ]
+        }}
+        '''.format(json_obj['user']['username'], follow_json)
+        return HttpResponse(ret_json)
+    except Exception as e:
+        print(e)
+        return HttpResponse('{"message" : "User does not exist", "success" : "False"}')
 
 # Helper function for get game/wishlist
 # TESTED

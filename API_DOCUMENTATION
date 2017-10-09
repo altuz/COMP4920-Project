@@ -153,8 +153,24 @@ Input: {"user":{"user1":"xxx", "user2":"yyy"}}
 Example: curl -d '{"user":{"user1" : "a regular", "user2" : "Jarmustard"}}' -X POST "http://localhost:8000/backend/follow_user/"
 Output:
 {
-    "message":"message"
+    "message":"message",
     "success":"True/False"
+}
+
+Function: Show the list of people that a user follows
+Url: backend/follow_list/
+Type: POST
+Input: {"user":{"username":"xxx"}}
+Example: curl -d '{"user":{"username" : "a 1regular"}}' -X POST "http://localhost:8000/backend/follow_list/"
+Output:
+{
+    "message":"success",
+    "follower":"xxx",
+    "followed_list": [
+        {"user_name" : "abc", "num_games" : "123"},
+        ....
+        ....
+    ]
 }
 
 Function: Check session

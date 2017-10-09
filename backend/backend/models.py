@@ -150,6 +150,8 @@ class Rating(models.Model):
             "rated_time": self.rated_time
         }
 
+    def __str__(self):
+        return str(self.user_id) + "/" + str(self.game_id) + "/" + str(self.rate) + "/" + str(self.comment) + "/" + str(self.rated_time)
 
 class Follow(models.Model):
     user_id = models.ForeignKey('User', related_name= "follower_id", on_delete=models.CASCADE, db_index=True)

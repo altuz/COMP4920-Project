@@ -540,6 +540,7 @@ def search_game(request):
     except:
         return HttpResponse('{"message":"input invalid", "search-games":{}}')
 
+# TESTED
 # Get the top "n" number of games
 # curl -X GET "http://localhost:8000/backend/get_top_games/?n=100"
 @api_view(['GET'])
@@ -553,6 +554,7 @@ def get_top_games(request):
     except:
         return HttpResponse('{"message":"input invalid", "get-top-games":{}}')
 
+# TESTED
 # Returns the game corresponding to given input gameid
 # @param    gameid of target game, if userid is provided, returns true/false for if in that users game/wishlist
 # @return   game with all it's contents
@@ -593,56 +595,34 @@ def get_game_info(request):
 
     return HttpResponse(outputJSON, content_type='application/json')
 
-# Return average rating of a given a game_id #TODO or game name?
-# TODO need to test,
-# TODO might replace with storing average rating and number of ratings in table
-@api_view(['GET'])
-def get_average_rating(request):
-    target_game_id = request.GET.get('gameid')
-    games = Rating.filter(game_id__exact=target_game_id)
-    if len(games) != 0:
-        ratings_list = [obj.as_dict() for obj in games]
-        average = str(sum(d['rate'] for d in ratings_list)/len*ratings_list) # convert to string for json
-
-        return HttpResponse('''
-                    {
-                        "average-rating":%s
-                    }    
-                '''.format(average))
-    else:
-        return HttpResponse('{"message":"input invalid", "average-rating":{}}')
-
-
+# TESTED
 # Save a rating or review
-# TODO need to test
-# For testing
-# curl -d '{"rating": {"username":"IHMS","gameid":4, "rate":4, "comment":"mada mada"} }' -X POST "http://localhost:8000/backend/rating/"
-# curl http://localhost:8000/backend/login/ -X POST -d '{"user":{"username":"IHMS","password":"123456"}}'
+# curl -d '{"review": {"username":"davidmo3576","gameid":"578080", "rate":"True", "comment":"mada mada"}}' -X POST "http://localhost:8000/backend/send_review/"
 @api_view(['POST'])
-def rating(request):
-    json_obj = None
+def send_review(request):
+    print("Send review")
+    print("...")
     try:
         json_obj = json.loads(request.body.decode())
     except:
         print("Error when loading the Json")
         return HttpResponse('{"message":"input invalid", "rating":{}}')
 
-    try:
-        # Checks if player exist in database
-        # Checks if game exist in database
-        # Unsuccessful if either check throws does not exist
-        user_id = User.objects.get(user_name=json_obj['rating']['username'])
-        game_id = GameList.objects.get(game_id=json_obj['rating']['gameid'])
-        rate = int(json_obj['rating']['rate']) # Asserts that rating is an integer
-        comment = json_obj['rating']['comment']
+    # Debugging
+    # player = User.objects.get(user_name=json_obj['review']['username'])
+    # game = GameList.objects.get(game_id=int(json_obj['review']['gameid']))
+    # entry_set = Rating.objects.filter(user_id=player, game_id=game)
+    # for entry in entry_set:
+    #     print(entry)
 
-        new_entry = Rating(user_id=user_id, game_id=game_id, rate=rate, comment=comment)
-        new_entry.save()
-        return HttpResponse('''
-            {
-                "message":"Successful"
-            }    
-        ''')
+    # Checks if player exist in database
+    # Checks if game exist in database
+    # Unsuccessful if either check throws does not exist
+    try:
+        player = User.objects.get(user_name=json_obj['review']['username'])
+        game = GameList.objects.get(game_id=int(json_obj['review']['gameid']))
+        rate = (str(json_obj['review']['rate']) == "True") # Asserts that rating is an integer
+        comment = json_obj['review']['comment']
     except:
         return HttpResponse('''
             {
@@ -650,10 +630,30 @@ def rating(request):
             }
         ''')
 
+    # Check if player has already reviewed this game
+    try:
+        # Update old rating
+        old_entry = Rating.objects.get(user_id=player, game_id=game)
+        old_entry.rate = rate
+        old_entry.comment = comment
+        old_entry.save()
+        print("Updated old review")
+    except:
+        # Create new rating
+        new_entry = Rating(user_id=player, game_id=game, rate=rate, comment=comment)
+        new_entry.save()
+        print("Made new review")
+
+    return HttpResponse('''
+        {
+            "message":"Successful"
+        }    
+    ''')
+
+
 # Gives 5 game recommendations for the given user
-# For testing:
-# TODO refactor below testing html for later
 # curl -X GET "http://localhost:8000/backend/recommend_v1/?username=a%20regular"
+# TESTED
 @api_view(['GET'])
 def recommend_v1(request):
     # Return error if user can't be found

@@ -220,10 +220,11 @@ Output:
     ]
 }
 
-Function: Rate and Review
-Url: backend/rating/
+Function: Send review
+Url: backend/send_review/
 Type: POST
-Input: {"rating": {"username":"IHMS","gameid":4, "rate":4, "comment":"mada mada"} }
+Input: {"review": {"username":"davidmo3576","gameid":"578080", "rate":"True", "comment":"mada mada"}}
+Sample_curl: curl -d '{"review": {"username":"davidmo3576","gameid":"578080", "rate":"True", "comment":"mada mada"}}' -X POST "http://localhost:8000/backend/send_review/"
 Output:
 {
     "message":"error/success"

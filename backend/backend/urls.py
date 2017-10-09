@@ -32,7 +32,7 @@ urlpatterns = [
     url(r'^backend/logout/', backend.views.logout),
     url(r'^backend/user_prof/', backend.views.user_prof),
     url(r'^backend/activate/(\w+)', backend.views.activate),
-    url(r'^backend/rating/', backend.views.rating),
+    url(r'^backend/send_review/', backend.views.send_review),
     url(r'^backend/recommend_v1/', backend.views.recommend_v1),
     url(r'^backend/get_top_games/', backend.views.get_top_games),
     url(r'^backend/check_in_userlist/', backend.views.check_in_userlist),

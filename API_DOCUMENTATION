@@ -58,6 +58,30 @@ Output:
     ]
 
 }
+Function: Search User
+Url: backend/search_user/
+Type: GET
+Input: q=keywords_separated_by_spaces
+Output:
+{
+    "results":
+    [ // List of results of this format
+        {
+            "user_id": 76561197960530222,
+            "user_name": "a regular",
+            "email": aregular@jmail.com,
+            "privacy" : false,
+            "num_games": 104
+        },
+        {
+            // etc
+        }
+        ...
+        ...
+        // empty if no matches
+    ]
+
+}
 
 Function: Get top 'n' number of games
 Url: backend/get_top_games/
@@ -150,10 +174,43 @@ Function: Make user1 follow user2
 Url: backend/follow_user/
 Type: POST
 Input: {"user":{"user1":"xxx", "user2":"yyy"}}
+Example: curl -d '{"user":{"user1" : "a regular", "user2" : "Jarmustard"}}' -X POST "http://localhost:8000/backend/follow_user/"
 Output:
 {
-    "message":"message"
+    "message":"message",
     "success":"True/False"
+}
+
+Function: Show the list of people that a user follows
+Url: backend/follow_list/
+Type: POST
+Input: {"user":{"username":"xxx"}}
+Example: curl -d '{"user":{"username" : "a 1regular"}}' -X POST "http://localhost:8000/backend/follow_list/"
+Output:
+{
+    "message":"success",
+    "follower":"xxx",
+    "followed_list": [
+        {"user_name" : "abc", "num_games" : "123"},
+        ....
+        ....
+    ]
+}
+
+Function: Shows a list of reviews for a game
+Url: backend/get_reviews/
+Type: POST
+Input: {"user":{"gameid":"123"}}
+Example: curl -d '{"user":{"gameid" : "639790"}}' -X POST "http://localhost:8000/backend/get_reviews/"
+Output:
+{
+    "message":"success",
+    "gameid":"123",
+    "reviews_list": [
+        {"user_name" : "abc", "rating" : "True", "comment" : "xyz"},
+        ....
+        ....
+    ]
 }
 
 Function: Check session
@@ -203,10 +260,11 @@ Output:
     ]
 }
 
-Function: Rate and Review
-Url: backend/rating/
+Function: Send review
+Url: backend/send_review/
 Type: POST
-Input: {"rating": {"username":"IHMS","gameid":4, "rate":4, "comment":"mada mada"} }
+Input: {"review": {"username":"davidmo3576","gameid":"578080", "rate":"True", "comment":"mada mada"}}
+Sample_curl: curl -d '{"review": {"username":"davidmo3576","gameid":"578080", "rate":"True", "comment":"mada mada"}}' -X POST "http://localhost:8000/backend/send_review/"
 Output:
 {
     "message":"error/success"

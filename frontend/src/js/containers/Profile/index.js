@@ -5,6 +5,8 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { getRecommendation1 } from '../../actions/userActions';
+//import { getRecommendation2 } from '../../actions/userActions';
+//impott { getFriendList } from '../../actions/userActions';
 
 @connect((store) => {
 	return {
@@ -20,6 +22,8 @@ export default class Profile extends React.Component {
 		super(props);
 		this.state= {
 		    rec1:[],
+		    //follow_list: [],
+		    //rec2:[],
 		};
 		this.requestedit = this.requestedit.bind(this);
 	}
@@ -53,7 +57,26 @@ export default class Profile extends React.Component {
     }
 
 
+/*componentWillMount() {
+    const username=this.props.user.user_name;
+    console.log("rec run");
+    getRecommendation2(username)
+        .then((res)=>{
+            this.setState({
+            rec2: res.data.results,
+          })
+        })
+     getFriendList(username)
+        .then((res_=>{
+            this.setState({
+            follow_list: res.data.user,
+            })
+         })
+     }
 
+
+
+*/
 	imageFormatter(cell,row){
         return (
             <img style={{height:35}} src={cell}/>
@@ -103,7 +126,7 @@ export default class Profile extends React.Component {
    						</Tab>
    						<Tab eventKey={3} title="Popular Recommendation">
    						    <div>
-    						    <BootstrapTable data={this.state.rec1} hover pagination>
+    						    <BootstrapTable data={this.state.rec1} hover>
                                     <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
                                     <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>
                                 </BootstrapTable>

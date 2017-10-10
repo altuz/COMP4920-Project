@@ -17,7 +17,6 @@ class Activate extends React.Component {
 
   }
 
-
   render() {
     return (
         <div>

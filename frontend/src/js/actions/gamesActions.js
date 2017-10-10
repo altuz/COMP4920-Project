@@ -45,6 +45,29 @@ export function add_to_wish_list(username,gameID){
     }))
   }
 }
+
+export function remove_from_game_list(username,gameID){
+  var user={
+    username : username,
+    gameid : gameID,
+    played : false,
+    wish : false,
+  }
+  console.log(user);
+  return function(dispatch){
+    axios.post('http://localhost:8000/backend/edit_list/',{
+      user
+    }).then((res=>{
+      console.log(res);
+      dispatch( {
+        type: 'UPDATE_GAMELIST',
+        payload:res.data,
+      })
+    }))
+  }
+}
+
+
 // export function fetchTweets() {
 //   return function(dispatch) {
 //     dispatch({type: "FETCH_TWEETS"});

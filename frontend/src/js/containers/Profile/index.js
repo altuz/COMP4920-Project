@@ -45,6 +45,21 @@ export default class Profile extends React.Component {
     )
   }
 
+  profileFormatter(cell,row,enumObject, index){
+        return (
+            <div>
+                <Link className='user_name' to ={{
+                    pathname: `/profiles/${row.user_name}`,
+                    state: {index}
+                }}>
+                {cell}
+                </Link>
+            </div>
+    )
+  }
+
+
+
   componentWillMount() {
     const username=this.props.user.user_name;
     console.log("rec run");
@@ -72,15 +87,6 @@ export default class Profile extends React.Component {
             rec2: res.data.results,
           })
         })
-     getFriendList(username)
-        .then((res_=>{
-            this.setState({
-            follow_list: res.data.user,
-            })
-         })
-     }
-
-
 
 */
 	imageFormatter(cell,row){
@@ -142,7 +148,7 @@ export default class Profile extends React.Component {
    						    <div>
     						    <BootstrapTable data={this.state.follow_list} hover>
                                     <TableHeaderColumn isKey dataField='user_name'  width='300px'>Username</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='num_games'  width='300px'>Game Number</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='num_games'  width='300px'>Number of Game</TableHeaderColumn>
                                 </BootstrapTable>
     						</div>
    						</Tab>

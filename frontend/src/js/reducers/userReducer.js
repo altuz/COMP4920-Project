@@ -46,18 +46,21 @@ export default function reducer(state={
         }
       }
       case "UPDATE_GAMELIST": {
-        localStorage.setItem('game_list', JSON.stringify(action.payload));
+        localStorage.setItem('game_list', JSON.stringify(action.payload.gamelist));
+        localStorage.setItem('wish_list', JSON.stringify(action.payload.wishlist));
         return {
           ...state,
-          game_list: action.payload,
+          game_list: action.payload.gamelist,
+          wish_list: action.payload.wishlist,
         }
       }
       case "UPDATE_WISHLIST": {
-
-        localStorage.setItem('wish_list', JSON.stringify(action.payload));
+        localStorage.setItem('game_list', JSON.stringify(action.payload.gamelist));
+        localStorage.setItem('wish_list', JSON.stringify(action.payload.wishlist));
         return {
           ...state,
-          wish_list: action.payload,
+          wish_list: action.payload.wishlist,
+          game_list: action.payload.gamelist,
         }
       }
     }

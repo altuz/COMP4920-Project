@@ -127,7 +127,22 @@ Output:
         }
     ],
     "in_game_list": "true/false",
-    "in_wish_list": "true/false"
+    "in_wish_list": "true/false",
+    "reviews_list": [
+                        {
+                            "user_name":
+                            "rating" : true/false
+                            "comment": "Mada mada"
+                        },
+                        ... etc
+                    ]
+    "user_review": [
+                        {
+                            "user_name":
+                            "rating" : true/false
+                            "comment": "Mada mada"
+                        }
+                    ]
 }
 --> Case target game is NOT found
 '{"message":"invalid gameid", "get_game_info":{}}'

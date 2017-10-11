@@ -83,17 +83,10 @@ def follow_user(request):
 # Get user's follow list
 # Tested
 # curl -d '{"user":{"username" : "a 1regular"}}' -X POST "http://localhost:8000/backend/follow_list/"
-@api_view(['POST'])
+@api_view(['GET'])
 def follow_list(request):
-    json_obj = None
     try:
-        json_obj = json.loads(request.body.decode())
-    except:
-        print("Error loading json")
-        return HttpResponse('{"message" : "input invalid", "success" : "False"}')
-
-    try:
-        follower = User.objects.get(user_name = json_obj['user']['username'])
+        follower = User.objects.get(user_name = request.GET.get('username'))
         following_list = Follow.objects.filter(user_id = follower)
         json_list = []
         for person in following_list:
@@ -112,7 +105,7 @@ def follow_list(request):
                 {}
             ]
         }}
-        '''.format(json_obj['user']['username'], follow_json)
+        '''.format(request.GET.get('username'), follow_json)
         return HttpResponse(ret_json)
     except Exception as e:
         print(e)
@@ -121,17 +114,10 @@ def follow_list(request):
 # Get reviews for a game
 # example: curl -d '{"user":{"gameid" : "639790"}}' -X POST "http://localhost:8000/backend/get_reviews/"
 # Tested
-@api_view(['POST'])
+@api_view(['GET'])
 def get_reviews(request):
-    json_obj = None
     try:
-        json_obj = json.loads(request.body.decode())
-    except:
-        print("Error loading json")
-        return HttpResponse('{"message" : "input invalid", "success" : "False"}')
-
-    try:
-        game    = GameList.objects.get(game_id = json_obj['user']['gameid'])
+        game    = GameList.objects.get(game_id = request.GET.get('gameid'))
         reviews = Rating.objects.filter(game_id = game)
         # Put 'results' querySet into dict format to convert into JSON dict
         json_list = []
@@ -155,7 +141,7 @@ def get_reviews(request):
                         {}
                     ]
                 }}
-                '''.format(json_obj['user']['gameid'], reviews_json)
+                '''.format(request.GET.get('gameid'), reviews_json)
         return HttpResponse(ret_json)
     except Exception as e:
         print(e)

@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { getRecommendation1 } from '../../actions/userActions';
 //import { getRecommendation2 } from '../../actions/userActions';
-//impott { getFriendList } from '../../actions/userActions';
+import { getFollowList } from '../../actions/userActions';
 
 @connect((store) => {
 	return {
@@ -22,7 +22,7 @@ export default class Profile extends React.Component {
 		super(props);
 		this.state= {
 		    rec1:[],
-		    //follow_list: [],
+		    follow_list: [],
 		    //rec2:[],
 		};
 		this.requestedit = this.requestedit.bind(this);
@@ -54,6 +54,12 @@ export default class Profile extends React.Component {
             rec1: res.data.results,
           })
         })
+    getFollowList(username)
+        .then((res)=>{
+            this.setState({
+            follow_list: res.data.follows,
+            })
+         })
     }
 
 
@@ -129,6 +135,14 @@ export default class Profile extends React.Component {
     						    <BootstrapTable data={this.state.rec1} hover>
                                     <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
                                     <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>
+                                </BootstrapTable>
+    						</div>
+   						</Tab>
+   						<Tab eventKey={4} title="Follow List">
+   						    <div>
+    						    <BootstrapTable data={this.state.follow_list} hover>
+                                    <TableHeaderColumn isKey dataField='user_name'  width='300px'>Username</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='num_games'  width='300px'>Game Number</TableHeaderColumn>
                                 </BootstrapTable>
     						</div>
    						</Tab>

@@ -17,6 +17,7 @@ def user_prof_helper(username):
     game_list = ""
     wish_list = ""
     user_prof = ""
+    flw_list = ""
     # Get user
     try:
         user_entry = User.objects.get(user_name=username)
@@ -38,14 +39,19 @@ def user_prof_helper(username):
         wish_list = get_list(username, False)
     except:
         print("No wishes")
-
+    # Get follow list
+    try:
+        flw_list = follow_list_helper(username)
+    except:
+        print("No follows")
     ret_json = '''
             {{
                 "user" : "{}",
                 "gamelist" : [{}],
-                "wishlist" : [{}]
+                "wishlist" : [{}],
+                "follows" : [{}]
             }}
-        '''.format(username, game_list, wish_list)
+        '''.format(username, game_list, wish_list, flw_list)
     return HttpResponse(ret_json)
 
 
@@ -86,7 +92,23 @@ def follow_user(request):
 @api_view(['GET'])
 def follow_list(request):
     try:
-        follower = User.objects.get(user_name = request.GET.get('username'))
+        ret_json = '''
+            {{
+                "message" : "success",
+                "username" : "{}",
+                "follows" : [
+                    {}
+                ]
+            }}
+            '''.format(request.GET.get('username'), follow_list_helper(request.GET.get('username')))
+        return HttpResponse(ret_json)
+    except:
+        return HttpResponse('{"message" : "User does not exist", "success" : "False"}')
+
+
+def follow_list_helper(name):
+    try:
+        follower = User.objects.get(user_name = name)
         following_list = Follow.objects.filter(user_id = follower)
         json_list = []
         for person in following_list:
@@ -97,19 +119,10 @@ def follow_list(request):
             json_list.append(f_json)
 
         follow_json = ",".join(json_list)
-        ret_json = '''
-        {{
-            "message" : "success",
-            "follower" : "{}",
-            "followed_list" : [
-                {}
-            ]
-        }}
-        '''.format(request.GET.get('username'), follow_json)
-        return HttpResponse(ret_json)
+        return follow_json
     except Exception as e:
         print(e)
-        return HttpResponse('{"message" : "User does not exist", "success" : "False"}')
+
 
 # Get reviews for a game
 # example: curl -d '{"user":{"gameid" : "639790"}}' -X POST "http://localhost:8000/backend/get_reviews/"

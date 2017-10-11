@@ -2,7 +2,7 @@ import React from "react";
 import {Button, Media, Tab, Nav} from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { getGameInfo } from '../../actions/userActions'
-import { add_to_game_list,add_to_wish_list } from '../../actions/gamesActions'
+import { add_to_game_list,add_to_wish_list,remove_from_game_list } from '../../actions/gamesActions'
 
 
 @connect((store) => {
@@ -22,6 +22,7 @@ export default class Profile extends React.Component {
     }
     this.add_to_game_list = this.add_to_game_list.bind(this);
     this.add_to_wish_list = this.add_to_wish_list.bind(this);
+    this.remove_from_game_list=this.remove_from_game_list.bind(this);
   }
 
   componentWillMount() {
@@ -60,6 +61,15 @@ export default class Profile extends React.Component {
     })
   }
 
+  remove_from_game_list(){
+    console.log(this.state.curr_game);
+    this.props.dispatch(remove_from_game_list(this.props.user.user_name,this.state.curr_game[0].game_id));
+    this.setState({
+      in_my_wish: false,
+      in_my_game: false,
+    })
+  }
+
 
   rawMarkup(){
     var rawMarkup = this.state.curr_game[0].game_description;
@@ -79,16 +89,16 @@ export default class Profile extends React.Component {
       if(this.props.user_fetched && this.state.in_my_game && !this.state.in_my_wish) {
       return (
           <div>
-            <Button className = "btn btn-default gamebutton" >Remove From Game List</Button>
+            <Button className = "btn btn-default gamebutton" onClick={this.remove_from_game_list } >Remove From Game List</Button>
           </div>
       )
     }
     if(this.props.user_fetched && !this.state.in_my_game && this.state.in_my_wish) {
       return (
           <div>
-            <Button className = "btn btn-primary gamebutton" onClick={this.add_to_game_list}>Add to Game List</Button>
+            <Button className = "btn btn-primary gamebutton" onClick={this.add_to_game_list} >Add to Game List</Button>
             <br/>
-            <Button className = "btn btn-default wishbutton" >Remove From Wish List</Button>
+            <Button className = "btn btn-default wishbutton" onClick={this.remove_from_game_list} >Remove From Wish List</Button>
           </div>
       )
     }

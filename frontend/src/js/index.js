@@ -18,8 +18,8 @@ class App extends React.Component{
 	          <Switch>
 	            <Route path='/' component={Main} />
 	          </Switch>		
-          	 </Router>
-	         </Provider>
+			 </Router>
+		 </Provider>
 
 		);
 	}

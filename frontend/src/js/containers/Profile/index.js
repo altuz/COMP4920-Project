@@ -148,7 +148,7 @@ export default class Profile extends React.Component {
    						    <div>
     						    <BootstrapTable data={this.state.follow_list} hover>
                                     <TableHeaderColumn isKey dataField='user_name'  width='300px'>Username</TableHeaderColumn>
-                                    <TableHeaderColumn dataField='num_games'  width='300px'>Number of Game</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='num_games'  width='300px'>Number of Games</TableHeaderColumn>
                                 </BootstrapTable>
     						</div>
    						</Tab>

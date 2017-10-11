@@ -17,6 +17,7 @@ def user_prof_helper(username):
     game_list = ""
     wish_list = ""
     user_prof = ""
+    flw_list = ""
     # Get user
     try:
         user_entry = User.objects.get(user_name=username)
@@ -38,14 +39,19 @@ def user_prof_helper(username):
         wish_list = get_list(username, False)
     except:
         print("No wishes")
-
+    # Get follow list
+    try:
+        flw_list = follow_list_helper(username)
+    except:
+        print("No follows")
     ret_json = '''
             {{
                 "user" : "{}",
                 "gamelist" : [{}],
-                "wishlist" : [{}]
+                "wishlist" : [{}],
+                "follows" : [{}]
             }}
-        '''.format(username, game_list, wish_list)
+        '''.format(username, game_list, wish_list, flw_list)
     return HttpResponse(ret_json)
 
 
@@ -83,17 +89,26 @@ def follow_user(request):
 # Get user's follow list
 # Tested
 # curl -d '{"user":{"username" : "a 1regular"}}' -X POST "http://localhost:8000/backend/follow_list/"
-@api_view(['POST'])
+@api_view(['GET'])
 def follow_list(request):
-    json_obj = None
     try:
-        json_obj = json.loads(request.body.decode())
+        ret_json = '''
+            {{
+                "message" : "success",
+                "username" : "{}",
+                "follows" : [
+                    {}
+                ]
+            }}
+            '''.format(request.GET.get('username'), follow_list_helper(request.GET.get('username')))
+        return HttpResponse(ret_json)
     except:
-        print("Error loading json")
-        return HttpResponse('{"message" : "input invalid", "success" : "False"}')
+        return HttpResponse('{"message" : "User does not exist", "success" : "False"}')
 
+
+def follow_list_helper(name):
     try:
-        follower = User.objects.get(user_name = json_obj['user']['username'])
+        follower = User.objects.get(user_name = name)
         following_list = Follow.objects.filter(user_id = follower)
         json_list = []
         for person in following_list:
@@ -104,34 +119,18 @@ def follow_list(request):
             json_list.append(f_json)
 
         follow_json = ",".join(json_list)
-        ret_json = '''
-        {{
-            "message" : "success",
-            "follower" : "{}",
-            "followed_list" : [
-                {}
-            ]
-        }}
-        '''.format(json_obj['user']['username'], follow_json)
-        return HttpResponse(ret_json)
+        return follow_json
     except Exception as e:
         print(e)
-        return HttpResponse('{"message" : "User does not exist", "success" : "False"}')
+
 
 # Get reviews for a game
 # example: curl -d '{"user":{"gameid" : "639790"}}' -X POST "http://localhost:8000/backend/get_reviews/"
 # Tested
-@api_view(['POST'])
+@api_view(['GET'])
 def get_reviews(request):
-    json_obj = None
     try:
-        json_obj = json.loads(request.body.decode())
-    except:
-        print("Error loading json")
-        return HttpResponse('{"message" : "input invalid", "success" : "False"}')
-
-    try:
-        game    = GameList.objects.get(game_id = json_obj['user']['gameid'])
+        game    = GameList.objects.get(game_id = request.GET.get('gameid'))
         reviews = Rating.objects.filter(game_id = game)
         # Put 'results' querySet into dict format to convert into JSON dict
         json_list = []
@@ -155,7 +154,7 @@ def get_reviews(request):
                         {}
                     ]
                 }}
-                '''.format(json_obj['user']['gameid'], reviews_json)
+                '''.format(request.GET.get('gameid'), reviews_json)
         return HttpResponse(ret_json)
     except Exception as e:
         print(e)
@@ -638,27 +637,67 @@ def get_game_info(request):
     except: # Case no matching game
         return HttpResponse('{"message":"invalid gameid", "get_game_info":{}')
 
-    # Step 2: check if user paramter given, if given user logged in
+    # Step 2: Collect the game reviews
+    game_obj = GameList.objects.get(game_id=game_id)
+    reviews = Rating.objects.filter(game_id=game_obj)
+    # Put 'results' querySet into dict format to convert into JSON dict
+    reviews_list = []
+    entry_dict = {}
+    for review in reviews:
+        try:
+            reviewer = review.user_id
+            entry_dict['user_name'] = reviewer.user_name
+            entry_dict['rating'] = review.rate
+            entry_dict['comment'] = review.comment
+            reviews_list.append(entry_dict)
+        except:
+            continue
+
+    # Step 3: check if user paramter given, if given user logged in
     player_obj = None
     try: # if given loggen in user, check if on their game list
         player_obj = User.objects.get(user_name=request.GET.get('username'))
     except:
         # if no user
         print("output type1: No user logged in")
-        outputJSON = json.dumps({"game_info": target_game, "in_game_list": "","in_wish_list": ""},
+        outputJSON = json.dumps({"game_info": target_game,
+                                 "in_game_list": "",
+                                 "in_wish_list": "",
+                                 "reviews_list": reviews_list,
+                                 "user_review": ""},
                                 ensure_ascii=False).encode('utf16')
 
+    # Step 4: Display whether in player game/wish list
     if player_obj:
-        game_set = PlayerLibrary.objects.filter(user_id=player_obj, game_id=game_id)
+        game_set = PlayerLibrary.objects.filter(user_id=player_obj, game_id=game_obj)
+        print(game_set)
         if game_set:
             print("output type2: Game is in player library")
             wish_list = game_set[0].wish_list # Should only have one entry, get entry 0
             played = game_set[0].played # Should only have one entry, get entry 0
-            outputJSON = json.dumps({"game_info": target_game, "in_game_list": played, "in_wish_list": wish_list},
+
+            # Step 5: Get their review if exists, should only have one entry
+            review = Rating.objects.filter(user_id=player_obj, game_id=game_obj)
+            user_review = {}
+            if review:
+                user_review['user_name'] = player_obj.user_name
+                user_review['rating'] = review[0].rate
+                user_review['comment'] = review[0].comment
+                print(user_review)
+
+            outputJSON = json.dumps({"game_info": target_game,
+                                     "in_game_list": played,
+                                     "in_wish_list": wish_list,
+                                     "reviews_list": reviews_list,
+                                     "user_review": user_review},
                                     ensure_ascii=False).encode('utf16')
         else:
             print("output type3: Game is NOT in player library")
-            outputJSON = json.dumps({"game_info": target_game, "in_game_list": False, "in_wish_list": False},
+            outputJSON = json.dumps({"game_info": target_game,
+                                     "in_game_list": False,
+                                     "in_wish_list": False,
+                                     "reviews_list": reviews_list,
+                                     "user_review": ""},
                                     ensure_ascii=False).encode('utf16')
 
     return HttpResponse(outputJSON, content_type='application/json')

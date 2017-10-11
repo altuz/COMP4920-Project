@@ -105,11 +105,11 @@ export function Verification(key){
     return axios.get(url);
 }*/
 
-/* export function getFriendList(username){
-    const url='http://localhost:8000/backend//?username='+username;
+ export function getFollowList(username){
+    const url='http://localhost:8000/backend/follow_list/?username='+username;
     return axios.get(url);
 }
-*/
+
 
 
 

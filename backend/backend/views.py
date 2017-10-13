@@ -732,7 +732,7 @@ def get_game_info(request):
                                      "in_game_list": played,
                                      "in_wish_list": wish_list,
                                      "reviews_list": reviews_list,
-                                     "user_review": user_review},
+                                     "user_review": [user_review]},
                                     ensure_ascii=False).encode('utf16')
         else:
             print("output type3: Game is NOT in player library")

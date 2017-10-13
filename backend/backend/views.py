@@ -12,6 +12,21 @@ import json
 import time
 import operator
 
+# Pass in user1 and user2
+@api_view(['GET'])
+def is_following(request):
+    user1 = request.GET['user1']
+    user2 = request.GET['user2']
+    try:
+        u1 = User.objects.get(user_name = user1)
+        u2 = User.objects.get(user_name = user2)
+        try:
+            f = Follow.objects.get(user_id = u1, follow_id = u2)
+            HttpResponse('{ "message" : "user1 follows user2", "success" : "True" }')
+        except:
+            HttpResponse('{ "message" : "user1 does not follow user2", "success" : "False" }')
+    except:
+        HttpResponse('{ "message" : "either one or both users does not exist", "success" : "False" }')
 
 def user_prof_helper(username):
     game_list = ""
@@ -82,6 +97,34 @@ def follow_user(request):
         new_entry = Follow(user_id = user_1, follow_id = user_2)
         new_entry.save()
         return HttpResponse('{"message" : "Followed", "success" : "True"}')
+    except Exception as e:
+        print(e)
+        return HttpResponse('{"message" : "User1 or User2 does not exist", "success" : "False"}')
+
+# Unfollow user
+# User1 -> User2
+@api_view(['POST'])
+def unfollow_user(request):
+    json_obj = None
+    # decode json
+    try:
+        json_obj = json.loads(request.body.decode())
+    except:
+        print("Error loading json")
+        return HttpResponse('{"message" : "input invalid", "success" : "False"}')
+
+    # check if user1 and user2 exists
+    try:
+        user_1 = json_obj['user']['user1']
+        user_2 = json_obj['user']['user2']
+        u1 = User.objects.get(user_name=user_1)
+        u2 = User.objects.get(user_name=user_2)
+        try:
+            f = Follow.objects.get(user_id=u1, follow_id=u2)
+            f.delete()
+            HttpResponse('{ "message" : "unfollow successful", "success" : "True" }')
+        except:
+            HttpResponse('{ "message" : "user1 does not follow user2", "success" : "False" }')
     except Exception as e:
         print(e)
         return HttpResponse('{"message" : "User1 or User2 does not exist", "success" : "False"}')

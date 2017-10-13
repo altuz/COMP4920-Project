@@ -47,7 +47,7 @@ export function searchGame(isFetched,state){
             payload:res.data,
           })
           isFetched();
-        });
+        })
     }
 }
 

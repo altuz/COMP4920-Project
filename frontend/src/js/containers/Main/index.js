@@ -6,6 +6,7 @@ import Search from "../../containers/Search";
 import Discover from "../../containers/Discover";
 import Profile from "../../containers/Profile";
 import Results from "../Results";
+import Friends from "../../containers/Friends";
 import SubResult from "../Results/SubResult.js";
 import Activate from "./Activate.js";
 
@@ -22,6 +23,7 @@ export default class Main extends React.Component {
                 <Route path='/search' component={Search} />
                 <Route path='/profile' component={Profile} />
                 <Route path='/results' component={Results} />
+                <Route path='/friends' component={Friends} />
                 <Route path='/games/:gameID' component={SubResult} />
                 <Route path='/activate/:key' component={Activate} />
             </Switch>

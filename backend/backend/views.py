@@ -22,11 +22,11 @@ def is_following(request):
         u2 = User.objects.get(user_name = user2)
         try:
             f = Follow.objects.get(user_id = u1, follow_id = u2)
-            HttpResponse('{ "message" : "user1 follows user2", "success" : "True" }')
+            return HttpResponse('{ "message" : "user1 follows user2", "success" : "True" }')
         except:
-            HttpResponse('{ "message" : "user1 does not follow user2", "success" : "False" }')
+            return HttpResponse('{ "message" : "user1 does not follow user2", "success" : "False" }')
     except:
-        HttpResponse('{ "message" : "either one or both users does not exist", "success" : "False" }')
+        return HttpResponse('{ "message" : "either one or both users does not exist", "success" : "False" }')
 
 def user_prof_helper(username):
     game_list = ""
@@ -122,9 +122,9 @@ def unfollow_user(request):
         try:
             f = Follow.objects.get(user_id=u1, follow_id=u2)
             f.delete()
-            HttpResponse('{ "message" : "unfollow successful", "success" : "True" }')
+            return HttpResponse('{ "message" : "unfollow successful", "success" : "True" }')
         except:
-            HttpResponse('{ "message" : "user1 does not follow user2", "success" : "False" }')
+            return HttpResponse('{ "message" : "user1 does not follow user2", "success" : "False" }')
     except Exception as e:
         print(e)
         return HttpResponse('{"message" : "User1 or User2 does not exist", "success" : "False"}')

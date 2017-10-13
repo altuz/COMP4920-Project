@@ -9,7 +9,7 @@ import Results from "../Results";
 import Friends from "../../containers/Friends";
 import SubResult from "../Results/SubResult.js";
 import Activate from "./Activate.js";
-
+import Others from "../../containers/Profile/Others.js";
 
 export default class Main extends React.Component {
   render() {
@@ -26,6 +26,7 @@ export default class Main extends React.Component {
                 <Route path='/friends' component={Friends} />
                 <Route path='/games/:gameID' component={SubResult} />
                 <Route path='/activate/:key' component={Activate} />
+                <Route path='/profiles/:user_name' component={Others} />
             </Switch>
         </div>
       </div>

@@ -110,6 +110,39 @@ export function Verification(key){
     return axios.get(url);
 }
 
+export function getProfile(username){
+    const url='http://localhost:8000/backend/user_prof/?username='+username;
+    return axios.get(url);
+}
+
+export function isFollow(user1,user2){
+    const url='http://localhost:8000/backend/is_following/?user1='+user1+'&user2='+user2;
+    return axios.get(url);
+}
+
+export function follow(user){
+    return function(dispatch){
+    axios.post('http://localhost:8000/backend/follow_user/',{
+        user
+    })
+    .catch((err)=>{
+      console.log(err);
+    });
+    }
+}
+
+export function unfollow(user){
+    return function(dispatch){
+    axios.post('http://localhost:8000/backend/unfollow_user/',{
+        user
+    })
+    .catch((err)=>{
+      console.log(err);
+    });
+    }
+}
+
+
 
 
 

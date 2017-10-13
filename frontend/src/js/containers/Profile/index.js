@@ -50,7 +50,6 @@ export default class Profile extends React.Component {
             <div>
                 <Link className='user_name' to ={{
                     pathname: `/profiles/${row.user_name}`,
-                    state: {index}
                 }}>
                 {cell}
                 </Link>
@@ -146,8 +145,8 @@ export default class Profile extends React.Component {
    						</Tab>
    						<Tab eventKey={4} title="Follow List">
    						    <div>
-    						    <BootstrapTable data={this.state.follow_list} hover>
-                                    <TableHeaderColumn isKey dataField='user_name'  width='300px'>Username</TableHeaderColumn>
+    						    <BootstrapTable data={this.state.follow_list} hover pagination>
+                                    <TableHeaderColumn isKey dataField='user_name' dataFormat={this.profileFormatter}  width='300px'>Username</TableHeaderColumn>
                                     <TableHeaderColumn dataField='num_games'  width='300px'>Number of Games</TableHeaderColumn>
                                 </BootstrapTable>
     						</div>

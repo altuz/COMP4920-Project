@@ -10,10 +10,12 @@ export default class Search extends React.Component {
                 <img src='static/images/steam-logo.svg' className='search-page-icon' />
                 SteamR
             </div>
-             <div className='input-group search-bar'>
-             <SearchBar />
-             </div>
+            <div className='search-bar-int'>
+              <div className='input-group search-bar'>
+                <SearchBar />
+              </div>
             </div>
+        </div>
     );
   }
 }

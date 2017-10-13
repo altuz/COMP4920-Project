@@ -208,6 +208,9 @@ input {
   margin: auto;
   padding-top: 10px;
 }
+.search-bar {
+  margin: auto;
+}
 
 .steamrtitle {
     margin-top: 10%;
@@ -218,11 +221,28 @@ input {
 
 
 .searchbar-input{
-  width: 500px;
-  height: 40px;
+  width: 600px;
+  height: 45px;
+  padding:5px;
   font-size: 20px;
   border-radius: 3px;
   border: 1px solid #4f5968;
+  text-align: center;
+}
+
+.select-input{
+  margin-left:19.8%;
+  width: 610px;
+  height: 45px;
+  padding:5px;
+  font-size: 15px;
+}
+
+.second-select{
+  margin-top: 5px;
+}
+.search-btn{
+  margin-top:60px
 }
 
 .logout-font {

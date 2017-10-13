@@ -292,12 +292,29 @@ input {
   height: 45px;
 }
 
-.game-page-tabs{
+.page-tabs{
   margin-top:10px;
 }
 
 .testing{
   width:100%;
+}
+
+.review-btn{
+  margin-top: 20px;
+}
+
+.review-header{
+  margin-top: 0;
+}
+
+.review-input {
+  width:600px;
+  height: 50px;
+}
+
+.rate-btn {
+   margin-left: 15px;
 }
 
 

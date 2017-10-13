@@ -67,6 +67,19 @@ export function remove_from_game_list(username,gameID){
   }
 }
 
+export function send_review(form, username, gameid){
+  var review ={
+    username : username,
+    gameid:gameid,
+    rate:form.values.rate,
+    comment: form.values.Review,
+  }
+  const url= 'http://localhost:8000/backend/send_review/';
+  return axios.post(url,{
+    review
+  })
+}
+
 
 // export function fetchTweets() {
 //   return function(dispatch) {

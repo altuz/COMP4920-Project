@@ -916,3 +916,9 @@ def edit_profile(request):
             print(e)
 
     return HttpResponse('{"message": "no user"}')
+
+
+@api_view(['POST'])
+def recommendation_v2(request):
+
+    return None

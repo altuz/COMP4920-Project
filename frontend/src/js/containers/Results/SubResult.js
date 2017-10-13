@@ -33,6 +33,7 @@ export default class Profile extends React.Component {
     const gameID=this.props.match.params.gameID;
     getGameInfo(gameID,username)
         .then((res)=>{
+          console.log(res);
           this.setState({
             curr_game:res.data.game_info,
             in_my_game: res.data.in_game_list,

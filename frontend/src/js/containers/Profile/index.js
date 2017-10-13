@@ -50,7 +50,6 @@ export default class Profile extends React.Component {
             <div>
                 <Link className='user_name' to ={{
                     pathname: `/profiles/${row.user_name}`,
-                    state: {index}
                 }}>
                 {cell}
                 </Link>
@@ -119,6 +118,7 @@ export default class Profile extends React.Component {
 					<p> Username : {user.user_name} </p>
     				<Button className = "btn btn-primary" type ="submit"  name = "Submit" onClick={this.requestedit}>Edit</Button>
     				</div>
+						<div className='page-tabs'>
     				<Tabs defaultActiveKey={1} className="Tabulation" id="uncontrolled-tab-example">
     					<Tab eventKey={1} title="Playlist">
     						<div>
@@ -146,13 +146,14 @@ export default class Profile extends React.Component {
    						</Tab>
    						<Tab eventKey={4} title="Follow List">
    						    <div>
-    						    <BootstrapTable data={this.state.follow_list} hover>
-                                    <TableHeaderColumn isKey dataField='user_name'  width='300px'>Username</TableHeaderColumn>
+    						    <BootstrapTable data={this.state.follow_list} hover pagination>
+                                    <TableHeaderColumn isKey dataField='user_name' dataFormat={this.profileFormatter}  width='300px'>Username</TableHeaderColumn>
                                     <TableHeaderColumn dataField='num_games'  width='300px'>Number of Games</TableHeaderColumn>
                                 </BootstrapTable>
     						</div>
    						</Tab>
    					</Tabs>
+						</div>
 			</div>
 			);
 		}

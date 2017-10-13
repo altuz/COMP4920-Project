@@ -296,6 +296,43 @@ input {
   height: 45px;
 }
 
+.page-tabs{
+  margin-top:10px;
+}
+
+.testing{
+  width:100%;
+}
+
+.review-btn{
+  margin-top: 20px;
+}
+
+.review-header{
+  margin-top: 0;
+}
+
+.review-input {
+  width:600px;
+  height: 50px;
+}
+
+.rate-btn {
+   margin-left: 15px;
+}
+
+
+.white-container{
+  background-color: white;
+  margin: 5px 5px 10px;
+  padding: 10px 15px;
+  border: 1px #e5e5e5 solid;
+  border-radius: 4px;
+}
+
+.rate-icon{
+  float: right;
+
 #custom-search-input{
     padding: 3px;
     border: solid 1px #E4E4E4;

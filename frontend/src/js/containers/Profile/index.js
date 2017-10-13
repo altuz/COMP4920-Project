@@ -118,6 +118,7 @@ export default class Profile extends React.Component {
 					<p> Username : {user.user_name} </p>
     				<Button className = "btn btn-primary" type ="submit"  name = "Submit" onClick={this.requestedit}>Edit</Button>
     				</div>
+						<div className='page-tabs'>
     				<Tabs defaultActiveKey={1} className="Tabulation" id="uncontrolled-tab-example">
     					<Tab eventKey={1} title="Playlist">
     						<div>
@@ -152,6 +153,7 @@ export default class Profile extends React.Component {
     						</div>
    						</Tab>
    					</Tabs>
+						</div>
 			</div>
 			);
 		}

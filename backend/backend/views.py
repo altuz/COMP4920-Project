@@ -12,6 +12,21 @@ import json
 import time
 import operator
 
+# Pass in user1 and user2
+@api_view(['GET'])
+def is_following(request):
+    user1 = request.GET['user1']
+    user2 = request.GET['user2']
+    try:
+        u1 = User.objects.get(user_name = user1)
+        u2 = User.objects.get(user_name = user2)
+        try:
+            f = Follow.objects.get(user_id = u1, follow_id = u2)
+            HttpResponse('{ "message" : "user1 follows user2", "success" : "True" }')
+        except:
+            HttpResponse('{ "message" : "user1 does not follow user2", "success" : "False" }')
+    except:
+        HttpResponse('{ "message" : "either one or both users does not exist", "success" : "False" }')
 
 def user_prof_helper(username):
     game_list = ""

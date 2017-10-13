@@ -1,8 +1,10 @@
 import React from "react";
-import {Button, Media, Tab, Nav} from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
-import { getGameInfo } from '../../actions/userActions'
+import { getGameInfo } from '../../actions/userActions';
 import { add_to_game_list,add_to_wish_list,remove_from_game_list } from '../../actions/gamesActions'
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import CommentBox from '../../components/CommentBox';
 
 
 @connect((store) => {
@@ -19,6 +21,8 @@ export default class Profile extends React.Component {
       curr_game:[],
       is_my_game:null,
       is_my_wish:null,
+      reviews_list:[],
+      user_review:[],
     }
     this.add_to_game_list = this.add_to_game_list.bind(this);
     this.add_to_wish_list = this.add_to_wish_list.bind(this);
@@ -38,6 +42,8 @@ export default class Profile extends React.Component {
             curr_game:res.data.game_info,
             in_my_game: res.data.in_game_list,
             in_my_wish: res.data.in_wish_list,
+            reviews_list: res.data.reviews_list,
+            user_review :res.data.user_review,
           })
 
         })
@@ -112,11 +118,34 @@ export default class Profile extends React.Component {
       const game=this.state.curr_game[0];
       return(
           <div className='row'>
-            <div className='col-md-8'>
+            <div className='col-md-9'>
               <img className='description-img' src={game.image_url}/>
-              <div dangerouslySetInnerHTML={this.rawMarkup()}></div>
+              <div className='game-page-tabs'>
+              <Tabs>
+                <TabList>
+                  <Tab><h5>Game Description</h5></Tab>
+                  <Tab><h5>Review</h5></Tab>
+                  {this.props.user_fetched ? (<Tab><h5>My review</h5></Tab>) : null}
+                </TabList>
+                <TabPanel>
+                  <div className='testing' dangerouslySetInnerHTML={this.rawMarkup()}></div>
+                </TabPanel>
+                <TabPanel>
+                  <div>
+                    <CommentBox data={this.state.reviews_list}/>
+                  </div>
+                </TabPanel>
+                {this.props.user_fetched ? (
+                <TabPanel>
+                <div>
+                  <CommentBox data={this.state.user_review}/>
+                </div>
+              </TabPanel>) : null}
+              </Tabs>
+              </div>
+
             </div>
-            <div className='col-md-4'>
+            <div className='col-md-3'>
                 {this.renderButton()}
             </div>
           </div>

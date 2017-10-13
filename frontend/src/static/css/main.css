@@ -291,3 +291,24 @@ input {
 .Select-control{
   height: 45px;
 }
+
+.game-page-tabs{
+  margin-top:10px;
+}
+
+.testing{
+  width:100%;
+}
+
+
+.white-container{
+  background-color: white;
+  margin: 5px 5px 10px;
+  padding: 10px 15px;
+  border: 1px #e5e5e5 solid;
+  border-radius: 4px;
+}
+
+.rate-icon{
+  float: right;
+}

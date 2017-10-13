@@ -34,9 +34,11 @@ export function logout(){
   }
 }
 
-export function searchGame(keyword,isFetched){
-    console.log("hehe");
-    const url='http://localhost:8000/backend/search_game/?q='+ keyword + "&category=";
+export function searchGame(isFetched,state){
+    console.log(state.selected_category);
+    console.log(state.selected_genre);
+    const url='http://localhost:8000/backend/search_game/?q='+ state.q + "&category="+state.selected_category
+        + "&genre="+state.selected_genre;
     return function(dispatch){
     axios.get(url)
         .then((res)=>{
@@ -45,7 +47,7 @@ export function searchGame(keyword,isFetched){
             payload:res.data,
           })
           isFetched();
-        });
+        })
     }
 }
 

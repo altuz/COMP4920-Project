@@ -18,7 +18,6 @@ export default class Others extends React.Component {
     constructor(props){
     super(props);
 	   this.state= {
-		   username:'',
 		   follow_list:[],
 		   gamelist:[],
 		   wishlist:[],
@@ -46,7 +45,6 @@ export default class Others extends React.Component {
         .then((res)=>{
             console.log(res);
            this.setState({
-            username:res.data.user,
             follow_list:res.data.follows,
             gamelist:res.data.gamelist,
             wishlist:res.data.wishlist,
@@ -89,11 +87,11 @@ export default class Others extends React.Component {
     console.log(this.state.isfollow);
     var user={
         user1:this.props.user.user_name,
-        user2:this.state.username
+        user2:this.props.match.params.user_name,
     }
     this.props.dispatch(follow(user));
     this.setState({
-      isfollow: true,
+      isfollow:"True",
      })
 
   }
@@ -102,11 +100,11 @@ export default class Others extends React.Component {
     console.log(this.state.isfollow);
     var user={
         user1:this.props.user.user_name,
-        user2:this.state.username
+        user2:this.props.match.params.user_name,
     }
     this.props.dispatch(unfollow(user));
     this.setState({
-      isFollow: false,
+      isfollow:"False",
      })
 
   }
@@ -114,7 +112,7 @@ export default class Others extends React.Component {
 
     renderButton = () => {
       console.log(this.state.isfollow);
-      if(!this.state.isfollow ) {
+      if(this.state.isfollow === 'False' ) {
         return (
             <div>
               <Button className = "btn btn-primary followbutton" onClick={() => this.Follow()}>Follow</Button>
@@ -137,7 +135,7 @@ export default class Others extends React.Component {
 						<img src = "http://www.ravalyogimatrimony.com/Content/images/default-profile-pic.png" alt = "profile picture"/>
 					</div>
 					<div className = "media-body">
-					<p> Username : {this.state.username} </p>
+					<p> Username : {this.props.match.params.user_name} </p>
     				<div className='col-md-4'>
                         {this.renderButton()}
                     </div>

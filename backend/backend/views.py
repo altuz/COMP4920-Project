@@ -746,12 +746,15 @@ def get_game_info(request):
                 user_review['rating'] = review[0].rate
                 user_review['comment'] = review[0].comment
                 print(user_review)
+                user_review_output = [user_review]
+            else:
+                user_review_output = []
 
             outputJSON = json.dumps({"game_info": target_game,
                                      "in_game_list": played,
                                      "in_wish_list": wish_list,
                                      "reviews_list": reviews_list,
-                                     "user_review": [user_review]},
+                                     "user_review": user_review_output},
                                     ensure_ascii=False).encode('utf16')
         else:
             print("output type3: Game is NOT in player library")

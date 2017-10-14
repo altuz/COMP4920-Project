@@ -142,6 +142,11 @@ export function unfollow(user){
     }
 }
 
+export function search_user(q){
+    const url='http://localhost:8000/backend/search_user/?q='+q;
+    return axios.get(url);
+}
+
 
 
 

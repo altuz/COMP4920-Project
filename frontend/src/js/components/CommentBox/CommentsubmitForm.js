@@ -3,9 +3,10 @@ import { Field, reduxForm } from 'redux-form';
 import { Button } from 'react-bootstrap';
 
 const SimpleForm = props => {
-  const { handleSubmit, pristine, reset, submitting } = props
+  const { handleSubmit, pristine, reset, submitting, isSubmitting } = props
+  console.log(isSubmitting);
   return (
-      <form onSubmit={handleSubmit}>
+      <form>
         <div>
           <label>Rate</label>
           <div>
@@ -36,12 +37,13 @@ const SimpleForm = props => {
           </div>
         </div>
         <div>
-          <button type="submit" disabled={pristine || submitting}>
+          <Button onClick={handleSubmit} disabled={pristine || submitting}>
             Submit
-          </button>
-          <button type="button" disabled={pristine || submitting} onClick={reset}>
+          </Button>
+          <Button type="button" disabled={pristine || submitting} onClick={reset}>
             Clear Values
-          </button>
+          </Button>
+          { isSubmitting ? (<img src='static/images/loading.svg' height="50" width="50"/>):null}
         </div>
       </form>
   )

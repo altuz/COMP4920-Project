@@ -24,6 +24,7 @@ export default class Profile extends React.Component {
       is_my_wish:null,
       reviews_list:[],
       user_review:[],
+      isSubmitting:false,
     }
     this.add_to_game_list = this.add_to_game_list.bind(this);
     this.add_to_wish_list = this.add_to_wish_list.bind(this);
@@ -32,8 +33,12 @@ export default class Profile extends React.Component {
   }
   //send_review(form, username, gameid)
   handleSubmit() {
+    this.setState({
+      isSubmitting:true,
+    })
     const gameID=this.props.match.params.gameID;
     send_review(this.props.form, this.props.user.user_name,gameID)
+    window.location.reload();
   }
 
   componentWillMount() {
@@ -146,7 +151,7 @@ export default class Profile extends React.Component {
                 <TabPanel>
                 <div>
                   <CommentBox data={this.state.user_review}/>
-                  <CommentForm handleSubmit={this.handleSubmit} user_review={this.state.user_review}/>
+                  <CommentForm handleSubmit={this.handleSubmit} user_review={this.state.user_review} isSubmitting={this.state.isSubmitting}/>
                 </div>
               </TabPanel>)  : null}
               </Tabs>

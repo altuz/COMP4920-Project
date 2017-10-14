@@ -151,7 +151,11 @@ export default class Profile extends React.Component {
                 <TabPanel>
                 <div>
                   <CommentBox data={this.state.user_review}/>
-                  <CommentForm handleSubmit={this.handleSubmit} user_review={this.state.user_review} isSubmitting={this.state.isSubmitting}/>
+                  <CommentForm handleSubmit={this.handleSubmit}
+                               user_review={this.state.user_review}
+                               isSubmitting={this.state.isSubmitting}
+                               in_my_game={this.state.in_my_game}
+                  />
                 </div>
               </TabPanel>)  : null}
               </Tabs>

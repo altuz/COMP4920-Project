@@ -18,9 +18,9 @@ export default class CommentForm extends React.Component {
 
   render() {
     return <div onClick={this.handleClick}>
-      {this.props.user_review.length>0 ?
+      { !this.props.in_my_game ? (<div><strong>You need to own the game first</strong></div>) : (this.props.user_review.length>0  ?
       (<Button className = "btn btn-primary review-btn">Edit Review</Button>):
-      (<Button className = "btn btn-primary review-btn">Add Review</Button>)}
+      (<Button className = "btn btn-primary review-btn">Add Review</Button>))}
       {
         this.state.isShowingModal &&
         <ModalContainer onClose={this.handleClose}>

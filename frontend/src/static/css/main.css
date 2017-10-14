@@ -364,3 +364,7 @@ input {
 #custom-search-input .glyphicon-search{
     font-size: 23px;
 }
+
+.friends-result{
+ float: left;
+}

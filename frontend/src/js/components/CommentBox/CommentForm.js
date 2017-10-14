@@ -26,7 +26,7 @@ export default class CommentForm extends React.Component {
         <ModalContainer onClose={this.handleClose}>
           <ModalDialog onClose={this.handleClose}>
             <h2 className='review-header'>Write Your Review</h2>
-            <CommentsubmitForm handleSubmit={this.props.handleSubmit }/>
+            <CommentsubmitForm handleSubmit={this.props.handleSubmit } isSubmitting={this.props.isSubmitting}/>
           </ModalDialog>
         </ModalContainer>
       }

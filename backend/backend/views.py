@@ -655,6 +655,25 @@ def search_game(request):
 # curl -X GET "http://localhost:8000/backend/get_top_games/?n=100"
 @api_view(['GET'])
 def get_top_games(request):
+    # Temporary code segment to analyse data
+    # ---------------------------------------
+    # target_game_id = 578080 # PLAYERUNKNOWN'S BATTLEGROUNDS (PUBG)
+    # target_game = GameList.objects.filter(game_id=target_game_id)
+    # player_set = PlayerLibrary.objects.filter(game_id=target_game)
+    #
+    # entries = []
+    # for player in player_set:
+    #     player_obj = player.user_id
+    #     entry_dict = {}
+    #     entry_dict['username'] = player_obj.user_name
+    #     entry_dict['hrs'] = player.played_hrs
+    #     entries.append(entry_dict)
+    # for entry in entries:
+    #     print(entry)
+    # outputJSON = json.dumps(entries, ensure_ascii=False).encode('utf16')
+    # return HttpResponse(outputJSON, content_type='application/json')
+    # ---------------------------------------
+
     try:
         number = int(request.GET.get('n'))
         results = GameList.objects.all()[:number]
@@ -685,10 +704,10 @@ def get_game_info(request):
     reviews = Rating.objects.filter(game_id=game_obj)
     # Put 'results' querySet into dict format to convert into JSON dict
     reviews_list = []
-    entry_dict = {}
     for review in reviews:
         try:
             reviewer = review.user_id
+            entry_dict = {}
             entry_dict['user_name'] = reviewer.user_name
             entry_dict['rating'] = review.rate
             entry_dict['comment'] = review.comment

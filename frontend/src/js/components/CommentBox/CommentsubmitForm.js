@@ -1,5 +1,6 @@
-import React from 'react'
-import { Field, reduxForm } from 'redux-form'
+import React from 'react';
+import { Field, reduxForm } from 'redux-form';
+import { Button } from 'react-bootstrap';
 
 const SimpleForm = props => {
   const { handleSubmit, pristine, reset, submitting } = props

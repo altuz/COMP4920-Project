@@ -131,7 +131,7 @@ export default class Profile extends React.Component {
               <Tabs>
                 <TabList>
                   <Tab><h5>Game Description</h5></Tab>
-                  <Tab><h5>Review</h5></Tab>
+                  <Tab><h5>Reviews</h5></Tab>
                   {this.props.user_fetched ? (<Tab><h5>My review</h5></Tab>) : null}
                 </TabList>
                 <TabPanel>
@@ -146,7 +146,7 @@ export default class Profile extends React.Component {
                 <TabPanel>
                 <div>
                   <CommentBox data={this.state.user_review}/>
-                  <CommentForm handleSubmit={this.handleSubmit}/>
+                  <CommentForm handleSubmit={this.handleSubmit} user_review={this.state.user_review}/>
                 </div>
               </TabPanel>)  : null}
               </Tabs>

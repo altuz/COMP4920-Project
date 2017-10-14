@@ -68,12 +68,22 @@ export function remove_from_game_list(username,gameID){
 }
 
 export function send_review(form, username, gameid){
-  var review ={
-    username : username,
-    gameid:gameid,
-    rate:form.values.rate,
-    comment: form.values.Review,
+  if(form.values.rate==='true'){
+    var review ={
+      username : username,
+      gameid:gameid,
+      rate:true,
+      comment: form.values.Review,
+    }
+  } else {
+    var review ={
+      username : username,
+      gameid:gameid,
+      rate:false,
+      comment: form.values.Review,
+    }
   }
+
   const url= 'http://localhost:8000/backend/send_review/';
   return axios.post(url,{
     review

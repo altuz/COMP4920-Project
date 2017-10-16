@@ -150,7 +150,7 @@ export default class Profile extends React.Component {
                 {this.props.user_fetched ? (
                 <TabPanel>
                 <div>
-                  <CommentBox data={this.state.user_review}/>
+                  {this.state.in_my_game ? <CommentBox data={this.state.user_review}/> : null}
                   <CommentForm handleSubmit={this.handleSubmit}
                                user_review={this.state.user_review}
                                isSubmitting={this.state.isSubmitting}

@@ -344,6 +344,12 @@ def edit_list(request):
             old_entry.wish_list = wishes
             old_entry.played = played
             old_entry.save()
+            if played is False and wishes is False:
+                try:
+                    user_rating = Rating.objects.get(user_id = player, game_id = game)
+                    user_rating.delete()
+                except:
+                    pass
         except:
             new_entry = PlayerLibrary(user_id=player, game_id=game, wish_list=wishes, played=played)
             new_entry.save()

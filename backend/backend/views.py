@@ -347,6 +347,17 @@ def edit_list(request):
             if played is False and wishes is False:
                 try:
                     user_rating = Rating.objects.get(user_id = player, game_id = game)
+                    rate_val = user_rating.rate
+                    rating_count = game.rating_count
+                    average_rating = game.average_rating
+                    total_rating = rating_count * average_rating
+                    if rate_val is True:
+                        total_rating -= 1
+                    rating_count -= 1
+                    new_average = total_rating/rating_count
+                    game.rating_count = rating_count
+                    game.average_rating = new_average
+                    game.save()
                     user_rating.delete()
                 except:
                     pass

@@ -2,6 +2,8 @@ export default function reducer(state={
     results: JSON.parse(localStorage.getItem('results'))||[],
     discover: JSON.parse(localStorage.getItem('discover'))||[],
     curr: JSON.parse(localStorage.getItem('curr'))||null,
+    isSubmitting:false,
+    keywords:{},
   }, action) {
 
     switch (action.type) {
@@ -10,6 +12,7 @@ export default function reducer(state={
         return {
           ...state,
           results: action.payload.results,
+          isSubmitting:false,
         }
       }
       case "CLEAR_RESULT": {
@@ -47,6 +50,13 @@ export default function reducer(state={
         return {
           ...state,
           tweets: state.tweets.filter(tweet => tweet.id !== action.payload),
+        }
+      }
+      case "SEARCHING_GAME":{
+        return {
+            ...state,
+            keywords:action.payload,
+            isSubmitting:true,
         }
       }
     }

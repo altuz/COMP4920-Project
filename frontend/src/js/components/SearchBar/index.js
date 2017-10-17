@@ -15,6 +15,7 @@ const genre = genres.genre_list;
 @connect((store)=>{
   return {
     results: store.games.results,
+    isSubmitting:store.games.isSubmitting,
   }
 })
 class SearchBar extends React.Component {
@@ -62,6 +63,11 @@ class SearchBar extends React.Component {
   }
 
   render () {
+    if(this.props.isSubmitting){
+      return (
+          <div><img src='static/images/searching.svg' height="100" width="100"/></div>
+      )
+    }
     return (
       <div className='searchbar-container'>
         <form onSubmit={this.handleSubmit.bind(this)}>

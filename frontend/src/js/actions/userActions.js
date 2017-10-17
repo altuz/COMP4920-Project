@@ -35,12 +35,21 @@ export function logout(){
 }
 
 export function searchGame(isFetched,state){
-    console.log(state.selected_category);
-    console.log(state.selected_genre);
+    const keyword = {
+      q:state.q,
+      genre:state.selected_genre,
+      category: state.selected_category,
+    }
+
     const url='http://localhost:8000/backend/search_game/?q='+ state.q + "&category="+state.selected_category
         + "&genre="+state.selected_genre;
     return function(dispatch){
-    axios.get(url)
+      dispatch({
+        type: "SEARCHING_GAME",
+        payload:keyword
+      });
+
+      axios.get(url)
         .then((res)=>{
           dispatch( {
             type: 'FETCH_RESULT',

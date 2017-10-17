@@ -37,7 +37,7 @@ export default class LoginForm extends React.Component {
 
   isFail() {
     this.props.dispatch(notifSend({
-      message: 'Login faild, please try again',
+      message: 'Login failed, please try again',
       kind: 'info',
       dismissAfter: 2000
     }));

@@ -65,9 +65,9 @@ export default class Results extends React.Component {
         <h2 style={{'textAlign':'center'}}>Showing {this.props.results.length} results for</h2>
         <div>
         <h4>
-          <div><strong>keyword :</strong> {keywords.q} </div>
-          <div><strong>genres :</strong> {keywords.genre} </div>
-          <div><strong>category :</strong> {keywords.category}  </div>
+          <div><strong>Keyword :</strong> {keywords.q} </div>
+          <div><strong>Genres :</strong> {keywords.genre} </div>
+          <div><strong>Categories :</strong> {keywords.category}  </div>
         </h4>
         </div>
         <BootstrapTable data={this.props.results}  hover pagination>

@@ -24,7 +24,6 @@ export default class Friends extends React.Component {
                 {cell}
                 </Link>
             </div>
-
     )
   }
 
@@ -45,7 +44,7 @@ export default class Friends extends React.Component {
 
 
     renderResult = () => {
-      if(this.state.result.lenghts !== 0 ) {
+      if(this.state.result.lenght !== 0 ) {
         return (
             <div>
                 <BootstrapTable data={this.state.result} hover>

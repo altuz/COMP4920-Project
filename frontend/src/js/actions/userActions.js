@@ -1,30 +1,26 @@
 import axios from 'axios';
 
-export function login(user) {
+export function login(user,isFail) {
   return function(dispatch){
     axios.post('http://localhost:8000/backend/login/',{
         user
     })
     .then((response)=>{
-        if(response.data.message==='success'){
-          console.log(response);
+        if(response.data.message ==='success'){
           localStorage.setItem('cookie', JSON.stringify(response.data.cookie));
             dispatch( {
               type: 'SET_USER',
               payload:response.data,
             })
+        } else {
+            isFail();
         }
     })
     .catch((err)=>{
+      console.log('fdfdfdf')
+      isFail();
       console.log(err);
     });
-    axios.get('http://localhost:8000/backend/get_top_games/?n=100')
-        .then((res2)=>{
-          dispatch({
-            type: 'SET_DISCOVER',
-            payload:res2.data,
-          })
-        })
     }
 }
 
@@ -35,12 +31,21 @@ export function logout(){
 }
 
 export function searchGame(isFetched,state){
-    console.log(state.selected_category);
-    console.log(state.selected_genre);
+    const keyword = {
+      q:state.q,
+      genre:state.selected_genre,
+      category: state.selected_category,
+    }
+
     const url='http://localhost:8000/backend/search_game/?q='+ state.q + "&category="+state.selected_category
         + "&genre="+state.selected_genre;
     return function(dispatch){
-    axios.get(url)
+      dispatch({
+        type: "SEARCHING_GAME",
+        payload:keyword
+      });
+
+      axios.get(url)
         .then((res)=>{
           dispatch( {
             type: 'FETCH_RESULT',

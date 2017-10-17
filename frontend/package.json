@@ -41,6 +41,7 @@
     "redux": "^3.6.0",
     "redux-form": "^7.1.1",
     "redux-logger": "^3.0.1",
+    "redux-notifications": "^4.0.1",
     "redux-promise-middleware": "^4.2.0",
     "redux-thunk": "^2.2.0",
     "remarkable": "^1.7.1"

@@ -11,9 +11,11 @@ const category = categories.category_list;
 const genre = genres.genre_list;
 
 
+
 @connect((store)=>{
   return {
     results: store.games.results,
+    isSubmitting:store.games.isSubmitting,
   }
 })
 class SearchBar extends React.Component {
@@ -61,9 +63,15 @@ class SearchBar extends React.Component {
   }
 
   render () {
+    if(this.props.isSubmitting){
+      return (
+          <div><img src='static/images/searching.svg' height="100" width="100"/></div>
+      )
+    }
     return (
       <div className='searchbar-container'>
         <form onSubmit={this.handleSubmit.bind(this)}>
+          <div className='input-group col-md-6' style={{'marginLeft':'205px'}}>
           <input
             className='searchbar-input'
             type='text'
@@ -71,6 +79,12 @@ class SearchBar extends React.Component {
             onChange={this.handleChange.bind(this)}
             name='q'
             value={this.state.q} />
+            <span className="input-group-btn">
+                  <button className="btn btn-info btn-lg" type="button" onClick={this.handleSubmit.bind(this)}>
+                      <i className="glyphicon glyphicon-search"></i>
+                  </button>
+            </span>
+          </div>
           <div className='select-input'>
             <Select
               multi
@@ -90,9 +104,6 @@ class SearchBar extends React.Component {
                   value={this.state.selected_genre}
               />
             </div>
-          </div>
-          <div className="form-group search-btn">
-            <Button className='btn btn-primary btn-md' type="submit" name="Submit"> Search</Button>
           </div>
         </form>
         {this.state.fetched &&

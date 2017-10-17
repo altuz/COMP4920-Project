@@ -39,6 +39,8 @@ export default function reducer(state={
         localStorage.removeItem('cookie');
         localStorage.removeItem('game_list');
         localStorage.removeItem('wish_list');
+        localStorage.removeItem('keywords');
+        localStorage.removeItem('curr');
         return {
           ...state,
           user: {},

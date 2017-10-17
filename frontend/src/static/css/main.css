@@ -131,7 +131,7 @@ input {
   top: 0;
   left: 0;
   height: 55px;
-  width: 100%;
+  width: 100% ;
   background: #2c3136;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   -webkit-font-smoothing: antialiased;

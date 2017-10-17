@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import {Button, Modal} from 'react-bootstrap';
 import SignupForm from '../Signup'
 import { login } from '../../actions/userActions.js';
+import { actions as notifActions, Notifs } from 'redux-notifications';
+const { notifSend } = notifActions;
 
 @connect((store)=>{
 	return store.user;
@@ -20,7 +22,9 @@ export default class LoginForm extends React.Component {
 	   this.requestsignup = this.requestsignup.bind(this);
 	   this.onChange = this.onChange.bind(this);
 	   this.handleSubmit = this.handleSubmit.bind(this);
+     this.isFail = this.isFail.bind(this);
 	}
+
 	requestsignup() {
 		this.setState({ issignup: true });
 	}
@@ -31,6 +35,17 @@ export default class LoginForm extends React.Component {
 		);
 	}
 
+  isFail() {
+    this.props.dispatch(notifSend({
+      message: 'Login faild, please try again',
+      kind: 'info',
+      dismissAfter: 2000
+    }));
+    this.setState({
+      isSubmitting:false,
+    })
+  }
+
 
 	handleSubmit(e){
 		e.preventDefault();
@@ -39,7 +54,7 @@ export default class LoginForm extends React.Component {
 			password:this.state.password
 		}
 		this.setState({isSubmitting:true});
-		this.props.dispatch(login(user));
+		this.props.dispatch(login(user,this.isFail));
 	}
 
 
@@ -56,6 +71,7 @@ export default class LoginForm extends React.Component {
 				<Modal.Header closeButton>
 					<Modal.Title>Login</Modal.Title>
 				</Modal.Header>
+				<Notifs />
 				<Modal.Body>
 					<form onSubmit={this.handleSubmit} method="post">
 						<div className ="form-group">

@@ -62,12 +62,12 @@ export default class Results extends React.Component {
     const { keywords } = this.props;
     return(
       <div>
-        <h2 style={{'textAlign':'center'}}>Search Result for</h2>
+        <h2 style={{'textAlign':'center'}}>Showing {this.props.results.length} results for</h2>
         <div>
         <h4>
           <div><strong>keyword :</strong> {keywords.q} </div>
-          <div><strong>genres: </strong> {keywords.genre} </div>
-          <div><strong>category: </strong> {keywords.category}  </div>
+          <div><strong>genres :</strong> {keywords.genre} </div>
+          <div><strong>category :</strong> {keywords.category}  </div>
         </h4>
         </div>
         <BootstrapTable data={this.props.results}  hover pagination>

@@ -1,30 +1,26 @@
 import axios from 'axios';
 
-export function login(user) {
+export function login(user,isFail) {
   return function(dispatch){
     axios.post('http://localhost:8000/backend/login/',{
         user
     })
     .then((response)=>{
-        if(response.data.message==='success'){
-          console.log(response);
+        if(response.data.message ==='success'){
           localStorage.setItem('cookie', JSON.stringify(response.data.cookie));
             dispatch( {
               type: 'SET_USER',
               payload:response.data,
             })
+        } else {
+            isFail();
         }
     })
     .catch((err)=>{
+      console.log('fdfdfdf')
+      isFail();
       console.log(err);
     });
-    axios.get('http://localhost:8000/backend/get_top_games/?n=100')
-        .then((res2)=>{
-          dispatch({
-            type: 'SET_DISCOVER',
-            payload:res2.data,
-          })
-        })
     }
 }
 

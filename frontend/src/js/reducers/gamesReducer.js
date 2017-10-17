@@ -3,7 +3,7 @@ export default function reducer(state={
     discover: JSON.parse(localStorage.getItem('discover'))||[],
     curr: JSON.parse(localStorage.getItem('curr'))||null,
     isSubmitting:false,
-    keywords:{},
+    keywords:JSON.parse(localStorage.getItem('keywords'))||{},
   }, action) {
 
     switch (action.type) {
@@ -53,6 +53,7 @@ export default function reducer(state={
         }
       }
       case "SEARCHING_GAME":{
+        localStorage.setItem('keywords', JSON.stringify(action.payload));
         return {
             ...state,
             keywords:action.payload,

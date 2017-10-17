@@ -1,7 +1,7 @@
 import React from "react";
 import Login from '../../components/Login';
 import { connect } from 'react-redux';
-import { Link, Switch, Route } from 'react-router-dom';
+import { Link, } from 'react-router-dom';
 
 class Header extends React.Component {
 	render(){
@@ -13,7 +13,6 @@ class Header extends React.Component {
 		            SteamR
 	          		</Link>
        			</div>
-
       		</header>
 	 )
 	}
@@ -58,7 +57,7 @@ export default class Nav extends React.Component {
     return(
     	<div>
     	<Header />
-		<SideBar path={this.props.path}/>
+		  <SideBar path={this.props.path}/>
 		</div>
     );
   }

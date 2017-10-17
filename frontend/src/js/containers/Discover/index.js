@@ -3,6 +3,7 @@ import { withRouter } from 'react-router';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { getDiscover } from '../../actions/gamesActions';
 
 @connect((store) => {
   return {
@@ -10,12 +11,14 @@ import { connect } from 'react-redux';
   }
 })
 class Main extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
+
+  componentWillMount() {
+    console.log(this.props.discover.length)
+    if(this.props.discover.length ===0){
+       console.log(this.props.discover.length)
+      this.props.dispatch(getDiscover());
     }
   }
-
 
   imageFormatter(cell,row){
     return (
@@ -36,6 +39,8 @@ class Main extends React.Component {
         <div>free</div>
     );
   };
+
+
 
   rateFormatter(cell,row){
     if(cell){

@@ -90,6 +90,18 @@ export function send_review(form, username, gameid){
   })
 }
 
+export function getDiscover(){
+  return function(dispatch) {
+    axios.get('http://localhost:8000/backend/get_top_games/?n=100')
+        .then((res2) => {
+          dispatch({
+            type: 'SET_DISCOVER',
+            payload: res2.data,
+          })
+        })
+  }
+}
+
 
 // export function fetchTweets() {
 //   return function(dispatch) {

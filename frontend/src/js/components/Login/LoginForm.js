@@ -4,12 +4,38 @@ import {Button, Modal} from 'react-bootstrap';
 import SignupForm from '../Signup'
 import { login } from '../../actions/userActions.js';
 import { actions as notifActions, Notifs } from 'redux-notifications';
-const { notifSend } = notifActions;
+const { notifSend,notifDismiss } = notifActions;
 
-@connect((store)=>{
-	return store.user;
+
+const s ={
+	'display': 'block',
+	'width': '100%',
+	'color': '#fff',
+	'backgroundColor': '#d9534f',
+	'borderColor': '#d43f3a',
+	'padding': '10px 16px',
+	'fontSize': '18px',
+	'lineHeight': '1.3333333',
+	'borderRadius': '0',
+	'textAlign': 'center',
+	'whiteSpace': 'nowrap',
+	'verticalAlign': 'middle',
+	'fontWeight': '400',
+	'marginBottom': '0',
+}
+
+function CustomNotif(props) {
+  return (
+			<div style={s}>
+        {props.message}
+			</div>
+  );
+}
+@connect((store) => {
+  return {
+    message: store.notifs.message,
+  };
 })
-
 export default class LoginForm extends React.Component {
 	constructor(props) {
 	  super(props);
@@ -23,11 +49,16 @@ export default class LoginForm extends React.Component {
 	   this.onChange = this.onChange.bind(this);
 	   this.handleSubmit = this.handleSubmit.bind(this);
      this.isFail = this.isFail.bind(this);
+    this.dismiss = this.dismiss.bind(this);
 	}
 
 	requestsignup() {
 		this.setState({ issignup: true });
 	}
+
+  dismiss(id) {
+    notifDismiss(id);
+  }
 
 	onChange(e){
 		this.setState(
@@ -71,7 +102,9 @@ export default class LoginForm extends React.Component {
 				<Modal.Header closeButton>
 					<Modal.Title>Login</Modal.Title>
 				</Modal.Header>
-				<Notifs />
+				<Notifs
+					CustomComponent={CustomNotif}
+				/>
 				<Modal.Body>
 					<form onSubmit={this.handleSubmit} method="post">
 						<div className ="form-group">

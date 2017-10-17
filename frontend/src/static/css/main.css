@@ -12,7 +12,7 @@ body::after {
 
 ul {
 	list-style: none;
-  padding-left: 0;
+    padding-left: 0;
 }
 
 a {
@@ -368,3 +368,23 @@ input {
 .friends-result{
  float: left;
 }
+
+
+.notif-btn{
+  border-radius: 0;
+  display: block;
+  width: 100%;
+  color: #fff;
+  background-color: #d9534f;
+  border-color: #d43f3a;
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 0px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  font-weight: 400;
+  margin-bottom: 0;
+}
+

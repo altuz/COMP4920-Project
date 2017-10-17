@@ -10,6 +10,7 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
     keywords:store.games.keywords,
   }
 })
+
 export default class Results extends React.Component {
   constructor (props) {
     super(props);

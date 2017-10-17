@@ -44,32 +44,33 @@ export default class Friends extends React.Component {
 
 
     renderResult = () => {
-      if(this.state.result.lenght !== 0 ) {
+      if(this.state.result.length !== 0 ) {
         return (
-            <div>
-                <BootstrapTable data={this.state.result} hover>
+            <div className="col-md-6 friends-result">
+                <BootstrapTable data={this.state.result} hover pagination={true}>
                 <TableHeaderColumn isKey dataField='user_name' dataFormat={this.profileFormatter}  width='300px'>Username</TableHeaderColumn>
                 </BootstrapTable>
             </div>
         )
       }
+      return null
   }
 
 
 
     render (){
       return(
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
+        <div className="container">
+            <div className="row">
+                <div className="col-md-6">
                     <h2>Friend Search</h2>
                     <div id="custom-search-input">
-                        <div class="input-group col-md-12">
+                        <div className="input-group col-md-12">
                             <input type="text" class="form-control input-lg" placeholder="Enter username" value={this.state.username}
                                     onChange={this.handleUsernameChange.bind(this)}/>
-                            <span class="input-group-btn">
-                                <button class="btn btn-info btn-lg" type="button" onClick={this.getResult.bind(this)}>
-                                    <i class="glyphicon glyphicon-search"></i>
+                            <span className="input-group-btn">
+                                <button className="btn btn-info btn-lg" type="button" onClick={this.getResult.bind(this)}>
+                                    <i className="glyphicon glyphicon-search"></i>
                                 </button>
                             </span>
                         </div>
@@ -80,7 +81,7 @@ export default class Friends extends React.Component {
             <div id="result">
                 {this.renderResult()}
             </div>
-        </div>      
+        </div>
       )
     }
 

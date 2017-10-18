@@ -71,6 +71,15 @@ class Main extends React.Component {
 
   }
 
+   numberFormatter(cell,row) {
+    return (
+      <span className='number'>
+        {cell.toLocaleString(navigator.language, { minimumFractionDigits: 0 })}
+      </span>
+
+    )
+  }
+
 
 
   render() {
@@ -85,7 +94,7 @@ class Main extends React.Component {
               <TableHeaderColumn dataField='publisher' width='200px' >Released By</TableHeaderColumn>
               <TableHeaderColumn dataField='price' dataFormat={this.priceFormatter} width='80px'>Price</TableHeaderColumn>
               <TableHeaderColumn dataField='average_rating' dataFormat={this.rateFormatter}>Rating</TableHeaderColumn>
-              <TableHeaderColumn dataField='num_player'>Owners</TableHeaderColumn>
+              <TableHeaderColumn dataField='num_player' dataFormat={this.numberFormatter}>Owners</TableHeaderColumn>
             </BootstrapTable>
           </div>
       );

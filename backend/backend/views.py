@@ -11,8 +11,10 @@ import smtplib
 import json
 import time
 import operator
+from backend.graph import Graph
 
 # Pass in user1 and user2
+
 @api_view(['GET'])
 def is_following(request):
     user1 = request.GET['user1']
@@ -956,8 +958,32 @@ def edit_profile(request):
 
     return HttpResponse('{"message": "no user"}')
 
+game_graph = None
+user_set = None
+game_set = None
 
 @api_view(['POST'])
-def recommendation_v2(request):
+def recommend_v2(request):
+    global game_graph, user_set, game_set
+    if game_graph is None:
+        print("Initializing Graph")
+        all_library = PlayerLibrary.objects.select_related('game_id', 'user_id').exclude(played_hrs=None).exclude(
+            played_hrs=0)
+        user_set = {}
+        game_set = {}
+        game_graph = Graph()
+        library_len = 0
+        for entry in all_library:
+            game = entry.game_id
+            user = entry.user_id
+            user_set[user.user_id] = user.user_name
+            game_set[game.game_id] = game.game_name
+            game_graph.connect_u_g(game.game_id, user.user_id, entry.played_hrs)
+            library_len += 1
+        game_graph.add_names(user_set, game_set)
+        game_graph.games_hours_stats()
+        print("Inserted {} edges to Graph".format(library_len))
+    return HttpResponse("test")
 
-    return None
+def graph_setup():
+    global game_graph, user_set, game_set

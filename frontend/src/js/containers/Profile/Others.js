@@ -74,14 +74,13 @@ export default class Others extends React.Component {
   profileFormatter(cell,row,enumObject, index){
         return (
             <div>
-                <Link className='user_name' to ={{
-                    pathname: `/profiles/${row.user_name}`,
-                }}>
-                {cell}
-                </Link>
+               <Link className='user_name' to ={{pathname: `/redirect/${row.user_name}`,}}>
+               {cell}
+               </Link>
             </div>
     )
   }
+
 
   Follow(){
     console.log(this.state.isfollow);

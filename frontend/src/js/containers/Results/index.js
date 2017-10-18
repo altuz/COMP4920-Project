@@ -3,18 +3,14 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
-const option = {
-  onRowClick: function(row, columnIndex, rowIndex) {
-    console.log(row)
-    alert(`You click row id: ${row.game_name}, column index: ${columnIndex}, row index: ${rowIndex}`);
-  },
-};
 
 @connect((store) => {
   return {
     results: store.games.results,
+    keywords:store.games.keywords,
   }
 })
+
 export default class Results extends React.Component {
   constructor (props) {
     super(props);
@@ -64,8 +60,17 @@ export default class Results extends React.Component {
   }
 
   render() {
+    const { keywords } = this.props;
     return(
       <div>
+        <h2 style={{'textAlign':'center'}}>Showing {this.props.results.length} results for</h2>
+        <div>
+        <h4>
+          <div><strong>Keyword :</strong> {keywords.q} </div>
+          <div><strong>Genres :</strong> {keywords.genre} </div>
+          <div><strong>Categories :</strong> {keywords.category}  </div>
+        </h4>
+        </div>
         <BootstrapTable data={this.props.results}  hover pagination>
           <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
           <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>

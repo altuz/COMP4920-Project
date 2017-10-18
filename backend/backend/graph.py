@@ -10,6 +10,9 @@ class Graph:
         # set of games and users
         self.g_nodes = []
         self.u_nodes = []
+        #
+        self.uid_names = None
+        self.gid_names = None
 
     # add user, returns true if added, false if user already in list
     def add_user(self, uid):
@@ -51,10 +54,23 @@ class Graph:
         u_node.addEdge(g_u_edge)
         return True
 
+    # add a dictionary of names
+    def add_names(self, unames, gnames):
+        self.uid_names = unames
+        self.gid_names = gnames
     # calculate stats for games
     def games_hours_stats(self):
+        print("there are {} games".format(len(self.g_nodes)))
         for game in self.g_nodes:
-            game.categorize_hours()
+            if len(game.edges) < 5:
+                continue
+            print("Stat for Game: {}({})".format(self.gid_names[game.node_id], game.node_id))
+            if not game.hours_stat:
+                game.categorize_hours()
+            print("This game has {} players".format(len(game.edges)))
+            print("Cut Offs: {}, {}, {}, {}, {}".format(game.hours_stat[0], game.hours_stat[1], game.hours_stat[2],
+                                                        game.hours_stat[3], game.hours_stat[4]))
+
 
 class Node:
     # define a new node
@@ -76,7 +92,8 @@ class Node:
         num_edges = len(sorted_edges)
         # Convert it to rating based on every 20th percentile
         for i in range(0, 5):
-            edge_idx = int((float(num_edges) / 5) * (i + 1))
+            edge_idx = int((float(num_edges) / 5) * (i + 1)) - 1
+            # print("{}th percentile is cut off at {} hours played".format(20 * (i + 1), sorted_edges[edge_idx].weight))
             self.hours_stat.append(sorted_edges[edge_idx].weight)
 
 class Edge:

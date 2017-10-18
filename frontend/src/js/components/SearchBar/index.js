@@ -71,7 +71,7 @@ class SearchBar extends React.Component {
     return (
       <div className='searchbar-container'>
         <form onSubmit={this.handleSubmit.bind(this)}>
-          <div className='input-group col-md-6' style={{'marginLeft':'205px'}}>
+          <div className='input-group col-md-6' style={{'marginLeft':'200px'}}>
           <input
             className='searchbar-input'
             type='text'

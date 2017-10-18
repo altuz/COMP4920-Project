@@ -676,10 +676,13 @@ def search_game(request):
 def get_top_games(request):
     # Temporary code segment to analyse data
     # ---------------------------------------
-    # target_game_id = 578080 # PLAYERUNKNOWN'S BATTLEGROUNDS (PUBG)
+    # # game_id = 578080 # PLAYERUNKNOWN'S BATTLEGROUNDS (PUBG)
+    # # game_id = 113200 # Binding of isaac
+    # # game_id = 319630 # Life is strange
+    # target_game_id = 268910
     # target_game = GameList.objects.filter(game_id=target_game_id)
-    # player_set = PlayerLibrary.objects.filter(game_id=target_game)
-    #
+    # player_set = PlayerLibrary.objects.filter(game_id=target_game).exclude(played_hrs=0)
+    
     # entries = []
     # for player in player_set:
     #     player_obj = player.user_id

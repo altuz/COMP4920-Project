@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from hashlib import blake2b
 from django.db.models import Q
 from functools import reduce
+from django.db import connection
 from django.db.models import Count
 import django
 import smtplib
@@ -967,21 +968,46 @@ def recommend_v2(request):
     global game_graph, user_set, game_set
     if game_graph is None:
         print("Initializing Graph")
-        all_library = PlayerLibrary.objects.select_related('game_id', 'user_id').exclude(played_hrs=None).exclude(
-            played_hrs=0)
+
+        #QUERY
+
+        query = ''' SELECT  g.game_id as "game_id", g.game_name as "game_name",
+                            u.user_id as "user_id", u.user_name as "user_name", 
+                            p.played_hrs as "played_hrs", r.rate as "rate"
+                    FROM backend_playerlibrary p
+                    LEFT JOIN backend_gamelist g
+                    ON g.game_id = p.game_id_id
+                    LEFT JOIN backend_user u
+                    ON u.user_id = p.user_id_id
+                    LEFT JOIN backend_rating r
+                    ON r.user_id_id = p.user_id_id
+                    AND r.game_id_id = p.game_id_id
+                    WHERE p.played_hrs != 0
+                    OR p.played_hrs != null;'''
+        cursor = connection.cursor()
+        rows = cursor.execute(query)
+
         user_set = {}
         game_set = {}
         game_graph = Graph()
         library_len = 0
-        for entry in all_library:
-            game = entry.game_id
-            user = entry.user_id
-            user_set[user.user_id] = user.user_name
-            game_set[game.game_id] = game.game_name
-            game_graph.connect_u_g(game.game_id, user.user_id, entry.played_hrs)
+        for entry in rows:
+            game = entry[0]
+            user = entry[2]
+            # Get related rating
+            rate_val = 0
+            # If there is a rating
+            rate_bool = entry[5]
+            if rate_bool is not None:
+                rate_val = 1 if rate_bool else -1
+            # TODO: Enter rate_val to edge
+            user_set[user] = entry[3]
+            game_set[game] = entry[1]
+            game_graph.connect_u_g(game, user, entry[4], rate_val)
             library_len += 1
         game_graph.add_names(user_set, game_set)
         game_graph.games_hours_stats()
+        game_graph.calculate_bias()
         print("Inserted {} edges to Graph".format(library_len))
     return HttpResponse("test")
 

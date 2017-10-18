@@ -35,7 +35,7 @@ class Graph:
         return True
 
     # add connection between user and game
-    def connect_u_g(self, gid, uid, hrs):
+    def connect_u_g(self, gid, uid, hrs, rt):
         # Check if user - game pair in graph
         if uid not in self.uid_lookup:
             self.add_user(uid)
@@ -48,10 +48,10 @@ class Graph:
         g_node = self.g_nodes[g_idx]
         u_node = self.u_nodes[u_idx]
         # Create a new edge
-        g_u_edge = Edge(g_node, u_node, hrs)
+        g_u_edge = Edge(g_node, u_node, hrs, rt)
         # We don't have to check if connection exist since it is guaranteed to be unique
-        g_node.addEdge(g_u_edge)
-        u_node.addEdge(g_u_edge)
+        g_node.add_edge(g_u_edge)
+        u_node.add_edge(g_u_edge)
         return True
 
     # add a dictionary of names
@@ -71,6 +71,19 @@ class Graph:
             print("Cut Offs: {}, {}, {}, {}, {}".format(game.hours_stat[0], game.hours_stat[1], game.hours_stat[2],
                                                         game.hours_stat[3], game.hours_stat[4]))
 
+    def calculate_average(self):
+        ""
+
+    def calculate_bias(self):
+        print("Calculating bias ")
+        for game in self.g_nodes:
+            game.average_weight()
+            print("game {} has averages of ({} hours, {} rating)".format(self.gid_names[game.node_id], game.average_hours, game.average_rating))
+
+        for user in self.u_nodes:
+            user.average_weight()
+            print("user {} has averages of ({} hours, {} rating)".format(self.uid_names[user.node_id], user.average_hours, user.average_rating))
+
 
 class Node:
     # define a new node
@@ -79,26 +92,42 @@ class Node:
         self.node_id = nid
         self.edges = []
         self.hours_stat = []
+        # averages
+        self.average_hours = 0
+        self.average_rating = 0
 
-    def addEdge(self, edge):
-        self.edges.append(edge)
+    def add_edge(self, h):
+        self.edges.append(h)
 
     # don't call this function on a user.
     # as it won't make sense
     # this data is only useful across individual games
     # To categorize users we have to do this for every game and cross check it with users
     def categorize_hours(self):
-        sorted_edges = sorted(self.edges, key = lambda edge : edge.weight, reverse = False)
-        num_edges = len(sorted_edges)
+        sorted_hours = sorted(self.edges, key = lambda edge : edge.hours, reverse = False)
+        num_edges = len(sorted_hours)
         # Convert it to rating based on every 20th percentile
         for i in range(0, 5):
             edge_idx = int((float(num_edges) / 5) * (i + 1)) - 1
             # print("{}th percentile is cut off at {} hours played".format(20 * (i + 1), sorted_edges[edge_idx].weight))
-            self.hours_stat.append(sorted_edges[edge_idx].weight)
+            self.hours_stat.append(sorted_hours[edge_idx].hours)
+
+    def average_weight(self):
+        total_hours = 0
+        total_rating = 0
+        rating_count = 0
+        for edge in self.edges:
+            total_hours += edge.hours
+            if edge.rating is not 0:
+                total_rating += edge.rating
+                rating_count += 1
+        self.average_hours = float(total_hours)/len(self.edges)
+        self.average_rating = float(total_rating)/rating_count if rating_count is not 0 else None
 
 class Edge:
     # define an edge between two nodes
-    def __init__(self, g_node, u_node, hours):
+    def __init__(self, g_node, u_node, hours, rating):
         self.game = g_node
         self.user = u_node
-        self.weight = hours
+        self.hours = hours
+        self.rating = rating

@@ -1011,7 +1011,9 @@ def recommend_v2(request):
         game_graph.add_names(user_set, game_set)
         game_graph.games_hours_stats()
         game_graph.calculate_bias()
+        game_graph.baseline_predictor()
         print("Inserted {} edges to Graph".format(library_len))
+    game_graph.show_baseline()
     return HttpResponse("test")
 
 def graph_setup():

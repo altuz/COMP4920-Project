@@ -1,4 +1,5 @@
 # Bipartite graph between set of users and set of games
+import numpy as np
 class Graph:
     # define empty graph
     def __init__(self):
@@ -13,7 +14,8 @@ class Graph:
         #
         self.uid_names = None
         self.gid_names = None
-
+        #
+        self.biases = None
     # add user, returns true if added, false if user already in list
     def add_user(self, uid):
         if uid in self.uid_lookup:
@@ -72,7 +74,16 @@ class Graph:
                                                         game.hours_stat[3], game.hours_stat[4]))
 
     def calculate_average(self):
-        ""
+        #global average rating
+        rating_total = 0
+        rating_count = 0
+        for user in self.u_nodes:
+            for edge in user.edges:
+                if edge.rating is -1:
+                    continue
+                rating_total += edge.rating
+                rating_count += 1
+        return float(rating_total)/rating_count
 
     def calculate_bias(self):
         print("Calculating bias ")
@@ -86,6 +97,43 @@ class Graph:
             print("user {} has averages of ({} hours, {} rating)".format(self.uid_names[user.node_id], user.average_hours, user.average_rating))
         num_reviews = sorted(num_reviews)
         print(', '.join(num_reviews))
+
+    def baseline_predictor(self):
+        global_ave = self.calculate_average()
+        matrix = []
+        ratings = []
+        for user in self.u_nodes:
+            uid = user.node_id
+            for edge in user.edges:
+                if edge.rating is -1:
+                    continue
+                vector = [0 for col in range(self.user_count + self.game_count)]
+                gid = edge.game.node_id
+                uidx = self.uid_lookup[uid]
+                gidx = self.gid_lookup[gid]
+                # user comes first
+                vector[uidx] = 1
+                vector[self.user_count + gidx] = 1
+                matrix.append(vector)
+                ratings.append(edge.rating - global_ave)
+        # build numpy array
+        print()
+        print("global ave is " + str(global_ave))
+        a = np.array(matrix)
+        b = np.array(ratings)
+        c = np.linalg.lstsq(a, b)
+        self.biases = c
+        return None
+
+    def show_baseline(self):
+        solution = self.biases[0]
+        residuals = self.biases[1]
+        rank = self.biases[2]
+        singular = self.biases[3]
+        print("Solution = {}".format(", ".join("{0}".format(n) for n in solution)))
+        # print("Residual = {}".format(", ".join("{0}".format(n) for n in residuals)))
+        print("Rank is " + str(rank))
+
 
 class Node:
     # define a new node

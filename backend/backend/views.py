@@ -998,11 +998,11 @@ def recommend_v2(request):
             game = entry[0]
             user = entry[2]
             # Get related rating
-            rate_val = 0
+            rate_val = -1
             # If there is a rating
             rate_bool = entry[5]
             if rate_bool is not None:
-                rate_val = 1 if rate_bool else -1
+                rate_val = 1 if rate_bool else 0
             # TODO: Enter rate_val to edge
             user_set[user] = entry[3]
             game_set[game] = entry[1]

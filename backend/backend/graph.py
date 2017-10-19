@@ -79,11 +79,13 @@ class Graph:
         for game in self.g_nodes:
             game.average_weight()
             print("game {} has averages of ({} hours, {} rating)".format(self.gid_names[game.node_id], game.average_hours, game.average_rating))
-
+        num_reviews = []
         for user in self.u_nodes:
             user.average_weight()
+            num_reviews.append(str(user.num_rating))
             print("user {} has averages of ({} hours, {} rating)".format(self.uid_names[user.node_id], user.average_hours, user.average_rating))
-
+        num_reviews = sorted(num_reviews)
+        print(', '.join(num_reviews))
 
 class Node:
     # define a new node
@@ -95,6 +97,8 @@ class Node:
         # averages
         self.average_hours = 0
         self.average_rating = 0
+        # number of reviews
+        self.num_rating = 0
 
     def add_edge(self, h):
         self.edges.append(h)
@@ -118,11 +122,12 @@ class Node:
         rating_count = 0
         for edge in self.edges:
             total_hours += edge.hours
-            if edge.rating is not 0:
+            if edge.rating is not -1:
                 total_rating += edge.rating
                 rating_count += 1
+        self.num_rating = rating_count
         self.average_hours = float(total_hours)/len(self.edges)
-        self.average_rating = float(total_rating)/rating_count if rating_count is not 0 else None
+        self.average_rating = float(total_rating)/rating_count if rating_count is not 0 else -1
 
 class Edge:
     # define an edge between two nodes

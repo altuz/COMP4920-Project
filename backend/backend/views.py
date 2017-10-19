@@ -966,7 +966,8 @@ game_graph = None
 user_set = None
 game_set = None
 
-@api_view(['POST'])
+# curl -X GET "http://localhost:8000/backend/recommend_v2/?username=a%20regular"
+@api_view(['GET'])
 def recommend_v2(request):
     global game_graph, user_set, game_set
     if game_graph is None:

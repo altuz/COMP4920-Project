@@ -1,3 +1,5 @@
+import math
+
 # Bipartite graph between set of users and set of games
 import numpy as np
 class Graph:
@@ -90,6 +92,8 @@ class Graph:
         for game in self.g_nodes:
             game.average_weight()
             print("game {} has averages of ({} hours, {} rating)".format(self.gid_names[game.node_id], game.average_hours, game.average_rating))
+            game.calcHoursNorm()
+            print("===== Calcing outgoing edge adjusted weights")
         num_reviews = []
         for user in self.u_nodes:
             user.average_weight()
@@ -177,6 +181,22 @@ class Node:
         self.average_hours = float(total_hours)/len(self.edges)
         self.average_rating = float(total_rating)/rating_count if rating_count is not 0 else -1
 
+    # Call for GAME nodes only, updates each edges normalised hrs value
+    def calcHoursNorm(self):
+        max = 0
+        for edge in self.edges:
+            edge.hoursNorm = math.atan(edge.hours/(self.average_hours))
+            if(edge.hoursNorm > max):
+                max = edge.hoursNorm
+            # print("------------edge hr: " + str(edge.hours) + ", node ave hr:" + str(self.average_hours) + " atanHr:" + str(edge.hoursNorm))
+        # TODO not sure if need to scale even, since going to use for ranking
+        # Scale according to the max so that value ranges are between 0 and 1
+        for edge in self.edges:
+            old = edge.hoursNorm
+            edge.hoursNorm = old / max
+            # print("------Adjusted-----edge hr: " + str(edge.hours) + ", node ave hr:"
+            #       + str(self.average_hours) + " atanHr:" + str(edge.hoursNorm) + ", max: " + str(max))
+
 class Edge:
     # define an edge between two nodes
     def __init__(self, g_node, u_node, hours, rating):
@@ -184,3 +204,4 @@ class Edge:
         self.user = u_node
         self.hours = hours
         self.rating = rating
+        self.hoursNorm = -1 # Normalised hrs, -1 means has not been computed yet

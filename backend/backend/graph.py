@@ -140,14 +140,14 @@ class Node:
             edge.hoursNorm = math.atan(edge.hours/(self.average_hours))
             if(edge.hoursNorm > max):
                 max = edge.hoursNorm
-            print("------------edge hr: " + str(edge.hours) + ", node ave hr:" + str(self.average_hours) + " atanHr:" + str(edge.hoursNorm))
+            # print("------------edge hr: " + str(edge.hours) + ", node ave hr:" + str(self.average_hours) + " atanHr:" + str(edge.hoursNorm))
         # TODO not sure if need to scale even, since going to use for ranking
         # Scale according to the max so that value ranges are between 0 and 1
         for edge in self.edges:
             old = edge.hoursNorm
             edge.hoursNorm = old / max
-            print("------Adjusted-----edge hr: " + str(edge.hours) + ", node ave hr:"
-                  + str(self.average_hours) + " atanHr:" + str(edge.hoursNorm) + ", max: " + str(max))
+            # print("------Adjusted-----edge hr: " + str(edge.hours) + ", node ave hr:"
+            #       + str(self.average_hours) + " atanHr:" + str(edge.hoursNorm) + ", max: " + str(max))
 
 class Edge:
     # define an edge between two nodes

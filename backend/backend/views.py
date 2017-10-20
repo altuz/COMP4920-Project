@@ -1066,7 +1066,7 @@ def recommend_v2(request):
                             SELECT *
                             FROM backend_user
                             ORDER BY RANDOM()
-                            LIMIT 500
+                            LIMIT 2000
                         ) y
                         UNION 
                         SELECT * 

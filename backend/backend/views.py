@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from hashlib import blake2b
 from django.db.models import Q
 from functools import reduce
+from django.db import connection
 from django.db.models import Count
 import django
 import smtplib
@@ -74,6 +75,7 @@ def user_prof_helper(username):
 
 # Retrieves user profile along with game list and wish list
 # TESTED
+# curl -X GET "http://localhost:8000/backend/user_prof/?username=a%20regular"
 @api_view(['GET'])
 def user_prof(request):
     return user_prof_helper(request.GET['username'])
@@ -133,7 +135,7 @@ def unfollow_user(request):
 
 # Get user's follow list
 # Tested
-# curl -d '{"user":{"username" : "a 1regular"}}' -X POST "http://localhost:8000/backend/follow_list/"
+# curl -d '{"user":{"username" : "a regular"}}' -X POST "http://localhost:8000/backend/follow_list/"
 @api_view(['GET'])
 def follow_list(request):
     try:
@@ -228,7 +230,12 @@ def get_list(username, type):
                 g_id = game.game_id
                 g_name = game.game_name
                 g_picture = game.image_url
-                g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}"}}'.format(g_name, g_id, g_picture)
+                g_played_hrs = entries.played_hrs
+                # print("played hours for " + str(g_name) + " is: " + str(g_played_hrs))
+                if(g_played_hrs == None):
+                    g_played_hrs = 0
+                    # print("Adjusted played hours for " + str(g_name) + " is: " + str(g_played_hrs))
+                g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}", "played_hrs":"{}"}}'.format(g_name, g_id, g_picture, g_played_hrs)
                 json_list.append(g_json)
             except:
                 continue
@@ -961,31 +968,197 @@ def edit_profile(request):
 
     return HttpResponse('{"message": "no user"}')
 
+# given json contain username, gameid, and hours
+# curl -d '{"edit_game_hrs":{"username" : "a regular", "gameid" : "578080", "played_hrs" : "566"}}' -X POST "http://localhost:8000/backenist/"
+@api_view(['POST'])
+def edit_game_hrs(request):
+    print("user edit function is running ...")
+    print("")
+    obj = None
+    try:
+        obj = json.loads(request.body.decode())
+        print("decode success")
+    except:
+        print("Error when loading the Json")
+        pass
+
+    if obj is not None:
+        # get user data
+        username = obj['edit_game_hrs']['username']
+        gameid = obj['edit_game_hrs']['gameid']
+        played_hrs = obj['edit_game_hrs']['played_hrs']
+
+        user_entry = User.objects.get(user_name=username)
+        game_entry = GameList.objects.get(game_id=gameid)
+        library_entry = PlayerLibrary.objects.get(user_id=user_entry, gameid=game_entry)
+
+
+        # if e is '':
+        #     e = user_entry.email
+        #
+        # if p is '':
+        #     p = user_entry.pass_word
+        #
+        # user_entry.email = e
+        # user_entry.pass_word = p
+        # print("new email" + user_entry.email)
+        # print("new pass" + user_entry.pass_word)
+        try:
+            user_entry.save()
+            return HttpResponse('{"message" : "edit success"}')
+        except Exception as e:
+            print(e)
+
+    return HttpResponse('{"message": "no user"}')
+
 game_graph = None
 user_set = None
 game_set = None
 
-@api_view(['POST'])
+# curl -X GET "http://localhost:8000/backend/recommend_test/"
+@api_view(['GET'])
+def recommend_test(request):
+    global game_graph, user_set, game_set
+    # =====================================================
+    # ---------Example from text book ---------------------
+    user_set = {}
+    game_set = {}
+    game_graph = Graph()
+
+    user_set = { '0':'1','1':'2','2':'3','3':'4','4':'5','5':'6','6':'7','7':'8','8':'9','9':'10'}
+    game_set = { '0':'A','1':'B','2':'C','3':'D','4':'E'} 
+
+    # params: game, user, hrs, rating 
+    game_graph.connect_u_g("A", "1", 5, 5)
+    game_graph.connect_u_g("A", "3", 5, 5)
+    game_graph.connect_u_g("A", "5", 4, 4)
+    game_graph.connect_u_g("A", "7", 3, 3)
+    game_graph.connect_u_g("A", "8", 5, 5)
+
+    game_graph.connect_u_g("B", "1", 4, 4) 
+    game_graph.connect_u_g("B", "2", 3, 3) 
+    game_graph.connect_u_g("B", "3", 2, 2)
+    game_graph.connect_u_g("B", "6", 3, 3) 
+    game_graph.connect_u_g("B", "9", 2, 2) 
+
+    game_graph.connect_u_g("C", "1", 4, 4)  
+    game_graph.connect_u_g("C", "2", 5, 5)
+    game_graph.connect_u_g("C", "4", 3, 3)
+    game_graph.connect_u_g("C", "7", 3, 3)
+    game_graph.connect_u_g("C", "8", 4, 4)
+    game_graph.connect_u_g("C", "9", 5, 5)
+    game_graph.connect_u_g("C", "10", 5, 5)
+
+    game_graph.connect_u_g("D", "4", 1, 1)
+    game_graph.connect_u_g("D", "5", 4, 4)
+    game_graph.connect_u_g("D", "6", 3, 3)
+    game_graph.connect_u_g("D", "7", 2, 2)
+    game_graph.connect_u_g("D", "9", 4, 4)
+    game_graph.connect_u_g("D", "10", 3, 3)
+
+    game_graph.connect_u_g("E", "2", 4, 4)
+    game_graph.connect_u_g("E", "3", 3, 3)
+    game_graph.connect_u_g("E", "4", 2, 2)
+    game_graph.connect_u_g("E", "5", 5, 5)
+    game_graph.connect_u_g("E", "5", 5, 5)
+    game_graph.connect_u_g("E", "8", 5, 5)
+    game_graph.connect_u_g("E", "10", 4, 4)
+
+    # ------------------------------------------------------------------
+    game_graph.add_names(user_set, game_set)
+    game_graph.games_hours_stats()
+    game_graph.calculate_bias() 
+
+    return HttpResponse("test") 
+
+
+# curl -X GET "http://localhost:8000/backend/recommend_v2/?username=a%20regular"
+@api_view(['GET'])
 def recommend_v2(request):
+    # TODO always include the user
+    # targetUser = request.GET.get('username')
     global game_graph, user_set, game_set
     if game_graph is None:
         print("Initializing Graph")
-        all_library = PlayerLibrary.objects.select_related('game_id', 'user_id').exclude(played_hrs=None).exclude(
-            played_hrs=0)
+
+        #QUERY
+        #
+        # query = ''' SELECT  g.game_id as "game_id", g.game_name as "game_name",
+        #                     u.user_id as "user_id", u.user_name as "user_name",
+        #                     p.played_hrs as "played_hrs", r.rate as "rate"
+        #             FROM backend_playerlibrary p
+        #             LEFT JOIN backend_gamelist g
+        #             ON g.game_id = p.game_id_id
+        #             LEFT JOIN backend_user u
+        #             ON u.user_id = p.user_id_id
+        #             LEFT JOIN backend_rating r
+        #             ON r.user_id_id = p.user_id_id
+        #             AND r.game_id_id = p.game_id_id
+        #             WHERE p.played_hrs != 0
+        #             OR p.played_hrs != null;'''
+
+        query = ''' SELECT  g.game_id as "game_id", g.game_name as "game_name", 
+                            u.user_id as "user_id", u.user_name as "user_name", 
+                            p.played_hrs as "played_hrs", r.rate as "rate"
+                    FROM backend_playerlibrary p
+                    INNER JOIN (
+                        SELECT *
+                        FROM backend_gamelist
+                        WHERE num_player > 100
+                        ORDER BY num_player DESC
+                        LIMIT 200
+                    ) g
+                    ON g.game_id = p.game_id_id
+                    INNER JOIN (
+                        SELECT *
+                        FROM (
+                            SELECT *
+                            FROM backend_user
+                            ORDER BY RANDOM()
+                            LIMIT 2000
+                        ) y
+                        UNION 
+                        SELECT * 
+                        FROM backend_user
+                        WHERE user_name = %s
+                    ) u
+                    ON u.user_id = p.user_id_id
+                    LEFT JOIN backend_rating r
+                    ON r.user_id_id = p.user_id_id
+                    AND r.game_id_id = p.game_id_id
+                    WHERE p.played_hrs != 0
+                    OR p.played_hrs != null;
+                    '''
+        cursor = connection.cursor()
+        rows = cursor.execute(query, [request.GET['username']])
+
+        our_user = User.objects.get(user_name = request.GET['username'])
+
         user_set = {}
         game_set = {}
         game_graph = Graph()
         library_len = 0
-        for entry in all_library:
-            game = entry.game_id
-            user = entry.user_id
-            user_set[user.user_id] = user.user_name
-            game_set[game.game_id] = game.game_name
-            game_graph.connect_u_g(game.game_id, user.user_id, entry.played_hrs)
+        for entry in rows:
+            game = entry[0]
+            user = entry[2]
+            # Get related rating
+            rate_val = -1
+            # If there is a rating
+            rate_bool = entry[5]
+            if rate_bool is not None:
+                rate_val = 1 if rate_bool else 0
+            # TODO: Enter rate_val to edge
+            user_set[user] = entry[3]
+            game_set[game] = entry[1]
+            game_graph.connect_u_g(game, user, entry[4], rate_val)
             library_len += 1
         game_graph.add_names(user_set, game_set)
-        game_graph.games_hours_stats()
+        # game_graph.games_hours_stats()
+        game_graph.calculate_bias()
+        game_graph.baseline_predictor()
         print("Inserted {} edges to Graph".format(library_len))
+    game_graph.show_baseline()
+    game_graph.get_recommendation(our_user.user_id)
     return HttpResponse("test")
 
 def graph_setup():

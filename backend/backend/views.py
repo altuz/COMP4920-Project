@@ -927,7 +927,7 @@ def recommend_v1(request):
     return HttpResponse(outputJSON, content_type='application/json')
 
 # given json contain username, email, and password
-# curl -d '{"edit":{"username" : "a regular", "email" : "edittest@gmail.com", "password" : "editpass"}}' -X POST "http://localhost:8000/backenist/"
+# curl -d '{"edit":{"username" : "a regular", "email" : "edittest@gmail.com", "password" : "editpass"}}' -X POST "http://localhost:8000/backend/edit_profile/"
 @api_view(['POST'])
 def edit_profile(request):
     print("user edit function is running ...")
@@ -969,7 +969,7 @@ def edit_profile(request):
     return HttpResponse('{"message": "no user"}')
 
 # given json contain username, gameid, and hours
-# curl -d '{"edit_game_hrs":{"username" : "a regular", "gameid" : "578080", "played_hrs" : "566"}}' -X POST "http://localhost:8000/backenist/"
+# curl -d '{"edit_game_hrs":{"username" : "a regular", "gameid" : "578080", "played_hrs" : "580"}}' -X POST "http://localhost:8000/backend/edit_game_hrs/"
 @api_view(['POST'])
 def edit_game_hrs(request):
     print("user edit function is running ...")
@@ -988,23 +988,19 @@ def edit_game_hrs(request):
         gameid = obj['edit_game_hrs']['gameid']
         played_hrs = obj['edit_game_hrs']['played_hrs']
 
-        user_entry = User.objects.get(user_name=username)
-        game_entry = GameList.objects.get(game_id=gameid)
-        library_entry = PlayerLibrary.objects.get(user_id=user_entry, gameid=game_entry)
-
-
-        # if e is '':
-        #     e = user_entry.email
-        #
-        # if p is '':
-        #     p = user_entry.pass_word
-        #
-        # user_entry.email = e
-        # user_entry.pass_word = p
-        # print("new email" + user_entry.email)
-        # print("new pass" + user_entry.pass_word)
         try:
-            user_entry.save()
+            user_entry = User.objects.get(user_name=username)
+            game_entry = GameList.objects.get(game_id=gameid)
+            library_entry = PlayerLibrary.objects.get(user_id=user_entry, game_id=game_entry)
+        except:
+            return HttpResponse('{"message" : "edit failure"}')
+
+        print("Old played hrs is " + str(library_entry.played_hrs))
+        library_entry.played_hrs = played_hrs
+
+        try:
+            library_entry.save()
+            print("New played hrs is " + str(library_entry.played_hrs))
             return HttpResponse('{"message" : "edit success"}')
         except Exception as e:
             print(e)

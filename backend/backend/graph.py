@@ -15,11 +15,11 @@ class Graph:
         self.u_nodes = []
         #
         self.uid_names = None
-        self.gid_names = None 
+        self.gid_names = None
         # Global average number of hours per user
-        self.average_hoursNorm = 0 
-        self.biases = None 
-        
+        self.average_hoursNorm = 0
+        self.biases = None
+
     # add user, returns true if added, false if user already in list
     def add_user(self, uid):
         if uid in self.uid_lookup:
@@ -112,7 +112,7 @@ class Graph:
         # print(', '.join(num_reviews))
 
     def baseline_predictor(self):
-        global_ave = self.calculate_average()
+        global_ave = self.average_hoursNorm
         matrix = []
         ratings = []
         i = 0
@@ -150,11 +150,25 @@ class Graph:
         residuals = self.biases[1]
         rank = self.biases[2]
         singular = self.biases[3]
-        print("Solution = {}".format(", ".join("{0}".format(n) for n in solution)))
+        print("Solution = {}".format(", ".join("{0}".format(n) for n in solution.T)))
         # print("Residual = {}".format(", ".join("{0}".format(n) for n in residuals)))
         print("Rank is " + str(rank))
 
-
+    def get_recommendation(self, user_id):
+        all_biases = self.biases[0]
+        predicted_rating = []
+        global_ave = self.average_hoursNorm
+        uidx = self.uid_lookup[user_id]
+        print("Length is " + str(len(all_biases)))
+        for game_id in range(self.game_count):
+            prediction = global_ave + all_biases[uidx, 0] + all_biases[self.user_count + game_id, 0]
+            predicted_rating.append([game_id, prediction])
+        sorted_prediction = sorted(predicted_rating, key = lambda tuple : tuple[1], reverse = False)
+        for tuple in sorted_prediction:
+            gid = self.g_nodes[tuple[0]].node_id
+            rating = tuple[1]
+            gamename = self.gid_names[gid]
+            print("Game {} is predicted to have rating of {}".format(gamename, rating))
 class Node:
     # define a new node
     def __init__(self, nt, nid):

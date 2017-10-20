@@ -1055,8 +1055,9 @@ def recommend_v2(request):
                     INNER JOIN (
                         SELECT *
                         FROM backend_gamelist
+                        WHERE num_player > 100
                         ORDER BY num_player DESC
-                        LIMIT 1000
+                        LIMIT 200
                     ) g
                     ON g.game_id = p.game_id_id
                     INNER JOIN (
@@ -1065,7 +1066,7 @@ def recommend_v2(request):
                             SELECT *
                             FROM backend_user
                             ORDER BY RANDOM()
-                            LIMIT 1500
+                            LIMIT 500
                         ) y
                         UNION 
                         SELECT * 
@@ -1081,6 +1082,8 @@ def recommend_v2(request):
                     '''
         cursor = connection.cursor()
         rows = cursor.execute(query, [request.GET['username']])
+
+        our_user = User.objects.get(user_name = request.GET['username'])
 
         user_set = {}
         game_set = {}
@@ -1106,6 +1109,7 @@ def recommend_v2(request):
         game_graph.baseline_predictor()
         print("Inserted {} edges to Graph".format(library_len))
     game_graph.show_baseline()
+    game_graph.get_recommendation(our_user.user_id)
     return HttpResponse("test")
 
 def graph_setup():

@@ -127,6 +127,7 @@ class Graph:
 
     # Gets random user from list of users
     # A misnomer, it will be changed to get user's friends first, and their friends. BFS till num
+    # XD
     def get_random_usernodes(self, user_id, num):
         visited = set()
         visited.add(user_id)

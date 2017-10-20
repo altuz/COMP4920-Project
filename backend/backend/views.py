@@ -982,7 +982,7 @@ def recommend_test(request):
     # params: game, user, hrs, rating 
     game_graph.connect_u_g("A", "1", 5, 5)
     game_graph.connect_u_g("A", "3", 5, 5)
-    game_graph.connect_u_g("A", "5", 3, 3)
+    game_graph.connect_u_g("A", "5", 4, 4)
     game_graph.connect_u_g("A", "7", 3, 3)
     game_graph.connect_u_g("A", "8", 5, 5)
 
@@ -1017,9 +1017,10 @@ def recommend_test(request):
 
     # ------------------------------------------------------------------
     game_graph.add_names(user_set, game_set)
-    game_graph.games_hours_stats()
-    game_graph.calculate_bias() 
-
+    #game_graph.games_hours_stats()
+    game_graph.calculate_bias()
+    game_graph.baseline_predictor()
+    game_graph.show_baseline()
     return HttpResponse("test") 
 
 
@@ -1028,6 +1029,12 @@ def recommend_test(request):
 def recommend_v2(request):
     # TODO always include the user
     # targetUser = request.GET.get('username')
+    global game_graph, user_set, game_set
+    our_user = User.objects.get(user_name=request.GET['username'])
+    game_graph.baseline_predictor(our_user.user_id, 299)
+    return HttpResponse("test")
+
+def graph_setup():
     global game_graph, user_set, game_set
     if game_graph is None:
         print("Initializing Graph")
@@ -1048,42 +1055,37 @@ def recommend_v2(request):
         #             WHERE p.played_hrs != 0
         #             OR p.played_hrs != null;'''
 
-        query = ''' SELECT  g.game_id as "game_id", g.game_name as "game_name", 
-                            u.user_id as "user_id", u.user_name as "user_name", 
-                            p.played_hrs as "played_hrs", r.rate as "rate"
-                    FROM backend_playerlibrary p
-                    INNER JOIN (
-                        SELECT *
-                        FROM backend_gamelist
-                        WHERE num_player > 100
-                        ORDER BY num_player DESC
-                        LIMIT 200
-                    ) g
-                    ON g.game_id = p.game_id_id
-                    INNER JOIN (
-                        SELECT *
-                        FROM (
-                            SELECT *
-                            FROM backend_user
-                            ORDER BY RANDOM()
-                            LIMIT 2000
-                        ) y
-                        UNION 
-                        SELECT * 
-                        FROM backend_user
-                        WHERE user_name = %s
-                    ) u
-                    ON u.user_id = p.user_id_id
-                    LEFT JOIN backend_rating r
-                    ON r.user_id_id = p.user_id_id
-                    AND r.game_id_id = p.game_id_id
-                    WHERE p.played_hrs != 0
-                    OR p.played_hrs != null;
-                    '''
+        query = (' SELECT  g.game_id as "game_id", g.game_name as "game_name", \n'
+                 '                            u.user_id as "user_id", u.user_name as "user_name", \n'
+                 '                            p.played_hrs as "played_hrs", r.rate as "rate"\n'
+                 '                    FROM backend_playerlibrary p\n'
+                 '                    INNER JOIN (\n'
+                 '                        SELECT *\n'
+                 '                        FROM backend_gamelist\n'
+                 '                        WHERE num_player > 100\n'
+                 '                        ORDER BY num_player DESC\n'
+                 '                        LIMIT 300\n'
+                 '                    ) g\n'
+                 '                    ON g.game_id = p.game_id_id\n'
+                 '                    INNER JOIN (\n'
+                 '                        SELECT *\n'
+                 '                        FROM (\n'
+                 '                            SELECT *\n'
+                 '                            FROM backend_user\n'
+                 '                            ORDER BY RANDOM()\n'
+                #'                            LIMIT 500\n'
+                 '                        ) y\n'
+                 '                    ) u\n'
+                 '                    ON u.user_id = p.user_id_id\n'
+                 '                    LEFT JOIN backend_rating r\n'
+                 '                    ON r.user_id_id = p.user_id_id\n'
+                 '                    AND r.game_id_id = p.game_id_id\n'
+                 '                    WHERE p.played_hrs != 0\n'
+                 '                    OR p.played_hrs != null;\n'
+                 '                    ')
         cursor = connection.cursor()
-        rows = cursor.execute(query, [request.GET['username']])
+        rows = cursor.execute(query)
 
-        our_user = User.objects.get(user_name = request.GET['username'])
 
         user_set = {}
         game_set = {}
@@ -1103,14 +1105,13 @@ def recommend_v2(request):
             game_set[game] = entry[1]
             game_graph.connect_u_g(game, user, entry[4], rate_val)
             library_len += 1
+        print("Graph initialized")
         game_graph.add_names(user_set, game_set)
         # game_graph.games_hours_stats()
         game_graph.calculate_bias()
-        game_graph.baseline_predictor()
-        print("Inserted {} edges to Graph".format(library_len))
-    game_graph.show_baseline()
-    game_graph.get_recommendation(our_user.user_id)
-    return HttpResponse("test")
 
-def graph_setup():
-    global game_graph, user_set, game_set
+        query2 = "SELECT user_id_id, follow_id_id FROM backend_follow;"
+        rows = cursor.execute(query2)
+        for row in rows:
+            game_graph.connect_u_u(row[0], row[1])
+        print("Inserted {} edges to Graph".format(library_len))

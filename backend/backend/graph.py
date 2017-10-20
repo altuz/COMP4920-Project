@@ -196,7 +196,7 @@ class Graph:
             rating = tuple[1]
             gamename = self.gid_names[gid]
             print("Game {} is predicted to have rating of {}".format(gamename, rating))
-        return None
+        return predictions
 
     def show_baseline(self, result):
         solution = result[0]

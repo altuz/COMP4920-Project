@@ -15,6 +15,8 @@ class Graph:
         #
         self.uid_names = None
         self.gid_names = None
+        # Global average number of hours per user
+        self.average_hoursNorm = 0
 
     # add user, returns true if added, false if user already in list
     def add_user(self, uid):
@@ -77,19 +79,26 @@ class Graph:
         ""
 
     def calculate_bias(self):
-        print("Calculating bias ")
+        print("Calculating bias & global average")
+        global_total_hoursNorm = 0
+        global_num_users = 0
         for game in self.g_nodes:
             game.average_weight()
-            print("game {} has averages of ({} hours, {} rating)".format(self.gid_names[game.node_id], game.average_hours, game.average_rating))
             game.calcHoursNorm()
-            print("===== Calcing outgoing edge adjusted weights")
+            global_total_hoursNorm += game.total_hoursNorm
+            global_num_users += game.num_users
+            # print("game {} has averages of ({} hours, {} rating)".format(self.gid_names[game.node_id], game.average_hours, game.average_rating))
+
+        self.average_hoursNorm = global_total_hoursNorm/global_num_users
+        print("Global average is" + str(self.average_hoursNorm))
+
         num_reviews = []
         for user in self.u_nodes:
             user.average_weight()
             num_reviews.append(str(user.num_rating))
-            print("user {} has averages of ({} hours, {} rating)".format(self.uid_names[user.node_id], user.average_hours, user.average_rating))
-        num_reviews = sorted(num_reviews)
-        print(', '.join(num_reviews))
+            # print("user {} has averages of ({} hours, {} rating)".format(self.uid_names[user.node_id], user.average_hours, user.average_rating))
+        # num_reviews = sorted(num_reviews)
+        # print(', '.join(num_reviews))
 
 class Node:
     # define a new node
@@ -103,6 +112,9 @@ class Node:
         self.average_rating = 0
         # number of reviews
         self.num_rating = 0
+        # fields to be used for global average calc
+        self.total_hoursNorm = 0
+        self.num_users = 0
 
     def add_edge(self, h):
         self.edges.append(h)
@@ -136,6 +148,8 @@ class Node:
     # Call for GAME nodes only, updates each edges normalised hrs value
     def calcHoursNorm(self):
         max = 0
+        self.num_users = 0
+        self.total_hoursNorm = 0
         for edge in self.edges:
             edge.hoursNorm = math.atan(edge.hours/(self.average_hours))
             if(edge.hoursNorm > max):
@@ -146,8 +160,13 @@ class Node:
         for edge in self.edges:
             old = edge.hoursNorm
             edge.hoursNorm = old / max
+
+            self.num_users += 1 # Number of outgoing edges equates to number of users
+            self.total_hoursNorm += edge.hoursNorm # keep track of total hoursNorm
             # print("------Adjusted-----edge hr: " + str(edge.hours) + ", node ave hr:"
             #       + str(self.average_hours) + " atanHr:" + str(edge.hoursNorm) + ", max: " + str(max))
+        print("For game" + str(self.node_id) + " total users = " + str(self.num_users) 
+            + ", total_hoursNorm = " + str(self.total_hoursNorm))
 
 class Edge:
     # define an edge between two nodes

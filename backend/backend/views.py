@@ -966,9 +966,68 @@ game_graph = None
 user_set = None
 game_set = None
 
+# curl -X GET "http://localhost:8000/backend/recommend_test/"
+@api_view(['GET'])
+def recommend_test(request):
+    global game_graph, user_set, game_set
+    # =====================================================
+    # ---------Example from text book ---------------------
+    user_set = {}
+    game_set = {}
+    game_graph = Graph()
+
+    user_set = { '0':'1','1':'2','2':'3','3':'4','4':'5','5':'6','6':'7','7':'8','8':'9','9':'10'}
+    game_set = { '0':'A','1':'B','2':'C','3':'D','4':'E'} 
+
+    # params: game, user, hrs, rating 
+    game_graph.connect_u_g("A", "1", 5, 5)
+    game_graph.connect_u_g("A", "3", 5, 5)
+    game_graph.connect_u_g("A", "5", 3, 3)
+    game_graph.connect_u_g("A", "7", 3, 3)
+    game_graph.connect_u_g("A", "8", 5, 5)
+
+    game_graph.connect_u_g("B", "1", 4, 4) 
+    game_graph.connect_u_g("B", "2", 3, 3) 
+    game_graph.connect_u_g("B", "3", 2, 2)
+    game_graph.connect_u_g("B", "6", 3, 3) 
+    game_graph.connect_u_g("B", "9", 2, 2) 
+
+    game_graph.connect_u_g("C", "1", 4, 4)  
+    game_graph.connect_u_g("C", "2", 5, 5)
+    game_graph.connect_u_g("C", "4", 3, 3)
+    game_graph.connect_u_g("C", "7", 3, 3)
+    game_graph.connect_u_g("C", "8", 4, 4)
+    game_graph.connect_u_g("C", "9", 5, 5)
+    game_graph.connect_u_g("C", "10", 5, 5)
+
+    game_graph.connect_u_g("D", "4", 1, 1)
+    game_graph.connect_u_g("D", "5", 4, 4)
+    game_graph.connect_u_g("D", "6", 3, 3)
+    game_graph.connect_u_g("D", "7", 2, 2)
+    game_graph.connect_u_g("D", "9", 4, 4)
+    game_graph.connect_u_g("D", "10", 3, 3)
+
+    game_graph.connect_u_g("E", "2", 4, 4)
+    game_graph.connect_u_g("E", "3", 3, 3)
+    game_graph.connect_u_g("E", "4", 2, 2)
+    game_graph.connect_u_g("E", "5", 5, 5)
+    game_graph.connect_u_g("E", "5", 5, 5)
+    game_graph.connect_u_g("E", "8", 5, 5)
+    game_graph.connect_u_g("E", "10", 4, 4)
+
+    # ------------------------------------------------------------------
+    game_graph.add_names(user_set, game_set)
+    game_graph.games_hours_stats()
+    game_graph.calculate_bias() 
+
+    return HttpResponse("test") 
+
+
 # curl -X GET "http://localhost:8000/backend/recommend_v2/?username=a%20regular"
 @api_view(['GET'])
 def recommend_v2(request):
+    # TODO always include the user
+    # targetUser = request.GET.get('username')
     global game_graph, user_set, game_set
     if game_graph is None:
         print("Initializing Graph")
@@ -1010,7 +1069,7 @@ def recommend_v2(request):
             game_graph.connect_u_g(game, user, entry[4], rate_val)
             library_len += 1
         game_graph.add_names(user_set, game_set)
-        game_graph.games_hours_stats()
+        # game_graph.games_hours_stats()
         game_graph.calculate_bias()
         print("Inserted {} edges to Graph".format(library_len))
     return HttpResponse("test")

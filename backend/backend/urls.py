@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'^backend/send_review/', backend.views.send_review),
     url(r'^backend/recommend_v1/', backend.views.recommend_v1),
     url(r'^backend/recommend_v2/', backend.views.recommend_v2),
+    url(r'^backend/recommend_test/', backend.views.recommend_test),
     url(r'^backend/get_top_games/', backend.views.get_top_games),
     url(r'^backend/check_in_userlist/', backend.views.check_in_userlist),
     url(r'^backend/edit_profile/', backend.views.edit_profile),

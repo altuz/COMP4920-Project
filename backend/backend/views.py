@@ -1033,22 +1033,54 @@ def recommend_v2(request):
         print("Initializing Graph")
 
         #QUERY
+        #
+        # query = ''' SELECT  g.game_id as "game_id", g.game_name as "game_name",
+        #                     u.user_id as "user_id", u.user_name as "user_name",
+        #                     p.played_hrs as "played_hrs", r.rate as "rate"
+        #             FROM backend_playerlibrary p
+        #             LEFT JOIN backend_gamelist g
+        #             ON g.game_id = p.game_id_id
+        #             LEFT JOIN backend_user u
+        #             ON u.user_id = p.user_id_id
+        #             LEFT JOIN backend_rating r
+        #             ON r.user_id_id = p.user_id_id
+        #             AND r.game_id_id = p.game_id_id
+        #             WHERE p.played_hrs != 0
+        #             OR p.played_hrs != null;'''
 
-        query = ''' SELECT  g.game_id as "game_id", g.game_name as "game_name",
+        query = ''' SELECT  g.game_id as "game_id", g.game_name as "game_name", 
                             u.user_id as "user_id", u.user_name as "user_name", 
                             p.played_hrs as "played_hrs", r.rate as "rate"
                     FROM backend_playerlibrary p
-                    LEFT JOIN backend_gamelist g
+                    INNER JOIN (
+                        SELECT *
+                        FROM backend_gamelist
+                        ORDER BY num_player DESC
+                        LIMIT 1000
+                    ) g
                     ON g.game_id = p.game_id_id
-                    LEFT JOIN backend_user u
+                    INNER JOIN (
+                        SELECT *
+                        FROM (
+                            SELECT *
+                            FROM backend_user
+                            ORDER BY RANDOM()
+                            LIMIT 1500
+                        ) y
+                        UNION 
+                        SELECT * 
+                        FROM backend_user
+                        WHERE user_name = %s
+                    ) u
                     ON u.user_id = p.user_id_id
                     LEFT JOIN backend_rating r
                     ON r.user_id_id = p.user_id_id
                     AND r.game_id_id = p.game_id_id
                     WHERE p.played_hrs != 0
-                    OR p.played_hrs != null;'''
+                    OR p.played_hrs != null;
+                    '''
         cursor = connection.cursor()
-        rows = cursor.execute(query)
+        rows = cursor.execute(query, [request.GET['username']])
 
         user_set = {}
         game_set = {}
@@ -1071,7 +1103,9 @@ def recommend_v2(request):
         game_graph.add_names(user_set, game_set)
         # game_graph.games_hours_stats()
         game_graph.calculate_bias()
+        game_graph.baseline_predictor()
         print("Inserted {} edges to Graph".format(library_len))
+    game_graph.show_baseline()
     return HttpResponse("test")
 
 def graph_setup():

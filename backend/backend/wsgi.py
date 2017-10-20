@@ -9,10 +9,10 @@ https://docs.djangoproject.com/en/1.11/howto/deployment/wsgi/
 
 import os
 from django.core.wsgi import get_wsgi_application
-from backend.views import graph_setup
+#from backend.views import graph_setup
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
 
-graph_setup()
+#graph_setup()
 
 application = get_wsgi_application()

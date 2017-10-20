@@ -102,7 +102,7 @@ export default class Profile extends React.Component {
 			<Edit />
 			);
 		}
-
+		console.log(this.props.gamelist)
 		//get the profile data from backend
 		const { user,fetched } = this.props;
 		console.log(fetched);
@@ -125,6 +125,7 @@ export default class Profile extends React.Component {
     						    <BootstrapTable data={this.props.gamelist} hover pagination>
                                     <TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
                                     <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>
+																		<TableHeaderColumn  width='100px'>Hours</TableHeaderColumn>
                                 </BootstrapTable>
     						</div>
     					</Tab>

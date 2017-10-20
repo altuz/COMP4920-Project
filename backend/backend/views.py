@@ -75,6 +75,7 @@ def user_prof_helper(username):
 
 # Retrieves user profile along with game list and wish list
 # TESTED
+# curl -X GET "http://localhost:8000/backend/user_prof/?username=a%20regular"
 @api_view(['GET'])
 def user_prof(request):
     return user_prof_helper(request.GET['username'])
@@ -134,7 +135,7 @@ def unfollow_user(request):
 
 # Get user's follow list
 # Tested
-# curl -d '{"user":{"username" : "a 1regular"}}' -X POST "http://localhost:8000/backend/follow_list/"
+# curl -d '{"user":{"username" : "a regular"}}' -X POST "http://localhost:8000/backend/follow_list/"
 @api_view(['GET'])
 def follow_list(request):
     try:
@@ -229,7 +230,12 @@ def get_list(username, type):
                 g_id = game.game_id
                 g_name = game.game_name
                 g_picture = game.image_url
-                g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}"}}'.format(g_name, g_id, g_picture)
+                g_played_hrs = entries.played_hrs
+                # print("played hours for " + str(g_name) + " is: " + str(g_played_hrs))
+                if(g_played_hrs == None):
+                    g_played_hrs = 0
+                    # print("Adjusted played hours for " + str(g_name) + " is: " + str(g_played_hrs))
+                g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}", "played_hrs":"{}"}}'.format(g_name, g_id, g_picture, g_played_hrs)
                 json_list.append(g_json)
             except:
                 continue
@@ -962,6 +968,49 @@ def edit_profile(request):
 
     return HttpResponse('{"message": "no user"}')
 
+# given json contain username, gameid, and hours
+# curl -d '{"edit_game_hrs":{"username" : "a regular", "gameid" : "578080", "played_hrs" : "566"}}' -X POST "http://localhost:8000/backenist/"
+@api_view(['POST'])
+def edit_game_hrs(request):
+    print("user edit function is running ...")
+    print("")
+    obj = None
+    try:
+        obj = json.loads(request.body.decode())
+        print("decode success")
+    except:
+        print("Error when loading the Json")
+        pass
+
+    if obj is not None:
+        # get user data
+        username = obj['edit_game_hrs']['username']
+        gameid = obj['edit_game_hrs']['gameid']
+        played_hrs = obj['edit_game_hrs']['played_hrs']
+
+        user_entry = User.objects.get(user_name=username)
+        game_entry = GameList.objects.get(game_id=gameid)
+        library_entry = PlayerLibrary.objects.get(user_id=user_entry, gameid=game_entry)
+
+
+        # if e is '':
+        #     e = user_entry.email
+        #
+        # if p is '':
+        #     p = user_entry.pass_word
+        #
+        # user_entry.email = e
+        # user_entry.pass_word = p
+        # print("new email" + user_entry.email)
+        # print("new pass" + user_entry.pass_word)
+        try:
+            user_entry.save()
+            return HttpResponse('{"message" : "edit success"}')
+        except Exception as e:
+            print(e)
+
+    return HttpResponse('{"message": "no user"}')
+
 game_graph = None
 user_set = None
 game_set = None
@@ -982,7 +1031,7 @@ def recommend_test(request):
     # params: game, user, hrs, rating 
     game_graph.connect_u_g("A", "1", 5, 5)
     game_graph.connect_u_g("A", "3", 5, 5)
-    game_graph.connect_u_g("A", "5", 3, 3)
+    game_graph.connect_u_g("A", "5", 4, 4)
     game_graph.connect_u_g("A", "7", 3, 3)
     game_graph.connect_u_g("A", "8", 5, 5)
 

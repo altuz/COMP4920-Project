@@ -110,8 +110,8 @@ class Graph:
         for user in self.u_nodes:
             uid = user.node_id
             for edge in user.edges:
-                if edge.rating is -1:
-                    continue
+                #if edge.rating is -1:
+                #    continue
                 vector = [0 for col in range(self.user_count + self.game_count)]
                 gid = edge.game.node_id
                 uidx = self.uid_lookup[uid]
@@ -120,7 +120,7 @@ class Graph:
                 vector[uidx] = 1
                 vector[self.user_count + gidx] = 1
                 matrix.append(vector)
-                ratings.append([edge.rating - global_ave])
+                ratings.append([edge.hoursNorm - global_ave])
             if len(matrix) is 1000:
                 break
         # build numpy array

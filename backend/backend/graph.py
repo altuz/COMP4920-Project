@@ -106,6 +106,7 @@ class Graph:
         global_ave = self.calculate_average()
         matrix = []
         ratings = []
+        i = 0
         for user in self.u_nodes:
             uid = user.node_id
             for edge in user.edges:
@@ -119,12 +120,18 @@ class Graph:
                 vector[uidx] = 1
                 vector[self.user_count + gidx] = 1
                 matrix.append(vector)
-                ratings.append(edge.rating - global_ave)
+                ratings.append([edge.rating - global_ave])
+            if len(matrix) is 1000:
+                break
         # build numpy array
         print()
         print("global ave is " + str(global_ave))
-        a = np.array(matrix)
-        b = np.array(ratings)
+        a = np.matrix(matrix)
+        b = np.matrix(ratings)
+        # calculate least squares of first derivative
+        # at = np.matrix.transpose(a)
+        b = np.matmul(a.T, b)
+        a = np.matmul(a.T, a)
         c = np.linalg.lstsq(a, b)
         self.biases = c
         return None

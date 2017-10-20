@@ -75,6 +75,7 @@ def user_prof_helper(username):
 
 # Retrieves user profile along with game list and wish list
 # TESTED
+# curl -X GET "http://localhost:8000/backend/user_prof/?username=a%20regular"
 @api_view(['GET'])
 def user_prof(request):
     return user_prof_helper(request.GET['username'])
@@ -134,7 +135,7 @@ def unfollow_user(request):
 
 # Get user's follow list
 # Tested
-# curl -d '{"user":{"username" : "a 1regular"}}' -X POST "http://localhost:8000/backend/follow_list/"
+# curl -d '{"user":{"username" : "a regular"}}' -X POST "http://localhost:8000/backend/follow_list/"
 @api_view(['GET'])
 def follow_list(request):
     try:
@@ -229,7 +230,12 @@ def get_list(username, type):
                 g_id = game.game_id
                 g_name = game.game_name
                 g_picture = game.image_url
-                g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}"}}'.format(g_name, g_id, g_picture)
+                g_played_hrs = entries.played_hrs
+                # print("played hours for " + str(g_name) + " is: " + str(g_played_hrs))
+                if(g_played_hrs == None):
+                    g_played_hrs = 0
+                    # print("Adjusted played hours for " + str(g_name) + " is: " + str(g_played_hrs))
+                g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}", "played_hrs":"{}"}}'.format(g_name, g_id, g_picture, g_played_hrs)
                 json_list.append(g_json)
             except:
                 continue
@@ -921,7 +927,7 @@ def recommend_v1(request):
     return HttpResponse(outputJSON, content_type='application/json')
 
 # given json contain username, email, and password
-# curl -d '{"edit":{"username" : "a regular", "email" : "edittest@gmail.com", "password" : "editpass"}}' -X POST "http://localhost:8000/backenist/"
+# curl -d '{"edit":{"username" : "a regular", "email" : "edittest@gmail.com", "password" : "editpass"}}' -X POST "http://localhost:8000/backend/edit_profile/"
 @api_view(['POST'])
 def edit_profile(request):
     print("user edit function is running ...")
@@ -956,6 +962,45 @@ def edit_profile(request):
         print("new pass" + user_entry.pass_word)
         try:
             user_entry.save()
+            return HttpResponse('{"message" : "edit success"}')
+        except Exception as e:
+            print(e)
+
+    return HttpResponse('{"message": "no user"}')
+
+# given json contain username, gameid, and hours
+# curl -d '{"edit_game_hrs":{"username" : "a regular", "gameid" : "578080", "played_hrs" : "580"}}' -X POST "http://localhost:8000/backend/edit_game_hrs/"
+@api_view(['POST'])
+def edit_game_hrs(request):
+    print("user edit function is running ...")
+    print("")
+    obj = None
+    try:
+        obj = json.loads(request.body.decode())
+        print("decode success")
+    except:
+        print("Error when loading the Json")
+        pass
+
+    if obj is not None:
+        # get user data
+        username = obj['edit_game_hrs']['username']
+        gameid = obj['edit_game_hrs']['gameid']
+        played_hrs = obj['edit_game_hrs']['played_hrs']
+
+        try:
+            user_entry = User.objects.get(user_name=username)
+            game_entry = GameList.objects.get(game_id=gameid)
+            library_entry = PlayerLibrary.objects.get(user_id=user_entry, game_id=game_entry)
+        except:
+            return HttpResponse('{"message" : "edit failure"}')
+
+        print("Old played hrs is " + str(library_entry.played_hrs))
+        library_entry.played_hrs = played_hrs
+
+        try:
+            library_entry.save()
+            print("New played hrs is " + str(library_entry.played_hrs))
             return HttpResponse('{"message" : "edit success"}')
         except Exception as e:
             print(e)

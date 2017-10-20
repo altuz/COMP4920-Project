@@ -1,7 +1,7 @@
 import math
+import numpy as np
 
 # Bipartite graph between set of users and set of games
-import numpy as np
 class Graph:
     # define empty graph
     def __init__(self):

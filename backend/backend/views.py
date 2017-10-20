@@ -1002,9 +1002,16 @@ def recommend_v2(request):
                     ON g.game_id = p.game_id_id
                     INNER JOIN (
                         SELECT *
+                        FROM (
+                            SELECT *
+                            FROM backend_user
+                            ORDER BY RANDOM()
+                            LIMIT 1500
+                        ) y
+                        UNION 
+                        SELECT * 
                         FROM backend_user
-                        ORDER BY RANDOM()
-                        LIMIT 1500
+                        WHERE user_name = %s
                     ) u
                     ON u.user_id = p.user_id_id
                     LEFT JOIN backend_rating r
@@ -1013,9 +1020,8 @@ def recommend_v2(request):
                     WHERE p.played_hrs != 0
                     OR p.played_hrs != null;
                     '''
-
         cursor = connection.cursor()
-        rows = cursor.execute(query)
+        rows = cursor.execute(query, [request.GET['username']])
 
         user_set = {}
         game_set = {}
@@ -1036,7 +1042,7 @@ def recommend_v2(request):
             game_graph.connect_u_g(game, user, entry[4], rate_val)
             library_len += 1
         game_graph.add_names(user_set, game_set)
-        game_graph.games_hours_stats()
+        # game_graph.games_hours_stats()
         game_graph.calculate_bias()
         game_graph.baseline_predictor()
         print("Inserted {} edges to Graph".format(library_len))

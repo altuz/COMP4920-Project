@@ -105,10 +105,10 @@ export function Verification(key){
   return axios.get(url);
 }
 
-/* export function getRecommendation2(username){
+export function getRecommendation2(username){
     const url='http://localhost:8000/backend/recommend_v2/?username='+username;
     return axios.get(url);
-}*/
+}
 
  export function getFollowList(username){
     const url='http://localhost:8000/backend/follow_list/?username='+username;

@@ -145,10 +145,10 @@ class Graph:
                 if friend not in visited:
                     visited.add(friend)
                     queue.insert(0, friend)
-                    print("Hellowws" + str(count))
         print("Count users: " + str(count))
         user_node = self.u_nodes[self.uid_lookup[user_id]]
         if count < num + 1:
+            print("HERE")
             copy_u = set(self.u_nodes)
             copy_u.remove(user_node)
             random_users = random.sample(copy_u, (num + 1 - count)) + random_users
@@ -189,7 +189,7 @@ class Graph:
         b = np.matmul(a.T, b)
         a = np.matmul(a.T, a)
         c = np.linalg.lstsq(a, b)
-        self.show_baseline(c)
+        # self.show_baseline(c)
         predictions = self.get_recommendation(user_id, c, num)
         predictionList = []
         for tuple in predictions:
@@ -216,6 +216,7 @@ class Graph:
         global_ave = self.average_hoursNorm
         uidx = count
         print("Length is " + str(len(all_biases)))
+        print("There are {} games and {} users".format(self.game_count, count + 1))
         for game_id in range(self.game_count):
             prediction = global_ave + all_biases[uidx, 0] + all_biases[count + game_id, 0]
             predicted_rating.append([game_id, prediction])

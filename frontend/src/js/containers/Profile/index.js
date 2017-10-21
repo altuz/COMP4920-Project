@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { getRecommendation1 } from '../../actions/userActions';
-//import { getRecommendation2 } from '../../actions/userActions';
+import { getRecommendation2 } from '../../actions/userActions';
 import { getFollowList } from '../../actions/userActions';
 
 @connect((store) => {
@@ -23,7 +23,7 @@ export default class Profile extends React.Component {
 		this.state= {
 		    rec1:[],
 		    follow_list: [],
-		    //rec2:[],
+		    rec2:[],
 		};
 		this.requestedit = this.requestedit.bind(this);
 	}
@@ -74,6 +74,12 @@ export default class Profile extends React.Component {
             follow_list: res.data.follows,
             })
          })
+    getRecommendation2(username)
+        .then((res)=>{
+            this.setState({
+            rec2: res.data.results,
+          })
+        })
     }
 
 
@@ -144,7 +150,15 @@ export default class Profile extends React.Component {
                                 </BootstrapTable>
     						</div>
    						</Tab>
-   						<Tab eventKey={4} title="Follow List">
+   						<Tab eventKey={4} title="Our Recomendation">
+   						    <div>
+    						    <BootstrapTable data={this.state.rec2} hover>
+                                    <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
+                                    <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>
+                                </BootstrapTable>
+    						</div>
+   						</Tab>
+   						<Tab eventKey={5} title="Follow List">
    						    <div>
     						    <BootstrapTable data={this.state.follow_list} hover pagination>
                                     <TableHeaderColumn isKey dataField='user_name' dataFormat={this.profileFormatter}  width='300px'>Username</TableHeaderColumn>

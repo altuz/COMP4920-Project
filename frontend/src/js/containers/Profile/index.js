@@ -103,18 +103,23 @@ export default class Profile extends React.Component {
     };
 
   SaveCell(row, cellName, cellValue){
-  	const url = 'http://localhost:8000/backend/edit_game_hrs/';
-  	const edit_game_hrs ={
-      username :this.props.user.user_name,
-			gameid: row.game_id,
-			played_hrs: cellValue,
+  	if(cellName === "played_hrs"){
+      const url = 'http://localhost:8000/backend/edit_game_hrs/';
+      const edit_game_hrs ={
+        username :this.props.user.user_name,
+        gameid: row.game_id,
+        played_hrs: cellValue,
+      }
+      console.log(edit_game_hrs);
+      axios.post(url,{
+        edit_game_hrs
+      }).then((res)=>{
+        console.log(res.data);
+      })
+		} else {
+  		alert("you are not allow to edit this column");
 		}
-		console.log(edit_game_hrs);
-  	axios.post(url,{
-  		edit_game_hrs
-  	}).then((res)=>{
-  				console.log(res.data);
-				})
+
 	}
 
 

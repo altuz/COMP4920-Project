@@ -1106,19 +1106,20 @@ def recommend_v2(request):
     # Step 3: Get predictions, match with db game_info exclude duplicates when adding to recommend list
     # TODO @Nicholas, test this, David's computer does not have enough memory to test
     print("5 Recommendations")
-    predictionList = game_graph.baseline_predictor(our_user.user_id, 100)
-    sorted_predictionList = sorted(predictionList, key = lambda tuple : tuple[1], reverse = True) # Sort the predictions based on rating/ranking, highest to lowest
+    predictionList = game_graph.baseline_predictor(our_user.user_id, 199)
+    # sorted_predictionList = sorted(predictionList, key = lambda tuple : tuple[1], reverse = True) # Sort the predictions based on rating/ranking, highest to lowest
     recommend_set = []
     print("PredictionsList")
-    for p in sorted_predictionList:
-        results = GameList.objects.filter(game_id__in=p[0]).exclude(game_id__in=recommend_set).exclude(game_id__in=player_games)
-
+    for p in reversed(predictionList):
+        results = GameList.objects.get(game_id = p[0]) #.exclude(game_id__in=recommend_set).exclude(game_id__in=player_games)
+        if results.game_id in player_games:
+            continue
         print("game_id: " + str(results.game_id) + ", game_name: "+ str(results.game_name) + ", Ranking/Rating: " + str(p[1]))
-        result_top_dict = results[0].as_dict()
+        result_top_dict = results.as_dict()
         recommend_set.append(result_top_dict['game_id'])
 
     # Step 4: Output results (ONLY TAKE TOP 5 MATCHES)
-    results = GameList.objects.filter(game_id__in=recommend_set)[:5]
+    results = GameList.objects.filter(game_id__in=recommend_set[:5])
     # # debugging
     # for result in results:
     #     print(result)
@@ -1126,7 +1127,6 @@ def recommend_v2(request):
     outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf-16')
     return HttpResponse(outputJSON, content_type='application/json')
 
-    return HttpResponse("test")
 
 def graph_setup():
     global game_graph, user_set, game_set
@@ -1166,7 +1166,7 @@ def graph_setup():
                  '                        FROM (\n'
                  '                            SELECT *\n'
                  '                            FROM backend_user\n'
-                 '                            ORDER BY RANDOM()\n'
+                #'                            ORDER BY RANDOM()\n'
                 # '                            LIMIT 200\n' # Comment this line out to remove limit
                  '                        ) y\n'
                  '                    ) u\n'

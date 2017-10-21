@@ -1222,7 +1222,7 @@ def graph_setup():
                  '                            SELECT *\n'
                  '                            FROM backend_user\n' 
                 #'                            ORDER BY RANDOM()\n'
-                '                            LIMIT 200\n' # Comment this line out to remove limit 
+                # '                            LIMIT 200\n' # Comment this line out to remove limit 
                  '                        ) y\n'
                  '                    ) u\n'
                  '                    ON u.user_id = p.user_id_id\n'

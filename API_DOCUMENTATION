@@ -291,13 +291,17 @@ Type: GET
 Input: username=username_of_target_user
 Output:
 {
+    "top_genres": [["Strategy", 10], ["Strategy", 5], ["Action", 2]],
     "results":
     [ // List of results of this format
         {
             "game_id": 1,
             "game_name": "Left 4 dead",
             "num_player": 23
-            ... other stats
+            ... other stats,
+            ...,
+            "genre_list": ["Adventure", "Casual", "Adventure"]
+            "category_list": ["Single-player", "Co-op"]
         },
         {
             "game_id": 3,
@@ -308,7 +312,6 @@ Output:
         ...
         ...
         //  Returns top 5 games ever if user has no games
-
     ]
 }
 

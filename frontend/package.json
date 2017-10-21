@@ -44,10 +44,7 @@
     "redux-notifications": "^4.0.1",
     "redux-promise-middleware": "^4.2.0",
     "redux-thunk": "^2.2.0",
-    "remarkable": "^1.7.1",
-    "validator": "^8.2.0",
-    "lodash": "^4.17.4",
-    "classnames": "^2.2.5"
+    "remarkable": "^1.7.1"
   },
   "scripts": {
     "dev": "./node_modules/.bin/webpack-dev-server --content-base src --inline --hot",

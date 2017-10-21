@@ -3,11 +3,6 @@ import {Button, Modal} from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { signup } from '../../actions/userActions.js';
 import { connect } from 'react-redux';
-import classnames from 'classnames';
-import validateInput from '../../function/signupvalidation';
-
-
-
 @connect((store)=>{
     return store.user;
 })
@@ -29,6 +24,7 @@ export default class SignupForm extends React.Component {
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.checkPassword = this.checkPassword.bind(this);
     }
 
     onChange(e){
@@ -37,16 +33,19 @@ export default class SignupForm extends React.Component {
         );
     }
 
-
-     isValid() {
-        const { errors, isValid } = validateInput(this.state);
-
-        if(!isValid) {
-            this.setState({ errors });
+    checkPassword(passwordconfirm)
+    {
+        if (this.state.password == passwordconfirm)
+        {
+            return true;
+        }
+        else{
+            return false;
         }
 
-        return isValid;
-      }
+    }
+
+
 
     handleSubmit(e){
       e.preventDefault();
@@ -59,6 +58,7 @@ export default class SignupForm extends React.Component {
         this.setState({isSubmitting:true});
         this.props.dispatch(signup(user));
         this.setState({issuccess:1})
+
       }
 
     render()
@@ -76,20 +76,17 @@ export default class SignupForm extends React.Component {
                         <label for="username" className="control-label">Username:</label>
                         <input onChange={this.onChange} type="text" className="form-control" name= "username" placeholder="Enter Username"/>
                     </div>
-                    <div className ={classnames('form-group', {'has-error': errors.email})}>
-                        <label className="control-label">Email:</label>
-                        <input onChange={this.onChange} type="text" className="form-control" id ="email" name="email" placeholder="Enter email"/>
-                        {errors.email && <span className="help-block">{errors.email}</span>}
+                    <div className ="form-group">
+                        <label for="email" className="control-label">Email:</label>
+                        <input onChange={this.onChange} type="text" name="email" className="form-control" placeholder="Enter email"/>
                     </div>
-                    <div className ={classnames('form-group', {'has-error': errors.password})}>
-                        <label className="control-label">Password: </label>
-                        <input onChange={this.onChange} type="password" className="form-control" id ="password" name="password" placeholder="Enter Password"/>
-                        {errors.password && <span className="help-block">{errors.password}</span>}
+                    <div className ="form-group">
+                        <label for="password" className="control-label">Password: </label>
+                        <input onChange={this.onChange} type="password" name ="password" className="form-control" placeholder="Enter Password"/>
                     </div>
-                    <div className ={classnames('form-group', {'has-error': errors.passwordconfirm})}>
-                        <label className="control-label">Confirm Password: </label>
-                        <input onChange={this.onChange} type="password" className="form-control" id ="passwordconfirm" name="passwordconfirm" placeholder="Enter Password again"/>
-                        {errors.passwordconfirm && <span className="help-block">{errors.passwordconfirm}</span>}
+                    <div className ="form-group">
+                        <label for="password" className="control-label">Confirm Password: </label>
+                        <input onChange={this.onChange} type="password" name= "passwordconfirm" className="form-control" placeholder="Enter Password again"/>
                     </div>
                     <div className="form-group">
                     <Button type = "submit" name="Submit"> Signup</Button>

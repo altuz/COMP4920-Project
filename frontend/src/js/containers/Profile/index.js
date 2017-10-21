@@ -7,6 +7,7 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { getRecommendation1 } from '../../actions/userActions';
 //import { getRecommendation2 } from '../../actions/userActions';
 import { getFollowList } from '../../actions/userActions';
+import axios from 'axios';
 
 @connect((store) => {
 	return {
@@ -26,6 +27,7 @@ export default class Profile extends React.Component {
 		    //rec2:[],
 		};
 		this.requestedit = this.requestedit.bind(this);
+    this.SaveCell = this.SaveCell.bind(this);
 	}
 
 	requestedit(){
@@ -94,6 +96,12 @@ export default class Profile extends React.Component {
         )
     };
 
+  SaveCell(row, cellName, cellValue){
+  	console.log(this.props.user);
+  	console.log(row);
+  	console.log(cellValue);
+	}
+
 
 
 	render () {
@@ -102,12 +110,17 @@ export default class Profile extends React.Component {
 			<Edit />
 			);
 		}
+
+    const cellEditProp = {
+      mode: 'click',
+      blurToSave: true,
+      afterSaveCell: this.SaveCell  // a hook for after saving cell
+    };
 		console.log(this.props.gamelist)
 		//get the profile data from backend
 		const { user,fetched } = this.props;
 		console.log(fetched);
 		if(fetched) {
-			//get data
 			console.log(user.user_name);
 			return(
 			<div>
@@ -122,10 +135,10 @@ export default class Profile extends React.Component {
     				<Tabs defaultActiveKey={1} className="Tabulation" id="uncontrolled-tab-example">
     					<Tab eventKey={1} title="Playlist">
     						<div>
-    						    <BootstrapTable data={this.props.gamelist} hover pagination>
+    						    <BootstrapTable data={this.props.gamelist} hover pagination cellEdit={ cellEditProp }>
                                     <TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
                                     <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>
-																		<TableHeaderColumn  width='100px'>Hours</TableHeaderColumn>
+																		<TableHeaderColumn  dataField='played_hrs' width='100px'>Played Hours</TableHeaderColumn>
                                 </BootstrapTable>
     						</div>
     					</Tab>

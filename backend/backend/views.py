@@ -728,8 +728,18 @@ def get_game_info(request):
     except: # Case no matching game
         return HttpResponse('{"message":"invalid gameid", "get_game_info":{}')
 
-    # Step 2: Collect the game reviews
+    # Step 2: Get the games genre/categories
     game_obj = GameList.objects.get(game_id=game_id)
+    genres_obj = Genres.objects.filter(game_id=game_obj)
+    category_obj = Categories.objects.filter(game_id=game_obj)
+    genre_list = []
+    category_list = []
+    for g in genres_obj:
+        genre_list.append(g.genre)
+    for c in category_obj:
+        category_list.append(c.category)
+
+    # Step 3: Collect the game reviews
     reviews = Rating.objects.filter(game_id=game_obj)
     # Put 'results' querySet into dict format to convert into JSON dict
     reviews_list = []
@@ -744,7 +754,7 @@ def get_game_info(request):
         except:
             continue
 
-    # Step 3: check if user paramter given, if given user logged in
+    # Step 4: check if user paramter given, if given user logged in
     player_obj = None
     try: # if given loggen in user, check if on their game list
         player_obj = User.objects.get(user_name=request.GET.get('username'))
@@ -752,13 +762,15 @@ def get_game_info(request):
         # if no user
         print("output type1: No user logged in")
         outputJSON = json.dumps({"game_info": target_game,
+                                 "game_genres": genre_list,
+                                 "game_categories": category_list,
                                  "in_game_list": "",
                                  "in_wish_list": "",
                                  "reviews_list": reviews_list,
                                  "user_review": ""},
                                 ensure_ascii=False).encode('utf16')
 
-    # Step 4: Display whether in player game/wish list
+    # Step 5: Display whether in player game/wish list
     if player_obj:
         game_set = PlayerLibrary.objects.filter(user_id=player_obj, game_id=game_obj)
         print(game_set)
@@ -767,7 +779,7 @@ def get_game_info(request):
             wish_list = game_set[0].wish_list # Should only have one entry, get entry 0
             played = game_set[0].played # Should only have one entry, get entry 0
 
-            # Step 5: Get their review if exists, should only have one entry
+            # Step 6: Get their review if exists, should only have one entry
             review = Rating.objects.filter(user_id=player_obj, game_id=game_obj)
             user_review = {}
             if review:
@@ -780,6 +792,8 @@ def get_game_info(request):
                 user_review_output = []
 
             outputJSON = json.dumps({"game_info": target_game,
+                                     "game_genres": genre_list,
+                                     "game_categories": category_list,
                                      "in_game_list": played,
                                      "in_wish_list": wish_list,
                                      "reviews_list": reviews_list,
@@ -788,6 +802,8 @@ def get_game_info(request):
         else:
             print("output type3: Game is NOT in player library")
             outputJSON = json.dumps({"game_info": target_game,
+                                     "game_genres": genre_list,
+                                     "game_categories": category_list,
                                      "in_game_list": False,
                                      "in_wish_list": False,
                                      "reviews_list": reviews_list,

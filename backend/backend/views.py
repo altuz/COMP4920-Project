@@ -1021,6 +1021,14 @@ def edit_game_hrs(request):
         print("Error when loading the Json")
         pass
 
+    # Initialise values
+    game_list = ""
+    # Get game list
+    try:
+        game_list = get_list(obj['edit_game_hrs']['username'], True)
+    except:
+        print("No games")
+
     if obj is not None:
         # get user data
         username = obj['edit_game_hrs']['username']
@@ -1040,7 +1048,15 @@ def edit_game_hrs(request):
         try:
             library_entry.save()
             # print("New played hrs is " + str(library_entry.played_hrs))
-            return HttpResponse('{"message" : "edit success"}')
+
+            ret_json = '''
+                    {{
+                        "gamelist" : [{}]
+                    }}
+                '''.format(game_list)
+            response = HttpResponse(ret_json)
+            return response
+            # return HttpResponse('{"message" : "edit success"}')
         except Exception as e:
             print(e)
 
@@ -1206,7 +1222,7 @@ def graph_setup():
                  '                            SELECT *\n'
                  '                            FROM backend_user\n' 
                 #'                            ORDER BY RANDOM()\n'
-                # '                            LIMIT 200\n' # Comment this line out to remove limit 
+                '                            LIMIT 200\n' # Comment this line out to remove limit 
                  '                        ) y\n'
                  '                    ) u\n'
                  '                    ON u.user_id = p.user_id_id\n'

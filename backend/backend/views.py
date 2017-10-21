@@ -1021,14 +1021,6 @@ def edit_game_hrs(request):
         print("Error when loading the Json")
         pass
 
-    # Initialise values
-    game_list = ""
-    # Get game list
-    try:
-        game_list = get_list(obj['edit_game_hrs']['username'], True)
-    except:
-        print("No games")
-
     if obj is not None:
         # get user data
         username = obj['edit_game_hrs']['username']
@@ -1048,6 +1040,15 @@ def edit_game_hrs(request):
         try:
             library_entry.save()
             # print("New played hrs is " + str(library_entry.played_hrs))
+
+            # Return the updated gamelist
+            # Initialise values
+            game_list = ""
+            # Get game list
+            try:
+                game_list = get_list(obj['edit_game_hrs']['username'], True)
+            except:
+                print("No games")
 
             ret_json = '''
                     {{

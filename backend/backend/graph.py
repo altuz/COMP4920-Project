@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import random
 
 # Bipartite graph between set of users and set of games
 class Graph:
@@ -18,7 +19,6 @@ class Graph:
         self.gid_names = None
         # Global average number of hours per user
         self.average_hoursNorm = 0
-        self.biases = None
 
     # add user, returns true if added, false if user already in list
     def add_user(self, uid):
@@ -59,6 +59,20 @@ class Graph:
         g_node.add_edge(g_u_edge)
         u_node.add_edge(g_u_edge)
         return True
+
+    # add connection between user one to user two
+    def connect_u_u(self, u1, u2):
+        # find indices
+        if u1 not in self.uid_lookup:
+            return
+        if u2 not in self.uid_lookup:
+            return
+        u1_idx = self.uid_lookup[u1]
+        # u2_idx = self.uid_lookup[u2]
+        # get nodes
+        u1_node = self.u_nodes[u1_idx]
+        # make u1 follow u2
+        u1_node.follow_list.append(u2)
 
     # add a dictionary of names
     def add_names(self, unames, gnames):
@@ -111,27 +125,60 @@ class Graph:
         # num_reviews = sorted(num_reviews)
         # print(', '.join(num_reviews))
 
-    def baseline_predictor(self):
+    # Gets random user from list of users
+    # A misnomer, it will be changed to get user's friends first, and their friends. BFS till num
+    # XD
+    def get_random_usernodes(self, user_id, num):
+        visited = set()
+        visited.add(user_id)
+        queue = [user_id]
+        random_users = []
+        count = 0
+        while queue is not [] and count < num + 1:
+            if len(queue) is 0:
+                break;
+            curr_user = queue.pop()
+            curr_user_node = self.u_nodes[self.uid_lookup[curr_user]]
+            count += 1
+            random_users.insert(0, curr_user_node)
+            for friend in curr_user_node.follow_list:
+                if friend not in visited:
+                    visited.add(friend)
+                    queue.insert(0, friend)
+        print("Count users: " + str(count))
+        user_node = self.u_nodes[self.uid_lookup[user_id]]
+        if count < num + 1:
+            print("HERE")
+            copy_u = set(self.u_nodes)
+            copy_u.remove(user_node)
+            random_users = random.sample(copy_u, (num + 1 - count)) + random_users
+
+        #random_users = random.sample(self.u_nodes, num)
+        return random_users
+
+    def baseline_predictor(self, user_id, num):
+        random_users = self.get_random_usernodes(user_id, num)
+        random_users.append(self.u_nodes[self.uid_lookup[user_id]])
+        ruser_count = num + 1
         global_ave = self.average_hoursNorm
         matrix = []
         ratings = []
         i = 0
-        for user in self.u_nodes:
+        for user in random_users:
             uid = user.node_id
             for edge in user.edges:
                 #if edge.rating is -1:
                 #    continue
-                vector = [0 for col in range(self.user_count + self.game_count)]
+                vector = [0 for col in range(ruser_count + self.game_count)]
                 gid = edge.game.node_id
-                uidx = self.uid_lookup[uid]
+                uidx = i
                 gidx = self.gid_lookup[gid]
                 # user comes first
                 vector[uidx] = 1
-                vector[self.user_count + gidx] = 1
+                vector[ruser_count + gidx] = 1
                 matrix.append(vector)
                 ratings.append([edge.hoursNorm - global_ave])
-            if len(matrix) is 1000:
-                break
+            i += 1
         # build numpy array
         print()
         print("global ave is " + str(global_ave))
@@ -142,33 +189,41 @@ class Graph:
         b = np.matmul(a.T, b)
         a = np.matmul(a.T, a)
         c = np.linalg.lstsq(a, b)
-        self.biases = c
-        return None
+        # self.show_baseline(c)
+        predictions = self.get_recommendation(user_id, c, num)
+        predictionList = []
+        for tuple in predictions:
+            gid = self.g_nodes[tuple[0]].node_id
+            rating = tuple[1]
+            gamename = self.gid_names[gid]
+            predictionList.append([gid,rating])
+            print("Game {} is predicted to have rating of {}".format(gamename, rating))
+        # return predictions
+        return predictionList
 
-    def show_baseline(self):
-        solution = self.biases[0]
-        residuals = self.biases[1]
-        rank = self.biases[2]
-        singular = self.biases[3]
+    def show_baseline(self, result):
+        solution = result[0]
+        residuals = result[1]
+        rank = result[2]
+        singular = result[3]
         print("Solution = {}".format(", ".join("{0}".format(n) for n in solution.T)))
         # print("Residual = {}".format(", ".join("{0}".format(n) for n in residuals)))
         print("Rank is " + str(rank))
 
-    def get_recommendation(self, user_id):
-        all_biases = self.biases[0]
+    def get_recommendation(self, user_id, result, count):
+        all_biases = result[0]
         predicted_rating = []
         global_ave = self.average_hoursNorm
-        uidx = self.uid_lookup[user_id]
+        uidx = count
         print("Length is " + str(len(all_biases)))
+        print("There are {} games and {} users".format(self.game_count, count + 1))
         for game_id in range(self.game_count):
-            prediction = global_ave + all_biases[uidx, 0] + all_biases[self.user_count + game_id, 0]
+            prediction = global_ave + all_biases[uidx, 0] + all_biases[count + game_id, 0]
             predicted_rating.append([game_id, prediction])
+
         sorted_prediction = sorted(predicted_rating, key = lambda tuple : tuple[1], reverse = False)
-        for tuple in sorted_prediction:
-            gid = self.g_nodes[tuple[0]].node_id
-            rating = tuple[1]
-            gamename = self.gid_names[gid]
-            print("Game {} is predicted to have rating of {}".format(gamename, rating))
+        return sorted_prediction
+
 class Node:
     # define a new node
     def __init__(self, nt, nid):
@@ -184,6 +239,8 @@ class Node:
         # fields to be used for global average calc
         self.total_hoursNorm = 0
         self.num_users = 0
+        # follow list
+        self.follow_list = []
 
     def add_edge(self, h):
         self.edges.append(h)
@@ -245,3 +302,4 @@ class Edge:
         self.hours = hours
         self.rating = rating
         self.hoursNorm = -1 # Normalised hrs, -1 means has not been computed yet
+

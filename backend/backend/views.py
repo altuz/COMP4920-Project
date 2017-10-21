@@ -798,7 +798,7 @@ def get_game_info(request):
 
 # TESTED
 # Save a rating or review
-# curl -d '{"review": {"username":"davidmo3576","gameid":"578080", "rate":"True", "comment":"mada mada"}}' -X POST "http://localhost:8000/backend/send_review/"
+# curl -d '{"review": {"username":"a regular","gameid":"578080", "rate":"True", "comment":"mada mada"}}' -X POST "http://localhost:8000/backend/send_review/"
 @api_view(['POST'])
 def send_review(request):
     print("Send review")
@@ -822,7 +822,7 @@ def send_review(request):
     try:
         player = User.objects.get(user_name=json_obj['review']['username'])
         game = GameList.objects.get(game_id=int(json_obj['review']['gameid']))
-        rate = (str(json_obj['review']['rate']) == "True") # Asserts that rating is an integer
+        rate_val = (str(json_obj['review']['rate']) == "True") # Asserts that rating is an integer
         comment = json_obj['review']['comment']
     except:
         return HttpResponse('''
@@ -833,16 +833,55 @@ def send_review(request):
 
     # Check if player has already reviewed this game
     try:
+        # Update total game rating
+        old_entry = Rating.objects.get(user_id=player, game_id=game) # Users old rating
+
+        try:
+            rating_count = game.rating_count
+            average_rating = game.average_rating
+            total_rating = rating_count * average_rating
+            # print("rate_val " + str(rate_val) + " old_entry.rate " + str(old_entry.rate))
+            if (rate_val is True) and (old_entry.rate is False):  # Increase if old was false
+                total_rating += 1
+                print("Total increased")
+            elif (rate_val is False) and (old_entry.rate is True):
+                total_rating -= 1
+                print("Total decreased")
+            new_average = total_rating / rating_count
+            game.rating_count = rating_count
+            game.average_rating = new_average
+            game.save()
+        except:
+            pass
+
         # Update old rating
-        old_entry = Rating.objects.get(user_id=player, game_id=game)
-        old_entry.rate = rate
+        old_entry.rate = rate_val
         old_entry.comment = comment
         old_entry.save()
+
         print("Updated old review")
+
     except:
+        # Update total game rating
+        try:
+            rating_count = game.rating_count
+            average_rating = game.average_rating
+            total_rating = rating_count * average_rating
+            if rate_val is True:
+                total_rating += 1
+                print("Total increased")
+            rating_count += 1  # Increase rating count
+            new_average = total_rating / rating_count
+            game.rating_count = rating_count
+            game.average_rating = new_average
+            game.save()
+        except:
+            pass
+
         # Create new rating
-        new_entry = Rating(user_id=player, game_id=game, rate=rate, comment=comment)
+        new_entry = Rating(user_id=player, game_id=game, rate=rate_val, comment=comment)
         new_entry.save()
+
         print("Made new review")
 
     return HttpResponse('''
@@ -927,7 +966,7 @@ def recommend_v1(request):
     return HttpResponse(outputJSON, content_type='application/json')
 
 # given json contain username, email, and password
-# curl -d '{"edit":{"username" : "a regular", "email" : "edittest@gmail.com", "password" : "editpass"}}' -X POST "http://localhost:8000/backenist/"
+# curl -d '{"edit":{"username" : "a regular", "email" : "edittest@gmail.com", "password" : "editpass"}}' -X POST "http://localhost:8000/backend/edit_profile/"
 @api_view(['POST'])
 def edit_profile(request):
     print("user edit function is running ...")
@@ -969,7 +1008,7 @@ def edit_profile(request):
     return HttpResponse('{"message": "no user"}')
 
 # given json contain username, gameid, and hours
-# curl -d '{"edit_game_hrs":{"username" : "a regular", "gameid" : "578080", "played_hrs" : "566"}}' -X POST "http://localhost:8000/backenist/"
+# curl -d '{"edit_game_hrs":{"username" : "a regular", "gameid" : "578080", "played_hrs" : "580"}}' -X POST "http://localhost:8000/backend/edit_game_hrs/"
 @api_view(['POST'])
 def edit_game_hrs(request):
     print("user edit function is running ...")
@@ -988,23 +1027,19 @@ def edit_game_hrs(request):
         gameid = obj['edit_game_hrs']['gameid']
         played_hrs = obj['edit_game_hrs']['played_hrs']
 
-        user_entry = User.objects.get(user_name=username)
-        game_entry = GameList.objects.get(game_id=gameid)
-        library_entry = PlayerLibrary.objects.get(user_id=user_entry, gameid=game_entry)
-
-
-        # if e is '':
-        #     e = user_entry.email
-        #
-        # if p is '':
-        #     p = user_entry.pass_word
-        #
-        # user_entry.email = e
-        # user_entry.pass_word = p
-        # print("new email" + user_entry.email)
-        # print("new pass" + user_entry.pass_word)
         try:
-            user_entry.save()
+            user_entry = User.objects.get(user_name=username)
+            game_entry = GameList.objects.get(game_id=gameid)
+            library_entry = PlayerLibrary.objects.get(user_id=user_entry, game_id=game_entry)
+        except:
+            return HttpResponse('{"message" : "edit failure"}')
+
+        # print("Old played hrs is " + str(library_entry.played_hrs))
+        library_entry.played_hrs = played_hrs
+
+        try:
+            library_entry.save()
+            # print("New played hrs is " + str(library_entry.played_hrs))
             return HttpResponse('{"message" : "edit success"}')
         except Exception as e:
             print(e)
@@ -1066,10 +1101,12 @@ def recommend_test(request):
 
     # ------------------------------------------------------------------
     game_graph.add_names(user_set, game_set)
-    game_graph.games_hours_stats()
-    game_graph.calculate_bias() 
-
+    #game_graph.games_hours_stats()
+    game_graph.calculate_bias()
+    game_graph.baseline_predictor()
+    game_graph.show_baseline()
     return HttpResponse("test") 
+
 
 
 # curl -X GET "http://localhost:8000/backend/recommend_v2/?username=a%20regular"
@@ -1077,6 +1114,60 @@ def recommend_test(request):
 def recommend_v2(request):
     # TODO always include the user
     # targetUser = request.GET.get('username')
+    global game_graph, user_set, game_set
+
+    # Step 1: Fetch corresponding player info
+    try:
+        our_user = User.objects.get(user_name=request.GET.get('username')) # Get the target user
+    except:
+        return HttpResponse('{"message":"invalid user", "recommend":{}}')
+
+    try:
+        game_list = PlayerLibrary.objects.filter(user_id=our_user)
+    except:
+        # If no games, for now, return top 5 current games
+        # TODO discuss with Nick if we should still do this for recommend_v2
+        results = GameList.objects.all()[:5]
+        results_list = [obj.as_dict() for obj in results]  # create a results_list to be converted to JSON format
+        outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf-16')
+        return HttpResponse(outputJSON, content_type='application/json')
+
+    # Step 2: Get all player games
+    player_games = []
+    for entries in game_list:
+        try:  # To handle the weird db issue atm where we ignore if game is not there
+            game_obj = entries.game_id
+            game_id = game_obj.game_id
+            player_games.append(game_id)
+        except:
+            continue
+
+    # Step 3: Get predictions, match with db game_info exclude duplicates when adding to recommend list
+    # TODO @Nicholas, test this, David's computer does not have enough memory to test
+    print("5 Recommendations")
+    predictionList = game_graph.baseline_predictor(our_user.user_id, 199)
+    # sorted_predictionList = sorted(predictionList, key = lambda tuple : tuple[1], reverse = True) # Sort the predictions based on rating/ranking, highest to lowest
+    recommend_set = []
+    print("PredictionsList")
+    for p in reversed(predictionList):
+        results = GameList.objects.get(game_id = p[0]) #.exclude(game_id__in=recommend_set).exclude(game_id__in=player_games)
+        if results.game_id in player_games:
+            continue
+        print("game_id: " + str(results.game_id) + ", game_name: "+ str(results.game_name) + ", Ranking/Rating: " + str(p[1]))
+        result_top_dict = results.as_dict()
+        recommend_set.append(result_top_dict['game_id'])
+
+    # Step 4: Output results (ONLY TAKE TOP 5 MATCHES)
+    results = GameList.objects.filter(game_id__in=recommend_set[:5])
+    # # debugging
+    # for result in results:
+    #     print(result)
+    results_list = [obj.as_dict() for obj in results]  # create a results_list to be converted to JSON format
+    outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf-16')
+    return HttpResponse(outputJSON, content_type='application/json')
+
+
+def graph_setup():
     global game_graph, user_set, game_set
     if game_graph is None:
         print("Initializing Graph")
@@ -1097,42 +1188,37 @@ def recommend_v2(request):
         #             WHERE p.played_hrs != 0
         #             OR p.played_hrs != null;'''
 
-        query = ''' SELECT  g.game_id as "game_id", g.game_name as "game_name", 
-                            u.user_id as "user_id", u.user_name as "user_name", 
-                            p.played_hrs as "played_hrs", r.rate as "rate"
-                    FROM backend_playerlibrary p
-                    INNER JOIN (
-                        SELECT *
-                        FROM backend_gamelist
-                        WHERE num_player > 100
-                        ORDER BY num_player DESC
-                        LIMIT 200
-                    ) g
-                    ON g.game_id = p.game_id_id
-                    INNER JOIN (
-                        SELECT *
-                        FROM (
-                            SELECT *
-                            FROM backend_user
-                            ORDER BY RANDOM()
-                            LIMIT 2000
-                        ) y
-                        UNION 
-                        SELECT * 
-                        FROM backend_user
-                        WHERE user_name = %s
-                    ) u
-                    ON u.user_id = p.user_id_id
-                    LEFT JOIN backend_rating r
-                    ON r.user_id_id = p.user_id_id
-                    AND r.game_id_id = p.game_id_id
-                    WHERE p.played_hrs != 0
-                    OR p.played_hrs != null;
-                    '''
+        query = (' SELECT  g.game_id as "game_id", g.game_name as "game_name", \n'
+                 '                            u.user_id as "user_id", u.user_name as "user_name", \n'
+                 '                            p.played_hrs as "played_hrs", r.rate as "rate"\n'
+                 '                    FROM backend_playerlibrary p\n'
+                 '                    INNER JOIN (\n'
+                 '                        SELECT *\n'
+                 '                        FROM backend_gamelist\n'
+                 '                        WHERE num_player > 100\n'
+                 '                        ORDER BY num_player DESC\n'
+                 '                        LIMIT 300\n'
+                 '                    ) g\n'
+                 '                    ON g.game_id = p.game_id_id\n'
+                 '                    INNER JOIN (\n'
+                 '                        SELECT *\n'
+                 '                        FROM (\n'
+                 '                            SELECT *\n'
+                 '                            FROM backend_user\n' 
+                #'                            ORDER BY RANDOM()\n'
+                # '                            LIMIT 200\n' # Comment this line out to remove limit 
+                 '                        ) y\n'
+                 '                    ) u\n'
+                 '                    ON u.user_id = p.user_id_id\n'
+                 '                    LEFT JOIN backend_rating r\n'
+                 '                    ON r.user_id_id = p.user_id_id\n'
+                 '                    AND r.game_id_id = p.game_id_id\n'
+                 '                    WHERE p.played_hrs != 0\n'
+                 '                    OR p.played_hrs != null;\n'
+                 '                    ')
         cursor = connection.cursor()
-        rows = cursor.execute(query, [request.GET['username']])
+        rows = cursor.execute(query)
 
-        our_user = User.objects.get(user_name = request.GET['username'])
 
         user_set = {}
         game_set = {}
@@ -1152,14 +1238,13 @@ def recommend_v2(request):
             game_set[game] = entry[1]
             game_graph.connect_u_g(game, user, entry[4], rate_val)
             library_len += 1
+        print("Graph initialized")
         game_graph.add_names(user_set, game_set)
         # game_graph.games_hours_stats()
         game_graph.calculate_bias()
-        game_graph.baseline_predictor()
-        print("Inserted {} edges to Graph".format(library_len))
-    game_graph.show_baseline()
-    game_graph.get_recommendation(our_user.user_id)
-    return HttpResponse("test")
 
-def graph_setup():
-    global game_graph, user_set, game_set
+        query2 = "SELECT user_id_id, follow_id_id FROM backend_follow;"
+        rows = cursor.execute(query2)
+        for row in rows:
+            game_graph.connect_u_u(row[0], row[1])
+        print("Inserted {} edges to Graph".format(library_len))

@@ -287,6 +287,7 @@ Output:
 
 Function: Recommender_v1
 Url: backend/recommend_v1
+Type: GET
 Input: username=username_of_target_user
 Output:
 {
@@ -309,4 +310,14 @@ Output:
         //  Returns top 5 games ever if user has no games
 
     ]
+}
+
+Function: Edit_played_hrs
+Url: backend/edit_played_hrs
+Type: POST
+Input: {"edit_game_hrs":{"username" : "a regular", "gameid" : "578080", "played_hrs" : "580"}}
+Sample_curl: curl -d '{"edit_game_hrs":{"username" : "a regular", "gameid" : "578080", "played_hrs" : "580"}}' -X POST "http://localhost:8000/backend/edit_game_hrs/"
+Output:
+{
+    "message":"failure/success"
 }

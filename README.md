@@ -26,12 +26,13 @@ Django 1.11.5
 pakage needed:
 ```sh
 pip3 install django-cors-headers
-pip install djangorestframework
+pip3 install djangorestframework
+python3.6 -m pip install numpy
 ```
 open another terminal, and cd to project directory
 ```sh
 $ cd backend 
-$ python manage.py runserver
+$ python3 manage.py runserver
 ```
 
 update database
@@ -89,7 +90,7 @@ Scraper Link:
 ```sh
 Link: https://drive.google.com/open?id=0B1v0wP8Fb4XHNTRsZEFydzRRN2c
 
-Instruction:
+Required Package and Python version:
 
 Python 2.7+
     pip install requests beautifulsoup4 unicodecsv

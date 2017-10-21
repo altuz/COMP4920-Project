@@ -156,9 +156,9 @@ export default class Profile extends React.Component {
     					<Tab eventKey={1} title="Playlist">
     						<div>
     						    <BootstrapTable data={this.props.gamelist} hover pagination cellEdit={ cellEditProp }>
-                                    <TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
+                                    <TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' editable={false}></TableHeaderColumn>
                                     <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>
-																		<TableHeaderColumn  dataField='played_hrs' width='100px'>Played Hours</TableHeaderColumn>
+																		<TableHeaderColumn  dataField='played_hrs' width='100px'>Played Hours(double click to edit)</TableHeaderColumn>
                                 </BootstrapTable>
     						</div>
     					</Tab>

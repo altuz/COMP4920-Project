@@ -103,18 +103,23 @@ export default class Profile extends React.Component {
     };
 
   SaveCell(row, cellName, cellValue){
-  	const url = 'http://localhost:8000/backend/edit_game_hrs/';
-  	const edit_game_hrs ={
-      username :this.props.user.user_name,
-			gameid: row.game_id,
-			played_hrs: cellValue,
+  	if(cellName === "played_hrs"){
+      const url = 'http://localhost:8000/backend/edit_game_hrs/';
+      const edit_game_hrs ={
+        username :this.props.user.user_name,
+        gameid: row.game_id,
+        played_hrs: cellValue,
+      }
+      console.log(edit_game_hrs);
+      axios.post(url,{
+        edit_game_hrs
+      }).then((res)=>{
+        console.log(res.data);
+      })
+		} else {
+  		alert("you are not allow to edit this column");
 		}
-		console.log(edit_game_hrs);
-  	axios.post(url,{
-  		edit_game_hrs
-  	}).then((res)=>{
-  				console.log(res.data);
-				})
+
 	}
 
 
@@ -151,9 +156,9 @@ export default class Profile extends React.Component {
     					<Tab eventKey={1} title="Playlist">
     						<div>
     						    <BootstrapTable data={this.props.gamelist} hover pagination cellEdit={ cellEditProp }>
-                                    <TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
-                                    <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>
-																		<TableHeaderColumn  dataField='played_hrs' width='100px'>Played Hours</TableHeaderColumn>
+                                    <TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' editable={false}></TableHeaderColumn>
+                                    <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='200px'>Game Name</TableHeaderColumn>
+																		<TableHeaderColumn  dataField='played_hrs' width='120px'>Played Hours(click to edit)</TableHeaderColumn>
                                 </BootstrapTable>
     						</div>
     					</Tab>

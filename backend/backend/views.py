@@ -988,21 +988,16 @@ def recommend_v1(request):
     # for result in results:
     #     print(result)
     results_list = [obj.as_dict() for obj in results]  # create a results_list to be converted to JSON format
-    # Add genre/category information for each game in result
+    # Add genre information for each game in result
     for result in results_list:
         game_obj = GameList.objects.get(game_id=result['game_id'])
         genres_obj = Genres.objects.filter(game_id=game_obj)
-        category_obj = Categories.objects.filter(game_id=game_obj)
         genre_list = []
-        category_list = []
         for g in genres_obj:
             genre_list.append(g.genre)
-        for c in category_obj:
-            category_list.append(c.category)
 
         # Add genre and category information to output
         result['genre_list'] = genre_list
-        result['category_list'] = category_list
         # print(result)
 
     # Step 2: Get the games genre/categories
@@ -1278,7 +1273,7 @@ def graph_setup():
                  '                            SELECT *\n'
                  '                            FROM backend_user\n' 
                 #'                            ORDER BY RANDOM()\n'
-                # '                            LIMIT 200\n' # Comment this line out to remove limit 
+                '                            LIMIT 200\n' # Comment this line out to remove limit 
                  '                        ) y\n'
                  '                    ) u\n'
                  '                    ON u.user_id = p.user_id_id\n'

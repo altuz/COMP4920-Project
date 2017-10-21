@@ -301,7 +301,6 @@ Output:
             ... other stats,
             ...,
             "genre_list": ["Adventure", "Casual", "Adventure"]
-            "category_list": ["Single-player", "Co-op"]
         },
         {
             "game_id": 3,

@@ -798,7 +798,7 @@ def get_game_info(request):
 
 # TESTED
 # Save a rating or review
-# curl -d '{"review": {"username":"davidmo3576","gameid":"578080", "rate":"True", "comment":"mada mada"}}' -X POST "http://localhost:8000/backend/send_review/"
+# curl -d '{"review": {"username":"a regular","gameid":"578080", "rate":"True", "comment":"mada mada"}}' -X POST "http://localhost:8000/backend/send_review/"
 @api_view(['POST'])
 def send_review(request):
     print("Send review")
@@ -822,7 +822,7 @@ def send_review(request):
     try:
         player = User.objects.get(user_name=json_obj['review']['username'])
         game = GameList.objects.get(game_id=int(json_obj['review']['gameid']))
-        rate = (str(json_obj['review']['rate']) == "True") # Asserts that rating is an integer
+        rate_val = (str(json_obj['review']['rate']) == "True") # Asserts that rating is an integer
         comment = json_obj['review']['comment']
     except:
         return HttpResponse('''
@@ -833,16 +833,55 @@ def send_review(request):
 
     # Check if player has already reviewed this game
     try:
+        # Update total game rating
+        old_entry = Rating.objects.get(user_id=player, game_id=game) # Users old rating
+
+        try:
+            rating_count = game.rating_count
+            average_rating = game.average_rating
+            total_rating = rating_count * average_rating
+            # print("rate_val " + str(rate_val) + " old_entry.rate " + str(old_entry.rate))
+            if (rate_val is True) and (old_entry.rate is False):  # Increase if old was false
+                total_rating += 1
+                print("Total increased")
+            elif (rate_val is False) and (old_entry.rate is True):
+                total_rating -= 1
+                print("Total decreased")
+            new_average = total_rating / rating_count
+            game.rating_count = rating_count
+            game.average_rating = new_average
+            game.save()
+        except:
+            pass
+
         # Update old rating
-        old_entry = Rating.objects.get(user_id=player, game_id=game)
-        old_entry.rate = rate
+        old_entry.rate = rate_val
         old_entry.comment = comment
         old_entry.save()
+
         print("Updated old review")
+
     except:
+        # Update total game rating
+        try:
+            rating_count = game.rating_count
+            average_rating = game.average_rating
+            total_rating = rating_count * average_rating
+            if rate_val is True:
+                total_rating += 1
+                print("Total increased")
+            rating_count += 1  # Increase rating count
+            new_average = total_rating / rating_count
+            game.rating_count = rating_count
+            game.average_rating = new_average
+            game.save()
+        except:
+            pass
+
         # Create new rating
-        new_entry = Rating(user_id=player, game_id=game, rate=rate, comment=comment)
+        new_entry = Rating(user_id=player, game_id=game, rate=rate_val, comment=comment)
         new_entry.save()
+
         print("Made new review")
 
     return HttpResponse('''
@@ -1165,9 +1204,9 @@ def graph_setup():
                  '                        SELECT *\n'
                  '                        FROM (\n'
                  '                            SELECT *\n'
-                 '                            FROM backend_user\n'
+                 '                            FROM backend_user\n' 
                 #'                            ORDER BY RANDOM()\n'
-                # '                            LIMIT 200\n' # Comment this line out to remove limit
+                # '                            LIMIT 200\n' # Comment this line out to remove limit 
                  '                        ) y\n'
                  '                    ) u\n'
                  '                    ON u.user_id = p.user_id_id\n'

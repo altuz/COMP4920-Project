@@ -103,9 +103,18 @@ export default class Profile extends React.Component {
     };
 
   SaveCell(row, cellName, cellValue){
-  	console.log(this.props.user);
-  	console.log(row);
-  	console.log(cellValue);
+  	const url = 'http://localhost:8000/backend/edit_game_hrs/';
+  	const edit_game_hrs ={
+      username :this.props.user.user_name,
+			gameid: row.game_id,
+			played_hrs: cellValue,
+		}
+		console.log(edit_game_hrs);
+  	axios.post(url,{
+  		edit_game_hrs
+  	}).then((res)=>{
+  				console.log(res.data);
+				})
 	}
 
 

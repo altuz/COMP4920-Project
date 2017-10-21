@@ -191,12 +191,15 @@ class Graph:
         c = np.linalg.lstsq(a, b)
         self.show_baseline(c)
         predictions = self.get_recommendation(user_id, c, num)
+        predictionList = []
         for tuple in predictions:
             gid = self.g_nodes[tuple[0]].node_id
             rating = tuple[1]
             gamename = self.gid_names[gid]
+            predictionList.append([gid,rating])
             print("Game {} is predicted to have rating of {}".format(gamename, rating))
-        return predictions
+        # return predictions
+        return predictionList
 
     def show_baseline(self, result):
         solution = result[0]

@@ -995,12 +995,12 @@ def edit_game_hrs(request):
         except:
             return HttpResponse('{"message" : "edit failure"}')
 
-        print("Old played hrs is " + str(library_entry.played_hrs))
+        # print("Old played hrs is " + str(library_entry.played_hrs))
         library_entry.played_hrs = played_hrs
 
         try:
             library_entry.save()
-            print("New played hrs is " + str(library_entry.played_hrs))
+            # print("New played hrs is " + str(library_entry.played_hrs))
             return HttpResponse('{"message" : "edit success"}')
         except Exception as e:
             print(e)
@@ -1069,14 +1069,63 @@ def recommend_test(request):
     return HttpResponse("test") 
 
 
+
 # curl -X GET "http://localhost:8000/backend/recommend_v2/?username=a%20regular"
 @api_view(['GET'])
 def recommend_v2(request):
     # TODO always include the user
     # targetUser = request.GET.get('username')
     global game_graph, user_set, game_set
-    our_user = User.objects.get(user_name=request.GET['username'])
-    game_graph.baseline_predictor(our_user.user_id, 299)
+
+    # Step 1: Fetch corresponding player info
+    try:
+        our_user = User.objects.get(user_name=request.GET.get('username')) # Get the target user
+    except:
+        return HttpResponse('{"message":"invalid user", "recommend":{}}')
+
+    try:
+        game_list = PlayerLibrary.objects.filter(user_id=our_user)
+    except:
+        # If no games, for now, return top 5 current games
+        # TODO discuss with Nick if we should still do this for recommend_v2
+        results = GameList.objects.all()[:5]
+        results_list = [obj.as_dict() for obj in results]  # create a results_list to be converted to JSON format
+        outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf-16')
+        return HttpResponse(outputJSON, content_type='application/json')
+
+    # Step 2: Get all player games
+    player_games = []
+    for entries in game_list:
+        try:  # To handle the weird db issue atm where we ignore if game is not there
+            game_obj = entries.game_id
+            game_id = game_obj.game_id
+            player_games.append(game_id)
+        except:
+            continue
+
+    # Step 3: Get predictions, match with db game_info exclude duplicates when adding to recommend list
+    # TODO @Nicholas, test this, David's computer does not have enough memory to test
+    print("5 Recommendations")
+    predictionList = game_graph.baseline_predictor(our_user.user_id, 100)
+    sorted_predictionList = sorted(predictionList, key = lambda tuple : tuple[1], reverse = True) # Sort the predictions based on rating/ranking, highest to lowest
+    recommend_set = []
+    print("PredictionsList")
+    for p in sorted_predictionList:
+        results = GameList.objects.filter(game_id__in=p[0]).exclude(game_id__in=recommend_set).exclude(game_id__in=player_games)
+
+        print("game_id: " + str(results.game_id) + ", game_name: "+ str(results.game_name) + ", Ranking/Rating: " + str(p[1]))
+        result_top_dict = results[0].as_dict()
+        recommend_set.append(result_top_dict['game_id'])
+
+    # Step 4: Output results (ONLY TAKE TOP 5 MATCHES)
+    results = GameList.objects.filter(game_id__in=recommend_set)[:5]
+    # # debugging
+    # for result in results:
+    #     print(result)
+    results_list = [obj.as_dict() for obj in results]  # create a results_list to be converted to JSON format
+    outputJSON = json.dumps({"results": results_list}, ensure_ascii=False).encode('utf-16')
+    return HttpResponse(outputJSON, content_type='application/json')
+
     return HttpResponse("test")
 
 def graph_setup():
@@ -1118,7 +1167,7 @@ def graph_setup():
                  '                            SELECT *\n'
                  '                            FROM backend_user\n'
                  '                            ORDER BY RANDOM()\n'
-                #'                            LIMIT 500\n'
+                # '                            LIMIT 200\n' # Comment this line out to remove limit
                  '                        ) y\n'
                  '                    ) u\n'
                  '                    ON u.user_id = p.user_id_id\n'

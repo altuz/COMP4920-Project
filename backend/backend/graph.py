@@ -36,8 +36,9 @@ class Graph:
                     del target_u.edges[e_index] # Remove this edge
                     break
                 e_index += 1
+            self.updateGlobal_hoursNorm(target_g)
         except:
-            print("Couldn't delete edge user-to-game, user_node not found")
+            print("Couldn't delete edge user-to-game, user_node not found") 
 
         # Step 2: Remove edge from game to user
         try:
@@ -51,10 +52,11 @@ class Graph:
                     del target_g.edges[e_index] # Remove this edge
                     break
                 e_index += 1
+            self.updateGlobal_hoursNorm(target_g)
         except:
             print("Couldn't delete edge game-to-user, game_node not found")
 
-        self.updateGlobal_hoursNorm(target_g)
+        
 
     # Add to gamelist should call this (So should add review?)
     def add_edge(self, user_id, game_id, hrs = 0, rating = -1): # default value for rating is -1

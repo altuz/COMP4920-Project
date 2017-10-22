@@ -329,6 +329,7 @@ def check_in_userlist(request):
 # Adding a game to a user's wish or played list
 # TESTED
 # curl -d '{"user":{"username" : "a regular", "gameid" : "578080", "played" : False, "wish" : True}}' -X POST "http://localhost:8000/backend/edit_list/"
+# curl -d '{"user":{"username" : "hst", "gameid" : "40", "played" : false, "wish" : false}}' -X POST "http://localhost:8000/backend/edit_list/"
 @api_view(['POST'])
 def edit_list(request):
     global game_graph, user_set, game_set # use the global variables
@@ -353,10 +354,21 @@ def edit_list(request):
             old_entry = PlayerLibrary.objects.get(user_id = player, game_id = game)
             old_entry.wish_list = wishes
             old_entry.played = played
-            old_entry.save()
+            old_entry.save() 
+
+            if played is True:
+                try:
+                    game_graph.add_edge(player.user_id, game.game_id) 
+                except:
+                    pass
+
             if played is False and wishes is False:
                 # Remove user to game edge to graph
-                game_graph.remove_edge(player.user_id, game.game_id)
+                try: 
+                    game_graph.remove_edge(player.user_id, game.game_id) 
+                except: 
+                    pass 
+
                 try:
                     # Removing users rating from total rating
                     user_rating = Rating.objects.get(user_id = player, game_id = game)
@@ -372,6 +384,7 @@ def edit_list(request):
                     game.average_rating = new_average
                     game.save()
                     user_rating.delete()
+                    print("howdy")
                 except:
                     pass
         except:
@@ -383,6 +396,7 @@ def edit_list(request):
         return user_prof_helper(json_obj['user']['username'])
 
     except Exception as e:
+        print(e)
         return HttpResponse('''
             {
                 "message":"Invalid Request"
@@ -1326,7 +1340,7 @@ def graph_setup():
                  '                            SELECT *\n'
                  '                            FROM backend_user\n' 
                 #'                            ORDER BY RANDOM()\n'
-                '                            LIMIT 200\n' # Comment this line out to remove limit 
+                # '                            LIMIT 200\n' # Comment this line out to remove limit 
                  '                        ) y\n'
                  '                    ) u\n'
                  '                    ON u.user_id = p.user_id_id\n'

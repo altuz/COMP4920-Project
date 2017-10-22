@@ -1057,6 +1057,7 @@ def edit_profile(request):
 
     return HttpResponse('{"message": "no user"}')
 
+# TESTED
 # given json contain username, gameid, and hours
 # curl -d '{"edit_game_hrs":{"username" : "a regular", "gameid" : "578080", "played_hrs" : "580"}}' -X POST "http://localhost:8000/backend/edit_game_hrs/"
 @api_view(['POST'])
@@ -1112,6 +1113,27 @@ def edit_game_hrs(request):
             print(e)
 
     return HttpResponse('{"message": "no user"}')
+
+# TESTED
+# Get the gamelist for specified user
+# curl -X GET "http://localhost:8000/backend/get_game_list/?username=a%20regular"
+@api_view(['GET'])
+def get_game_list(request):
+    # Initialise values
+    game_list = ""
+    # Get game list
+    try:
+        game_list = get_list(request.GET.get('username'), True)
+    except:
+        print("No games")
+
+    ret_json = '''
+                        {{
+                            "gamelist" : [{}]
+                        }}
+                    '''.format(game_list)
+    response = HttpResponse(ret_json)
+    return response
 
 game_graph = None
 user_set = None

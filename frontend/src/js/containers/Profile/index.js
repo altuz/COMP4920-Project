@@ -10,6 +10,7 @@ import { getRecommendation2,getFollowList,getRecommendation1, edit_hrs,updateppr
 	return {
 		user: store.user.user,
 		wishlist: store.user.wish_list,
+    gamelist: store.user.game_list,
 		fetched: store.user.fetched,
 	};
 })
@@ -143,11 +144,13 @@ export default class Profile extends React.Component {
     				<Tabs defaultActiveKey={1} className="Tabulation" id="uncontrolled-tab-example">
     					<Tab eventKey={1} title="Playlist">
     						<div>
-                  <BootstrapTable data={this.state.gamelist} hover pagination cellEdit={ cellEditProp }>
+                  {this.props.gamelist.length> 0 ? (this.state.gamelist.length> 0 ? (<BootstrapTable data={this.state.gamelist} hover pagination cellEdit={ cellEditProp }>
                     <TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' editable={false}></TableHeaderColumn>
                     <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='200px'>Game Name</TableHeaderColumn>
                     <TableHeaderColumn  dataField='played_hrs' width='120px'>Played Hours (Click number to edit)</TableHeaderColumn>
-                  </BootstrapTable>
+                  </BootstrapTable>):
+                    (<img src='static/images/loading.svg' height="50" width="50"/>)):
+                    (<div>There is no game in your game list</div>)}
     						</div>
     					</Tab>
    						<Tab eventKey={2} title="Wishlist">
@@ -188,5 +191,6 @@ export default class Profile extends React.Component {
 			</div>
 			);
 		}
+		return null;
 	}
 }

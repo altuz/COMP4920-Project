@@ -39,12 +39,7 @@ def user_prof_helper(username):
     # Get user
     try:
         user_entry = User.objects.get(user_name=username)
-        user_prof = '''
-                {{ 
-                    "username" : "{}",
-                    "user_id" : "{}"
-                }}
-            '''.format(user_entry.user_name, user_entry.user_id)
+        user_prof = json.dumps( {"username" : user_set.user_name, "user_id" : user_set.user_id}).encode('utf-16')
     except:
         HttpResponse('{ "user" : {}, "gamelist" : {}, "wishlist" : {} }')
     # Get game list
@@ -70,7 +65,7 @@ def user_prof_helper(username):
                 "wishlist" : [{}],
                 "follows" : [{}]
             }}
-        '''.format(username, game_list, wish_list, flw_list)
+        '''.format(username.replace('"', '\\"'), game_list, wish_list, flw_list)
     return HttpResponse(ret_json)
 
 
@@ -185,7 +180,7 @@ def get_reviews(request):
         for review in reviews:
             try:
                 reviewer = review.user_id
-                r_name = reviewer.user_name
+                r_name = reviewer.user_name.replace('"', '\\"')
                 r_bool = review.rate
                 r_comment = review.comment
                 f_json = '{{"user_name" : "{}", "rating" : "{}", "comment" : "{}"}}'.format(r_name, r_bool, r_comment)

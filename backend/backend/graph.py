@@ -70,7 +70,8 @@ class Graph:
             target_u_node = Node(True, user_id)
             u_index = len(self.u_nodes) # old len equals yet to be added index
             self.u_nodes.append(target_u_node)
-            self.uid_lookup[user_id] = len(self.u_nodes)-1# Store list index in lookup (new len - 1)
+            self.uid_lookup[user_id] = len(self.u_nodes)-1 # Store list index in lookup (new len - 1)
+            self.user_count += 1
             # print("created new user node")
 
         # Step 2: Find the game node
@@ -84,6 +85,7 @@ class Graph:
             g_index = len(self.g_nodes)
             self.g_nodes.append(target_g_node)
             self.gid_lookup[game_id] = len(self.g_nodes) - 1  # Store list index in lookup
+            self.game_count += 1
             # print("created new game node")
 
         # Step 3: Create a new edge (ONLY IF IT DOESN"T ALREADY EXIST)
@@ -147,6 +149,7 @@ class Graph:
             u_index = len(self.u_nodes)  # old len equals yet to be added index
             self.u_nodes.append(target_u_node)
             self.uid_lookup[user_id] = len(self.u_nodes) - 1  # Store list index in lookup (new len - 1)
+            self.user_count += 1
             # print("created new user node")
 
         # Step 2: Find the game node
@@ -160,6 +163,7 @@ class Graph:
             g_index = len(self.g_nodes)
             self.g_nodes.append(target_g_node)
             self.gid_lookup[game_id] = len(self.g_nodes) - 1  # Store list index in lookup
+            self.game_count += 1
             # print("created new game node")
 
         # Step 3: Update the corresponding edges (Add the edges if they do not exist)

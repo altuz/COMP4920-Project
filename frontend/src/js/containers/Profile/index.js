@@ -11,7 +11,7 @@ import { getRecommendation2,getFollowList,getRecommendation1, edit_hrs,updateppr
 		user: store.user.user,
 		wishlist: store.user.wish_list,
     gamelist: store.user.game_list,
-		fetched: store.user.fetched,
+		fetched: store.user.fetche,
 	};
 })
 
@@ -23,6 +23,7 @@ export default class Profile extends React.Component {
 		    follow_list: [],
 		    rec2:[],
         gamelist:[],
+        top_genres:[],
 		};
 		this.requestedit = this.requestedit.bind(this);
     this.SaveCell = this.SaveCell.bind(this);
@@ -71,8 +72,10 @@ export default class Profile extends React.Component {
     })
     getRecommendation1(username)
         .then((res)=>{
+            console.log(res.data)
             this.setState({
             rec1: res.data.results,
+            top_genres:res.data.top_genres,
           })
         })
     getFollowList(username)
@@ -163,6 +166,7 @@ export default class Profile extends React.Component {
    						</Tab>
    						<Tab eventKey={3} title="Popular Recommendation">
    						    <div>
+                    <strong>there are some popular genres that you usually play {this.state.genre_list}</strong>
     						    <BootstrapTable data={this.state.rec1} hover>
                         <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
                         <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>

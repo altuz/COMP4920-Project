@@ -50,7 +50,8 @@ def user_prof_helper(username):
     # Get game list
     try:
         game_list = get_list(username, True)
-    except:
+    except Exception as e:
+        print(e)
         print("No games")
     # Get wish list
     try:
@@ -222,7 +223,7 @@ def get_list(username, type):
         else:
             gamelist = PlayerLibrary.objects.filter(user_id=player, played=False, wish_list=True)
         json_list = []
-        print(gamelist)
+        #print(gamelist)
         # convert to json list
         for entries in gamelist:
             try:
@@ -237,7 +238,8 @@ def get_list(username, type):
                     # print("Adjusted played hours for " + str(g_name) + " is: " + str(g_played_hrs))
                 g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}", "played_hrs":"{}"}}'.format(g_name, g_id, g_picture, g_played_hrs)
                 json_list.append(g_json)
-            except:
+            except Exception as e:
+                print(e)
                 continue
         print(','.join(json_list))
         return ','.join(json_list)
@@ -273,7 +275,8 @@ def get_gamelist(request):
             }}
         '''.format(game_list)
         return HttpResponse(ret_json)
-    except:
+    except Exception as e:
+        print(e)
         return HttpResponse('{"message":"does not exist, "gamelist":[]"}')
 
 
@@ -1303,7 +1306,9 @@ def graph_setup():
                  '                    ON r.user_id_id = p.user_id_id\n'
                  '                    AND r.game_id_id = p.game_id_id\n'
                  '                    WHERE p.played_hrs != 0\n'
-                 '                    OR p.played_hrs != null;\n'
+                 '                    OR p.played_hrs != null\n'
+                 '                    AND p.played != 0\n'
+                 '                    AND p.wish_list != 0\n;'
                  '                    ')
         cursor = connection.cursor()
         rows = cursor.execute(query)

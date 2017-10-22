@@ -161,7 +161,7 @@ def follow_list_helper(name):
         json_list = []
         for person in following_list:
             followed = person.follow_id
-            f_name = followed.user_name
+            f_name = followed.user_name.replace('"', '\\"')
             f_numg = followed.num_games
             f_json = '{{"user_name" : "{}", "num_games" : "{}"}}'.format(f_name, f_numg)
             json_list.append(f_json)
@@ -236,6 +236,7 @@ def get_list(username, type):
                 if(g_played_hrs == None):
                     g_played_hrs = 0
                     # print("Adjusted played hours for " + str(g_name) + " is: " + str(g_played_hrs))
+                g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}", "played_hrs":"{}"}}'.format(g_name, g_id, g_picture, g_played_hrs)
                 g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}", "played_hrs":"{}"}}'.format(g_name, g_id, g_picture, g_played_hrs)
                 json_list.append(g_json)
             except Exception as e:
@@ -776,7 +777,7 @@ def get_game_info(request):
     # Step 5: Display whether in player game/wish list
     if player_obj:
         game_set = PlayerLibrary.objects.filter(user_id=player_obj, game_id=game_obj)
-        print(game_set)
+        # print(game_set)
         if game_set:
             print("output type2: Game is in player library")
             wish_list = game_set[0].wish_list # Should only have one entry, get entry 0

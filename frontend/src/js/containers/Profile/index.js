@@ -147,7 +147,7 @@ export default class Profile extends React.Component {
                   {this.props.gamelist.length> 0 ? (this.state.gamelist.length> 0 ? (<BootstrapTable data={this.state.gamelist} hover pagination cellEdit={ cellEditProp }>
                     <TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' editable={false}></TableHeaderColumn>
                     <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='200px'>Game Name</TableHeaderColumn>
-                    <TableHeaderColumn  editable={ { type: 'textarea'} } dataField='played_hrs' width='120px'>Played Hours (Click number to edit)</TableHeaderColumn>
+                    <TableHeaderColumn  editable={ { type: 'textarea'}} dataField='played_hrs' width='120px'>Played Hours (Click number to edit)</TableHeaderColumn>
                   </BootstrapTable>):
                     (<img src='static/images/loading.svg' height="50" width="50"/>)):
                     (<div>There is no game in your game list</div>)}

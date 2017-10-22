@@ -6,7 +6,7 @@ export default class CommentBox extends React.Component {
   renderList = () => {
     if(this.props.data.length > 0){
       return (
-          <CommentList data={this.props.data}/>
+          <CommentList data={this.props.data} fetchd={this.props.fetched}/>
       )
     }
     return (

@@ -113,6 +113,7 @@ export default class Profile extends React.Component {
 
 
 	render () {
+    console.log(this.state.rec1);
 		if (this.state.isedit){
 			return (
 			<Edit />
@@ -142,11 +143,11 @@ export default class Profile extends React.Component {
     				<Tabs defaultActiveKey={1} className="Tabulation" id="uncontrolled-tab-example">
     					<Tab eventKey={1} title="Playlist">
     						<div>
-                  {this.state.gamelist.length > 0 ? (<BootstrapTable data={this.state.gamelist} hover pagination cellEdit={ cellEditProp }>
+                  <BootstrapTable data={this.state.gamelist} hover pagination cellEdit={ cellEditProp }>
                     <TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' editable={false}></TableHeaderColumn>
                     <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='200px'>Game Name</TableHeaderColumn>
                     <TableHeaderColumn  dataField='played_hrs' width='120px'>Played Hours (Click number to edit)</TableHeaderColumn>
-                  </BootstrapTable>) :(<img src='static/images/loading.svg' height="50" width="50"/>)}
+                  </BootstrapTable>
     						</div>
     					</Tab>
    						<Tab eventKey={2} title="Wishlist">
@@ -160,9 +161,10 @@ export default class Profile extends React.Component {
    						<Tab eventKey={3} title="Popular Recommendation">
    						    <div>
     						    <BootstrapTable data={this.state.rec1} hover>
-                                    <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
-                                    <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>
-                                </BootstrapTable>
+                        <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
+                        <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>
+                        <TableHeaderColumn dataField='genre_list'>Genres</TableHeaderColumn>
+                    </BootstrapTable>
     						</div>
    						</Tab>
    						<Tab eventKey={4} title="Our Recomendation">
@@ -170,7 +172,7 @@ export default class Profile extends React.Component {
     						    <BootstrapTable data={this.state.rec2} hover>
                                     <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
                                     <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>
-                                </BootstrapTable>
+                    </BootstrapTable>
     						</div>
    						</Tab>
    						<Tab eventKey={5} title="Follow List">

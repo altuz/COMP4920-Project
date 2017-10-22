@@ -4,12 +4,11 @@ import Edit  from "./EditProfile"
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import { getRecommendation2,getFollowList,getRecommendation1, edit_hrs  } from '../../actions/userActions';
+import { getRecommendation2,getFollowList,getRecommendation1, edit_hrs,updatepprofile  } from '../../actions/userActions';
 
 @connect((store) => {
 	return {
 		user: store.user.user,
-		gamelist: store.user.game_list,
 		wishlist: store.user.wish_list,
 		fetched: store.user.fetched,
 	};
@@ -22,9 +21,10 @@ export default class Profile extends React.Component {
 		    rec1:[],
 		    follow_list: [],
 		    rec2:[],
-				gamelist: this.props.gamelist,
+        gamelist:[],
 		};
 		this.requestedit = this.requestedit.bind(this);
+    this.SaveCell = this.SaveCell.bind(this);
 	}
 
 	requestedit(){
@@ -61,6 +61,13 @@ export default class Profile extends React.Component {
   componentWillMount() {
     const username=this.props.user.user_name;
     console.log("rec run");
+    updatepprofile(username)
+        .then((res)=>{
+          console.log("dfdfdf",res.data);
+          this.setState({
+            gamelist: res.data.gamelist,
+          })
+    })
     getRecommendation1(username)
         .then((res)=>{
             this.setState({
@@ -79,7 +86,9 @@ export default class Profile extends React.Component {
             rec2: res.data.results,
           })
         })
+
     }
+
 
 	imageFormatter(cell,row){
         return (
@@ -89,13 +98,6 @@ export default class Profile extends React.Component {
 
   SaveCell(row, cellName, cellValue){
       edit_hrs(row.game_id,this.props.user,cellValue)
-			.then((res)=>{
-      	console.log(res);
-			})
-			.catch((err)=>{
-      	console.log(err);
-      	alert("format wrong")
-			});
 	}
 
   onBeforeSaveCell(row, cellName, cellValue) {
@@ -121,13 +123,12 @@ export default class Profile extends React.Component {
       mode: 'click',
       blurToSave: true,
 			beforeSaveCell:this.onBeforeSaveCell,
-      afterveCell: this.SaveCell  // a hook for after saving cell
+      afterSaveCell: this.SaveCell  // a hook for after saving cell
     };
 		//get the profile data from backend
+    console.log(this.state.gamelist);
 		const { user,fetched } = this.props;
-		console.log(fetched);
 		if(fetched) {
-			console.log(user.user_name);
 			return(
 			<div>
 					<div className ="media-left">
@@ -141,11 +142,11 @@ export default class Profile extends React.Component {
     				<Tabs defaultActiveKey={1} className="Tabulation" id="uncontrolled-tab-example">
     					<Tab eventKey={1} title="Playlist">
     						<div>
-    						    <BootstrapTable data={this.state.gamelist} hover pagination cellEdit={ cellEditProp }>
-												<TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' editable={false}></TableHeaderColumn>
-												<TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='200px'>Game Name</TableHeaderColumn>
-												<TableHeaderColumn dataField='played_hrs' width='120px'>Played Hours(click to edit)</TableHeaderColumn>
-										</BootstrapTable>
+                  {this.state.gamelist.length > 0 ? (<BootstrapTable data={this.state.gamelist} hover pagination cellEdit={ cellEditProp }>
+                    <TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' editable={false}></TableHeaderColumn>
+                    <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='200px'>Game Name</TableHeaderColumn>
+                    <TableHeaderColumn  dataField='played_hrs' width='120px'>Played Hours (Click number to edit)</TableHeaderColumn>
+                  </BootstrapTable>) :(<img src='static/images/loading.svg' height="50" width="50"/>)}
     						</div>
     					</Tab>
    						<Tab eventKey={2} title="Wishlist">
@@ -185,6 +186,5 @@ export default class Profile extends React.Component {
 			</div>
 			);
 		}
-		return null;
 	}
 }

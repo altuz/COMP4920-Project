@@ -66,20 +66,6 @@ export function edit_hrs(game_id,user,hours){
   return axios.post(url, {
     edit_game_hrs
   })
-  // return function(dispatch){
-  //   axios.post(url,{
-  //     edit_game_hrs
-  //   }).then((res)=>{
-  //     dispatch({
-  //       type:"UPDATE_PROFILE",
-  //       payload:res.data,
-  //     })
-  //   })
-  //   .catch((err)=>{
-  //     console.log(err);
-  //     alert("wrong format");
-  //   })
-  // }
 }
 
 export function clearResult(){
@@ -179,6 +165,10 @@ export function search_user(q){
 }
 
 
+export function updatepprofile(username){
+    const url ='http://localhost:8000/backend/get_game_list/?username='+username;
+    return axios.get(url);
+}
 
 
 

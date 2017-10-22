@@ -291,13 +291,16 @@ Type: GET
 Input: username=username_of_target_user
 Output:
 {
+    "top_genres": [["Strategy", 10], ["Strategy", 5], ["Action", 2]],
     "results":
     [ // List of results of this format
         {
             "game_id": 1,
             "game_name": "Left 4 dead",
             "num_player": 23
-            ... other stats
+            ... other stats,
+            ...,
+            "genre_list": ["Adventure", "Casual", "Adventure"]
         },
         {
             "game_id": 3,
@@ -308,7 +311,6 @@ Output:
         ...
         ...
         //  Returns top 5 games ever if user has no games
-
     ]
 }
 
@@ -320,4 +322,18 @@ Sample_curl: curl -d '{"edit_game_hrs":{"username" : "a regular", "gameid" : "57
 Output:
 {
     "message":"failure/success"
+}
+
+Function: get_game_list
+Url: backend/get_game_list/
+Type: GET
+Input: url parameter with username=target_user
+Sample_curl: curl -X GET "http://localhost:8000/backend/get_game_list/?username=a%20regular"
+Output:
+{
+    "gamelist" : [
+        {"game_name" : "abc", "game_id" : "123", "thumbnail" : "url.com", "played_hrs" : "xyz"},
+        ....
+        ....
+    ]
 }

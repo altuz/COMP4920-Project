@@ -20,6 +20,189 @@ class Graph:
         # Global average number of hours per user
         self.average_hoursNorm = 0
 
+    # Remove from gamelist should call this
+    def remove_edge(self, user_id, game_id):
+        # Step 1: Remove edge from user to game
+        try:
+            u_index = self.uid_lookup[user_id]
+            target_u = self.u_nodes[u_index]
+            e_index = 0
+            for edge in target_u.edges:
+                g_node = edge.game
+                if(g_node.node_id == game_id):
+                    print("Found the game " + str(g_node.node_id) + " [edge removed]")
+                    del target_u.edges[e_index] # Remove this edge
+                    break
+                e_index += 1
+        except:
+            print("Couldn't delete edge user-to-game, user_node not found")
+
+        # Step 2: Remove edge from game to user
+        try:
+            g_index = self.gid_lookup[game_id]  # Find index target game in g_nodes
+            target_g = self.g_nodes[g_index]
+            e_index = 0
+            for edge in target_g.edges:
+                u_node = edge.user
+                if (u_node.node_id == user_id):
+                    print("Found the user " + str(u_node.node_id) + " [edge removed]")
+                    del target_g.edges[e_index] # Remove this edge
+                    break
+                e_index += 1
+        except:
+            print("Couldn't delete edge game-to-user, game_node not found")
+
+    # Add to gamelist should call this (So should add review?)
+    def add_edge(self, user_id, game_id, hrs = 0, rating = -1): # default value for rating is -1
+        # Step 1: Find user node
+        try:
+            # Look up userNode, add it if it does not exist
+            u_index = self.uid_lookup[user_id]
+            target_u_node = self.u_nodes[u_index]
+        except:
+            # Create the userNode if it does not exist
+            target_u_node = Node(True, user_id)
+            u_index = len(self.u_nodes) # old len equals yet to be added index
+            self.u_nodes.append(target_u_node)
+            self.uid_lookup[user_id] = len(self.u_nodes)-1# Store list index in lookup (new len - 1)
+            # print("created new user node")
+
+        # Step 2: Find the game node
+        try:
+            # Look up userNode, add it if it does not exist
+            g_index = self.gid_lookup[game_id]
+            target_g_node = self.g_nodes[g_index]
+        except:
+            # Create the userNode if it does not exist
+            target_g_node = Node(False, game_id)
+            g_index = len(self.g_nodes)
+            self.g_nodes.append(target_g_node)
+            self.gid_lookup[game_id] = len(self.g_nodes) - 1  # Store list index in lookup
+            # print("created new game node")
+
+        # Step 3: Create a new edge (ONLY IF IT DOESN"T ALREADY EXIST)
+        # First check user to games
+        g_u_edge = Edge(target_g_node, target_u_node, hrs, rating)
+        add_edge = True
+        for edge in target_u_node.edges:
+            g_node = edge.game
+            if (g_node.node_id == game_id):
+                # print("Edge u-g already exists")
+                add_edge = False
+
+        # Add edge from u_node to g_node
+        if (add_edge):
+            print("added edge u-g: " + str(target_u_node.node_id) + " ---> " + str(target_g_node.node_id))
+            target_u_node.add_edge(g_u_edge)
+
+        # Then check game to users
+        add_edge = True
+        for edge in target_g_node.edges:
+            u_node = edge.user
+            if (u_node.node_id == user_id):
+                # print("Edge g-u already exists")
+                add_edge = False
+
+        # Add edge from g_node to u_node
+        if (add_edge):
+            print("added edge g-u: " + str(target_g_node.node_id) + " ---> " + str(target_u_node.node_id))
+            target_g_node.add_edge(g_u_edge)
+
+        # # This is to test insertion was successful
+        # u_index = self.uid_lookup[user_id]
+        # target_u = self.u_nodes[u_index]
+        # for edge in target_u.edges:
+        #     g_node = edge.game
+        #     if (g_node.node_id == game_id):
+        #         print("Found the added u-g edge with game " + str(g_node.node_id))
+        #
+        # g_index = self.gid_lookup[game_id]  # Find index target game in g_nodes
+        # target_g = self.g_nodes[g_index]
+        # for edge in target_g.edges:
+        #     u_node = edge.user
+        #     if (u_node.node_id == user_id):
+        #         print("Found the added g-u edge with user " + str(u_node.node_id))
+
+
+    # Edit game hours should call this
+    # TODO so should edit review
+    def update_edge(self, user_id, game_id, hrs = -1, rating = -1):
+        # Step 1: Find user node
+        try:
+            # Look up userNode, add it if it does not exist
+            u_index = self.uid_lookup[user_id]
+            target_u_node = self.u_nodes[u_index]
+        except:
+            # Create the userNode if it does not exist
+            target_u_node = Node(True, user_id)
+            u_index = len(self.u_nodes)  # old len equals yet to be added index
+            self.u_nodes.append(target_u_node)
+            self.uid_lookup[user_id] = len(self.u_nodes) - 1  # Store list index in lookup (new len - 1)
+            # print("created new user node")
+
+        # Step 2: Find the game node
+        try:
+            # Look up userNode, add it if it does not exist
+            g_index = self.gid_lookup[game_id]
+            target_g_node = self.g_nodes[g_index]
+        except:
+            # Create the userNode if it does not exist
+            target_g_node = Node(False, game_id)
+            g_index = len(self.g_nodes)
+            self.g_nodes.append(target_g_node)
+            self.gid_lookup[game_id] = len(self.g_nodes) - 1  # Store list index in lookup
+            # print("created new game node")
+
+        # Step 3: Update the corresponding edges (Add the edges if they do not exist)
+        # First check user to games
+
+        if(hrs == -1):
+            update_hrs = False # Don't update hours
+            g_u_edge = Edge(target_g_node, target_u_node, 0, rating) # Edge to be added if not exist already
+        else:
+            update_hrs = True
+            g_u_edge = Edge(target_g_node, target_u_node, hrs, rating) # Edge to be added if not exist already
+
+        add_edge = True
+        for edge in target_u_node.edges:
+            g_node = edge.game
+            if (g_node.node_id == game_id):
+                print("Old edge values (for edge u-g [" + str(target_u_node.node_id) + " --> " + str(
+                    g_node.node_id) + "]): hours = "
+                      + str(edge.hours) + " , rating = " + str(edge.rating))
+                if (update_hrs):
+                    edge.hours = hrs
+                edge.rating = rating
+                print("New edge values (for edge u-g [" + str(target_u_node.node_id) + " --> " + str(
+                    g_node.node_id) + "]): hours = "
+                      + str(edge.hours) + " , rating = " + str(edge.rating))
+                add_edge = False # Don't need to add edge
+
+        # Add edge from u_node to g_node if it doesn't exist
+        if (add_edge):
+            print("add edge g-u " + str(target_u_node.node_id) + " --> " + str(target_g_node.node_id))
+            target_u_node.add_edge(g_u_edge)
+
+        # Then check game to users
+        add_edge = True
+        for edge in target_g_node.edges:
+            u_node = edge.user
+            if (u_node.node_id == user_id):
+                print("Old edge values (for edge g-u [" + str(target_g_node.node_id) + " --> " + str(u_node.node_id) +"]): hours = "
+                      + str(edge.hours) + " , rating = " + str(edge.rating))
+                if (update_hrs):
+                    edge.hours = hrs
+                edge.rating = rating
+                print("New edge values (for edge g-u [" + str(target_g_node.node_id) + " --> " + str(
+                    u_node.node_id) + "]): hours = "
+                      + str(edge.hours) + " , rating = " + str(edge.rating))
+                add_edge = False # Don't need to add edge
+
+        # Add edge from g_node to u_node
+        if (add_edge):
+            print("add edge g-u " + str(target_g_node.node_id) + " --> " + str(target_u_node.node_id))
+            target_g_node.add_edge(g_u_edge)
+
     # add user, returns true if added, false if user already in list
     def add_user(self, uid):
         if uid in self.uid_lookup:

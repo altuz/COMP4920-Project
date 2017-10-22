@@ -222,7 +222,7 @@ def get_list(username, type):
         else:
             gamelist = PlayerLibrary.objects.filter(user_id=player, played=False, wish_list=True)
         json_list = []
-        print(gamelist)
+        # print(gamelist) # debugging
         # convert to json list
         for entries in gamelist:
             try:
@@ -239,7 +239,7 @@ def get_list(username, type):
                 json_list.append(g_json)
             except:
                 continue
-        print(','.join(json_list))
+        # print(','.join(json_list)) # Just for debugging
         return ','.join(json_list)
     except Exception as e:
         print(e)
@@ -315,8 +315,8 @@ def check_in_userlist(request):
     try:
         user_id = int(request.GET.get('userid'))
         game_id = int(request.GET.get('gameid'))
-        played = (request.GET.get('played') == "true")
-        wish_list = (request.GET.get('wishlist') == "true")
+        played = ((request.GET.get('played') == "true") or (request.GET.get('played') == "True"))
+        wish_list = ((request.GET.get('wishlist') == "true") or (request.GET.get('played') == "True"))
 
         test = PlayerLibrary.objects.get(user_id=user_id,
                                   game_id=game_id,
@@ -329,9 +329,11 @@ def check_in_userlist(request):
 
 # Adding a game to a user's wish or played list
 # TESTED
-# curl -d '{"user":{"username" : "a regular", "gameid" : "", "played" : False, "wish" : True}}' -X POST "http://localhost:8000/backend/edit_list/"
+# curl -d '{"user":{"username" : "a regular", "gameid" : "578080", "played" : False, "wish" : True}}' -X POST "http://localhost:8000/backend/edit_list/"
 @api_view(['POST'])
 def edit_list(request):
+    global game_graph, user_set, game_set # use the global variables
+
     json_obj = None
     try:
         json_obj = json.loads(request.body.decode())
@@ -354,7 +356,10 @@ def edit_list(request):
             old_entry.played = played
             old_entry.save()
             if played is False and wishes is False:
+                # Remove user to game edge to graph
+                game_graph.remove_edge(player.user_id, game.game_id)
                 try:
+                    # Removing users rating from total rating
                     user_rating = Rating.objects.get(user_id = player, game_id = game)
                     rate_val = user_rating.rate
                     rating_count = game.rating_count
@@ -373,8 +378,11 @@ def edit_list(request):
         except:
             new_entry = PlayerLibrary(user_id=player, game_id=game, wish_list=wishes, played=played)
             new_entry.save()
+            # Add user to game edge to graph
+            game_graph.add_edge(player.user_id, game.game_id)
 
         return user_prof_helper(json_obj['user']['username'])
+
     except Exception as e:
         return HttpResponse('''
             {
@@ -819,6 +827,8 @@ def get_game_info(request):
 def send_review(request):
     print("Send review")
     print("...")
+    global game_graph # For use with recommend_v2 calculations
+
     try:
         json_obj = json.loads(request.body.decode())
     except:
@@ -838,7 +848,7 @@ def send_review(request):
     try:
         player = User.objects.get(user_name=json_obj['review']['username'])
         game = GameList.objects.get(game_id=int(json_obj['review']['gameid']))
-        rate_val = (str(json_obj['review']['rate']) == "True") # Asserts that rating is an integer
+        rate_val = ((str(json_obj['review']['rate']) == "True") or (str(json_obj['review']['rate']) == "true"))# Asserts that rating is a boolean
         comment = json_obj['review']['comment']
     except:
         return HttpResponse('''
@@ -875,6 +885,13 @@ def send_review(request):
         old_entry.comment = comment
         old_entry.save()
 
+        # Add updated values to graph
+        if(rate_val is True):
+            rate_graph = 1
+        else:
+            rate_graph = 0
+        game_graph.update_edge(player.user_id, game.game_id, -1, rate_graph) # -1 means don't update played hours value
+
         print("Updated old review")
 
     except:
@@ -897,6 +914,14 @@ def send_review(request):
         # Create new rating
         new_entry = Rating(user_id=player, game_id=game, rate=rate_val, comment=comment)
         new_entry.save()
+
+        # Add updated values to graph
+        # Add updated values to graph
+        if (rate_val is True):
+            rate_graph = 1
+        else:
+            rate_graph = 0
+        game_graph.update_edge(player.user_id, game.game_id, -1, rate_graph)  # -1 means don't update played hours value
 
         print("Made new review")
 
@@ -1064,6 +1089,7 @@ def edit_profile(request):
 def edit_game_hrs(request):
     print("user edit function is running ...")
     print("")
+    global game_graph # Used to update the graph used for recommend_v2
     obj = None
     try:
         obj = json.loads(request.body.decode())
@@ -1090,6 +1116,8 @@ def edit_game_hrs(request):
 
         try:
             library_entry.save()
+            game_graph.update_edge(user_entry.user_id, game_entry.game_id, played_hrs) # Update the graph value
+
             # print("New played hrs is " + str(library_entry.played_hrs))
 
             # Return the updated gamelist
@@ -1119,6 +1147,22 @@ def edit_game_hrs(request):
 # curl -X GET "http://localhost:8000/backend/get_game_list/?username=a%20regular"
 @api_view(['GET'])
 def get_game_list(request):
+    # TESTING Graph edge functions
+    # # --------------------------------
+    # global game_graph, user_set, game_set
+    #
+    # player = User.objects.get(user_name="squek")
+    # # game_graph.remove_edge(player.user_id,578080)
+    # if(request.GET.get('test') == "1"):
+    #     game_graph.add_edge(player.user_id, 48000)  # default value for rating is -1
+    # elif(request.GET.get('test') == "2"):
+    #     game_graph.remove_edge(player.user_id, 48000)
+    # else:
+    #     game_graph.update_edge(player.user_id, 48000, 300, 1)
+    #
+    # return HttpResponse('{"message": "no user"}')
+    # --------------------------------
+
     # Initialise values
     game_list = ""
     # Get game list
@@ -1194,9 +1238,7 @@ def recommend_test(request):
     game_graph.calculate_bias()
     game_graph.baseline_predictor()
     game_graph.show_baseline()
-    return HttpResponse("test") 
-
-
+    return HttpResponse("test")
 
 # curl -X GET "http://localhost:8000/backend/recommend_v2/?username=a%20regular"
 @api_view(['GET'])

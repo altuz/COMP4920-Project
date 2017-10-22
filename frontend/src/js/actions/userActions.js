@@ -7,6 +7,7 @@ export function login(user,isFail) {
     })
     .then((response)=>{
         if(response.data.message ==='success'){
+          console.log(response.data);
           localStorage.setItem('cookie', JSON.stringify(response.data.cookie));
             dispatch( {
               type: 'SET_USER',

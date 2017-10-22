@@ -231,7 +231,7 @@ def get_list(username, type):
                 if(g_played_hrs == None):
                     g_played_hrs = 0
                     # print("Adjusted played hours for " + str(g_name) + " is: " + str(g_played_hrs))
-                g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}", "played_hrs":"{}"}}'.format(g_name, g_id, g_picture, g_played_hrs)
+                # g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}", "played_hrs":"{}"}}'.format(g_name, g_id, g_picture, g_played_hrs)
                 g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}", "played_hrs":"{}"}}'.format(g_name, g_id, g_picture, g_played_hrs)
                 json_list.append(g_json)
             except Exception as e:

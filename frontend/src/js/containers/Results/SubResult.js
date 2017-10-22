@@ -11,6 +11,7 @@ import CommentForm from '../../components/CommentBox/CommentForm.js';
 @connect((store) => {
   return {
     user: store.user.user,
+    user_fetched:store.user.fetched,
     user_fetched: store.user.fetched,
     form: store.form.simple,
   }
@@ -141,7 +142,7 @@ export default class Profile extends React.Component {
 
 
   render () {
-    console.log(this.state);
+    console.log(this.props.user_fetched);
     if(this.state.curr_game.length>0){
       const game=this.state.curr_game[0];
       return(
@@ -166,7 +167,7 @@ export default class Profile extends React.Component {
                 {this.props.user_fetched ? (
                 <TabPanel>
                 <div>
-                  {this.state.in_my_game ? <CommentBox data={this.state.user_review}/> : null}
+                  {this.state.in_my_game ? <CommentBox data={this.state.user_review} fetched={this.props.user_fetched}/> : null}
                   <CommentForm handleSubmit={this.handleSubmit}
                                user_review={this.state.user_review}
                                isSubmitting={this.state.isSubmitting}

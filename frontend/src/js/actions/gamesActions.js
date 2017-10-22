@@ -37,11 +37,12 @@ export function add_to_wish_list(username,gameID){
     axios.post('http://localhost:8000/backend/edit_list/',{
       user
     }).then((res=>{
-      console.log(res);
-      dispatch( {
-        type: 'UPDATE_WISHLIST',
-        payload:res.data,
-      })
+      if(res.data.message != "Invalid Request"){
+        dispatch( {
+          type: 'UPDATE_WISHLIST',
+          payload:res.data,
+        })
+      }
     }))
   }
 }
@@ -58,11 +59,13 @@ export function remove_from_game_list(username,gameID){
     axios.post('http://localhost:8000/backend/edit_list/',{
       user
     }).then((res=>{
-      console.log(res);
+      console.log(res)
+      if(res.data.message != "Invalid Request"){
       dispatch( {
         type: 'UPDATE_GAMELIST',
         payload:res.data,
       })
+      }
     }))
   }
 }

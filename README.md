@@ -32,60 +32,20 @@ python3.6 -m pip install numpy
 open another terminal, and cd to project directory
 ```sh
 $ cd backend 
-$ python3 manage.py runserver
+$ python3.6 manage.py runserver
 ```
 
-update database
-```sh
-rm all cache files, rm the db file
-python3.6 manage.py migrate --fake backend zero
-python3.6 manage.py migrates
 ```
 
-make superuser
-```sh
-python3 manage.py createsuperuser
-Username:
-Email:
-Password
-Password (again)
-```
-
-Initialise DataBase, script running order
-```sh
-fill the db:
-1. make sure all following folder exist in current directory:
-    * steam_data
-    * steam_spy_data
-    * friend_list.txt
-    * steam_game_review
-    * friend_data
-    * user_data
-    * extend_review
-    * mysqlite.db
-2. python3 insert_steam_data.py
-3. python3 insert_spy_data.py
-4. python3 insert_users.py 
-5. python3 insert_friend_list.py
-6. python3 insert_rating_count_to_game_list.py
-7. python3 insert_reviews_for_users.py
-
-
-scrapping data:
-1. python3 get_steam_game_data.py (get all steam game stats store at steam_data)
-2. python3 get_steam_spy_data.py (get all steam spy game stats store at steam_spy_data, depends on steam_data)
-3. python3 get_user_id.py (get number of user_id and store at friend_list.txt, use bfs to build a friend tree)
-4. python3 get_user_data_from_friend_list.py (get user_info, user_games and store at user_data, depends on friend_list.txt)
-5. python3 get_friend_list.py (get friend list of each user and store at friend_data, depends on friend_list.txt)
-6. python3 get_game_review.py (get game reviews for all games)
-7. python scraper.py (get games review which more than 20)
-```
-
-DB file:
+DB file(Too big for submission):
 ```sh
 DB Link: https://drive.google.com/file/d/0B088tAJfImVlUnh3c0N6dnNHRm8/view?usp=sharing
 ```
 
+
+
+# Miscellaneous
+# Steam web scraping
 Scraper Link:
 ```sh
 Link: https://drive.google.com/open?id=0B1v0wP8Fb4XHNTRsZEFydzRRN2c

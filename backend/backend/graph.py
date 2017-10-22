@@ -24,6 +24,8 @@ class Graph:
 
     # Remove from gamelist should call this
     def remove_edge(self, user_id, game_id):
+        succeed = True
+
         # Step 1: Remove edge from user to game
         try:
             u_index = self.uid_lookup[user_id]
@@ -34,11 +36,12 @@ class Graph:
                 if(g_node.node_id == game_id):
                     print("Found the game " + str(g_node.node_id) + " [edge removed]")
                     del target_u.edges[e_index] # Remove this edge
+                    print("--removed successfully")
                     break
-                e_index += 1
-            self.updateGlobal_hoursNorm(target_g)
+                e_index += 1 
         except:
             print("Couldn't delete edge user-to-game, user_node not found") 
+            succeed = False
 
         # Step 2: Remove edge from game to user
         try:
@@ -50,12 +53,17 @@ class Graph:
                 if (u_node.node_id == user_id):
                     print("Found the user " + str(u_node.node_id) + " [edge removed]")
                     del target_g.edges[e_index] # Remove this edge
+                    print("--removed successfully")
                     break
                 e_index += 1
-            self.updateGlobal_hoursNorm(target_g)
         except:
             print("Couldn't delete edge game-to-user, game_node not found")
+            succeed = True
 
+        if succeed:
+            print("--try update")
+            self.updateGlobal_hoursNorm(target_g)
+            print("--succeed update")
         
 
     # Add to gamelist should call this (So should add review?)
@@ -68,6 +76,9 @@ class Graph:
         except:
             # Create the userNode if it does not exist
             self.add_user(user_id)
+            u_index = self.uid_lookup[user_id]
+            target_u_node = self.u_nodes[u_index]
+
             # target_u_node = Node(True, user_id)
             # u_index = len(self.u_nodes) # old len equals yet to be added index
             # self.u_nodes.append(target_u_node)
@@ -83,6 +94,9 @@ class Graph:
         except:
             # Create the userNode if it does not exist
             self.add_game(game_id)
+            g_index = self.gid_lookup[game_id]
+            target_g_node = self.g_nodes[g_index]
+
             # target_g_node = Node(False, game_id)
             # g_index = len(self.g_nodes)
             # self.g_nodes.append(target_g_node)
@@ -148,6 +162,9 @@ class Graph:
         except:
             # Create the userNode if it does not exist
             self.add_user(user_id)
+            u_index = self.uid_lookup[user_id]
+            target_u_node = self.u_nodes[u_index]
+
             # target_u_node = Node(True, user_id)
             # u_index = len(self.u_nodes)  # old len equals yet to be added index
             # self.u_nodes.append(target_u_node)
@@ -163,6 +180,9 @@ class Graph:
         except:
             # Create the userNode if it does not exist
             self.add_game(game_id)
+            g_index = self.gid_lookup[game_id]
+            target_g_node = self.g_nodes[g_index]
+
             # target_g_node = Node(False, game_id)
             # g_index = len(self.g_nodes)
             # self.g_nodes.append(target_g_node)

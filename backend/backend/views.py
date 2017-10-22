@@ -358,14 +358,14 @@ def edit_list(request):
 
             if played is True:
                 try:
-                    game_graph.add_edge(player.user_id, game.game_id) 
+                    game_graph.add_edge(int(player.user_id), int(game.game_id)) 
                 except:
                     pass
 
             if played is False and wishes is False:
                 # Remove user to game edge to graph
                 try: 
-                    game_graph.remove_edge(player.user_id, game.game_id) 
+                    game_graph.remove_edge(int(player.user_id), int(game.game_id)) 
                 except: 
                     pass 
 
@@ -391,7 +391,7 @@ def edit_list(request):
             new_entry = PlayerLibrary(user_id=player, game_id=game, wish_list=wishes, played=played)
             new_entry.save()
             # Add user to game edge to graph
-            game_graph.add_edge(player.user_id, game.game_id)
+            game_graph.add_edge(int(player.user_id), int(game.game_id))
 
         return user_prof_helper(json_obj['user']['username'])
 
@@ -903,7 +903,7 @@ def send_review(request):
             rate_graph = 1
         else:
             rate_graph = 0
-        game_graph.update_edge(player.user_id, game.game_id, -1, rate_graph) # -1 means don't update played hours value
+        game_graph.update_edge(int(player.user_id), int(game.game_id), -1, rate_graph) # -1 means don't update played hours value
 
         print("Updated old review")
 
@@ -934,7 +934,7 @@ def send_review(request):
             rate_graph = 1
         else:
             rate_graph = 0
-        game_graph.update_edge(player.user_id, game.game_id, -1, rate_graph)  # -1 means don't update played hours value
+        game_graph.update_edge(int(player.user_id), int(game.game_id), -1, rate_graph)  # -1 means don't update played hours value
 
         print("Made new review")
 
@@ -1119,7 +1119,7 @@ def edit_game_hrs(request):
 
         try:
             library_entry.save()
-            game_graph.update_edge(user_entry.user_id, game_entry.game_id, int(played_hrs)) # Update the graph value
+            game_graph.update_edge(int(user_entry.user_id), int(game_entry.game_id), int(played_hrs)) # Update the graph value
 
             # print("New played hrs is " + str(library_entry.played_hrs))
 
@@ -1373,6 +1373,9 @@ def graph_setup():
             # TODO: Enter rate_val to edge
             user_set[user] = entry[3]
             game_set[game] = entry[1]
+            # print("Types - game: " + str(type(game)) + ", user: " + str(type(user)) 
+            #     + ", username??: " + str(type(entry[3])) + ", gamename: " + str(type(entry[1])))
+
             game_graph.connect_u_g(game, user, entry[4], rate_val)
             library_len += 1
         print("Graph initialized")

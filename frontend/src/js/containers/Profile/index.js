@@ -171,7 +171,7 @@ export default class Profile extends React.Component {
    						</Tab>
    						<Tab eventKey={3} title="Popular Recommendation">
    						    <div>
-                    <strong>These are the top genres that you usually play{genremap}</strong>
+                    <strong>These are the top genres that you usually play : {genremap}</strong>
     						    <BootstrapTable data={this.state.rec1} hover>
                         <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
                         <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>

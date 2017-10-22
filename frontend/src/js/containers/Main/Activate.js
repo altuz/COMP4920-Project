@@ -80,7 +80,7 @@ class Activate extends React.Component {
 
   activatenotf() {
     this.props.dispatch(notifSend({
-      message: 'You now has been activated Successfully, Click here and login in',
+      message: 'You now have now been activated, Click here and login in',
       kind: 'info',
       dismissAfter: 60000
     }));

@@ -147,7 +147,7 @@ export default class Profile extends React.Component {
       return(
           <div className='row'>
             <div className='col-md-9'>
-              <img className='description-img' src={game.image_url} height='500px'/>
+              <img className='description-img' src={game.image_url} height='400px'/>
               <div className='page-tabs'>
               <Tabs>
                 <TabList>

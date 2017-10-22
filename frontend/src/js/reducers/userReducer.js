@@ -65,6 +65,13 @@ export default function reducer(state={
           game_list: action.payload.gamelist,
         }
       }
+      case "UPDATE_PROFILE":{
+        localStorage.setItem('game_list', JSON.stringify(action.payload));
+        return {
+          ...state,
+          game_list: action.payload.gamelist,
+        }
+      }
     }
 
     return state

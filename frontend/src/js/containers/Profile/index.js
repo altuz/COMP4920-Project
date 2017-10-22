@@ -4,10 +4,7 @@ import Edit  from "./EditProfile"
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import { getRecommendation1 } from '../../actions/userActions';
-import { getRecommendation2 } from '../../actions/userActions';
-import { getFollowList } from '../../actions/userActions';
-import axios from 'axios';
+import { getRecommendation2,getFollowList,getRecommendation1, edit_hrs  } from '../../actions/userActions';
 
 @connect((store) => {
 	return {
@@ -25,9 +22,9 @@ export default class Profile extends React.Component {
 		    rec1:[],
 		    follow_list: [],
 		    rec2:[],
+				gamelist: this.props.gamelist,
 		};
 		this.requestedit = this.requestedit.bind(this);
-    this.SaveCell = this.SaveCell.bind(this);
 	}
 
 	requestedit(){
@@ -84,18 +81,6 @@ export default class Profile extends React.Component {
         })
     }
 
-
-/*componentWillMount() {
-    const username=this.props.user.user_name;
-    console.log("rec run");
-    getRecommendation2(username)
-        .then((res)=>{
-            this.setState({
-            rec2: res.data.results,
-          })
-        })
-
-*/
 	imageFormatter(cell,row){
         return (
             <img style={{height:35}} src={cell}/>
@@ -103,24 +88,25 @@ export default class Profile extends React.Component {
     };
 
   SaveCell(row, cellName, cellValue){
-  	if(cellName === "played_hrs"){
-      const url = 'http://localhost:8000/backend/edit_game_hrs/';
-      const edit_game_hrs ={
-        username :this.props.user.user_name,
-        gameid: row.game_id,
-        played_hrs: cellValue,
-      }
-      console.log(edit_game_hrs);
-      axios.post(url,{
-        edit_game_hrs
-      }).then((res)=>{
-        console.log(res.data);
-      })
-		} else {
-  		alert("you are not allow to edit this column");
-		}
-
+      edit_hrs(row.game_id,this.props.user,cellValue)
+			.then((res)=>{
+      	console.log(res);
+			})
+			.catch((err)=>{
+      	console.log(err);
+      	alert("format wrong")
+			});
 	}
+
+  onBeforeSaveCell(row, cellName, cellValue) {
+    // You can do any validation on here for editing value,
+    // return false for reject the editing
+		if(cellValue.match(/\D+/g)){
+			alert("please only input number");
+			return false
+		}
+    return true;
+  }
 
 
 
@@ -134,9 +120,9 @@ export default class Profile extends React.Component {
     const cellEditProp = {
       mode: 'click',
       blurToSave: true,
-      afterSaveCell: this.SaveCell  // a hook for after saving cell
+			beforeSaveCell:this.onBeforeSaveCell,
+      afterveCell: this.SaveCell  // a hook for after saving cell
     };
-		console.log(this.props.gamelist)
 		//get the profile data from backend
 		const { user,fetched } = this.props;
 		console.log(fetched);
@@ -155,11 +141,11 @@ export default class Profile extends React.Component {
     				<Tabs defaultActiveKey={1} className="Tabulation" id="uncontrolled-tab-example">
     					<Tab eventKey={1} title="Playlist">
     						<div>
-    						    <BootstrapTable data={this.props.gamelist} hover pagination cellEdit={ cellEditProp }>
-                                    <TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' editable={false}></TableHeaderColumn>
-                                    <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='200px'>Game Name</TableHeaderColumn>
-																		<TableHeaderColumn  dataField='played_hrs' width='120px'>Played Hours(click to edit)</TableHeaderColumn>
-                                </BootstrapTable>
+    						    <BootstrapTable data={this.state.gamelist} hover pagination cellEdit={ cellEditProp }>
+												<TableHeaderColumn dataField='thumbnail' dataFormat={this.imageFormatter} width = '90px' editable={false}></TableHeaderColumn>
+												<TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='200px'>Game Name</TableHeaderColumn>
+												<TableHeaderColumn dataField='played_hrs' width='120px'>Played Hours(click to edit)</TableHeaderColumn>
+										</BootstrapTable>
     						</div>
     					</Tab>
    						<Tab eventKey={2} title="Wishlist">
@@ -199,5 +185,6 @@ export default class Profile extends React.Component {
 			</div>
 			);
 		}
+		return null;
 	}
 }

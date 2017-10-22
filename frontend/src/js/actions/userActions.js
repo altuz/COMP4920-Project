@@ -92,7 +92,6 @@ export function signup(user,isFail){
     axios.post('http://localhost:8000/backend/register/',{
         user
     })
-    }
     .then((response)=>{
         if(response.data ==='register created successfully'){
 

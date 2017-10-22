@@ -82,7 +82,7 @@ class Activate extends React.Component {
     this.props.dispatch(notifSend({
       message: 'You now have now been activated, Click here and login in',
       kind: 'info',
-      dismissAfter: 60000
+      dismissAfter: 10000
     }));
   }
 
@@ -90,7 +90,7 @@ class Activate extends React.Component {
     this.props.dispatch(notifSend({
       message: 'Fail to activate, Please Click here and try again.',
       kind: 'danger',
-      dismissAfter: 60000,
+      dismissAfter: 10000,
     }));
   }
 

@@ -1,0 +1,26 @@
+.genre-container{
+    background-color: white;
+    padding: 10px 15px;
+    border: 1px #e5e5e5 solid;
+    border-radius: 4px;
+    box-shadow:3px 3px 1px #4f5968;
+}
+
+.wishbutton{
+    margin-top:20px;
+    width: 100%;
+}
+
+.gamebutton {
+    width: 100%;
+}
+
+.genre {
+    margin-top: 50px;
+    font-family: Arial Black;
+}
+
+.category{
+    margin-top: 20px;
+    font-family: Arial Black;
+}

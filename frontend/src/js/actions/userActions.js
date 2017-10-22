@@ -7,6 +7,7 @@ export function login(user,isFail) {
     })
     .then((response)=>{
         if(response.data.message ==='success'){
+          console.log(response.data);
           localStorage.setItem('cookie', JSON.stringify(response.data.cookie));
             dispatch( {
               type: 'SET_USER',
@@ -86,12 +87,24 @@ export function getGameInfo(gameID,username){
   return axios.get(url);
 }
 
-export function signup(user){
+export function signup(user,isFail){
   console.log(user);
   return function(dispatch){
     axios.post('http://localhost:8000/backend/register/',{
         user
     })
+    .then((response)=>{
+        if(response.data ==='register created successfully'){
+
+        } else {
+            isFail();
+        }
+    })
+    .catch((err)=>{
+      console.log('fdfdfdf')
+      isFail();
+      console.log(err);
+    });
     }
 }
 

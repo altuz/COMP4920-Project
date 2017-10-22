@@ -117,6 +117,11 @@ export default class Profile extends React.Component {
 
 
 	render () {
+    var genremap=null;
+
+    if(this.state.top_genres.length>0){
+      genremap =  this.state.top_genres.map((genre,i) => <span key={i}> {genre}{ i !=this.state.top_genres.length-1 ? ',':null}</span>)
+    }
     console.log(this.state.rec1);
 		if (this.state.isedit){
 			return (
@@ -131,7 +136,7 @@ export default class Profile extends React.Component {
       afterSaveCell: this.SaveCell  // a hook for after saving cell
     };
 		//get the profile data from backend
-    console.log(this.state.gamelist);
+    console.log(this.state.rec1);
 		const { user,fetched } = this.props;
 		if(fetched) {
 			return(
@@ -166,7 +171,7 @@ export default class Profile extends React.Component {
    						</Tab>
    						<Tab eventKey={3} title="Popular Recommendation">
    						    <div>
-                    <strong>there are some popular genres that you usually play<div>{this.state.top_genres}</div></strong>
+                    <strong>These are the top genres that you usually play{genremap}</strong>
     						    <BootstrapTable data={this.state.rec1} hover>
                         <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
                         <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>

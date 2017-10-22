@@ -56,6 +56,18 @@ export function searchGame(isFetched,state){
     }
 }
 
+export function edit_hrs(game_id,user,hours){
+  const url = 'http://localhost:8000/backend/edit_game_hrs/';
+  const edit_game_hrs ={
+    username :user.user_name,
+    gameid: game_id,
+    played_hrs: hours,
+  }
+  return axios.post(url, {
+    edit_game_hrs
+  })
+}
+
 export function clearResult(){
   return function(dispatch){
     dispatch( {
@@ -162,6 +174,12 @@ export function unfollow(user){
 
 export function search_user(q){
     const url='http://localhost:8000/backend/search_user/?q='+q;
+    return axios.get(url);
+}
+
+
+export function updatepprofile(username){
+    const url ='http://localhost:8000/backend/get_game_list/?username='+username;
     return axios.get(url);
 }
 

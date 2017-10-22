@@ -24,3 +24,17 @@
     margin-top: 20px;
     font-family: Arial Black;
 }
+
+
+.load-more{
+    background-color: white;
+    padding: 5px 15px;
+    border: 1px #e5e5e5 solid;
+    width: 100px;
+    text-align: center;
+}
+
+.load-more:hover {
+    background-color: #e5e5e5;
+    cursor: pointer;
+}

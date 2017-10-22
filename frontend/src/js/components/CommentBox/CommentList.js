@@ -8,6 +8,7 @@ export default class CommentList extends React.Component {
       limit:5,
     };
     this.loadmore = this.loadmore.bind(this);
+    this.collapse = this.collapse.bind(this);
   }
 
   loadmore(){
@@ -20,6 +21,13 @@ export default class CommentList extends React.Component {
       limit :vlimit,
     })
   }
+  collapse(){
+    this.setState({
+      limit : 5,
+    })
+  }
+
+
   render() {
     const commentNodes = this.props.data.slice(0,this.state.limit).map((comment,i) => {
       return (
@@ -31,8 +39,13 @@ export default class CommentList extends React.Component {
     return (
         <div>
           {commentNodes}
-          <div style={{marginLeft: '42%'}} onClick={this.loadmore}>
-            {this.state.limit === this.props.data.length ? <div>There is no more</div> :(<div className='load-more'>Load More</div>)}
+          <div style={{marginLeft: '42%'}}>
+            {this.state.limit === this.props.data.length ? (
+                <div>
+                  <div>There is no more</div>
+                  <div className='load-more' onClick={this.collapse}>Collapse</div>
+                </div> )
+                :(<div className='load-more' onClick={this.loadmore}>Load More</div>)}
           </div>
 
         </div>

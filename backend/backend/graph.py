@@ -67,11 +67,12 @@ class Graph:
             target_u_node = self.u_nodes[u_index]
         except:
             # Create the userNode if it does not exist
-            target_u_node = Node(True, user_id)
-            u_index = len(self.u_nodes) # old len equals yet to be added index
-            self.u_nodes.append(target_u_node)
-            self.uid_lookup[user_id] = len(self.u_nodes)-1 # Store list index in lookup (new len - 1)
-            self.user_count += 1
+            self.add_user(user_id)
+            # target_u_node = Node(True, user_id)
+            # u_index = len(self.u_nodes) # old len equals yet to be added index
+            # self.u_nodes.append(target_u_node)
+            # self.uid_lookup[user_id] = len(self.u_nodes)-1 # Store list index in lookup (new len - 1)
+            # self.user_count += 1
             # print("created new user node")
 
         # Step 2: Find the game node
@@ -81,11 +82,12 @@ class Graph:
             target_g_node = self.g_nodes[g_index]
         except:
             # Create the userNode if it does not exist
-            target_g_node = Node(False, game_id)
-            g_index = len(self.g_nodes)
-            self.g_nodes.append(target_g_node)
-            self.gid_lookup[game_id] = len(self.g_nodes) - 1  # Store list index in lookup
-            self.game_count += 1
+            self.add_game(game_id)
+            # target_g_node = Node(False, game_id)
+            # g_index = len(self.g_nodes)
+            # self.g_nodes.append(target_g_node)
+            # self.gid_lookup[game_id] = len(self.g_nodes) - 1  # Store list index in lookup
+            # self.game_count += 1
             # print("created new game node")
 
         # Step 3: Create a new edge (ONLY IF IT DOESN"T ALREADY EXIST)
@@ -145,11 +147,12 @@ class Graph:
             target_u_node = self.u_nodes[u_index]
         except:
             # Create the userNode if it does not exist
-            target_u_node = Node(True, user_id)
-            u_index = len(self.u_nodes)  # old len equals yet to be added index
-            self.u_nodes.append(target_u_node)
-            self.uid_lookup[user_id] = len(self.u_nodes) - 1  # Store list index in lookup (new len - 1)
-            self.user_count += 1
+            self.add_user(user_id)
+            # target_u_node = Node(True, user_id)
+            # u_index = len(self.u_nodes)  # old len equals yet to be added index
+            # self.u_nodes.append(target_u_node)
+            # self.uid_lookup[user_id] = len(self.u_nodes) - 1  # Store list index in lookup (new len - 1)
+            # self.user_count += 1
             # print("created new user node")
 
         # Step 2: Find the game node
@@ -159,11 +162,12 @@ class Graph:
             target_g_node = self.g_nodes[g_index]
         except:
             # Create the userNode if it does not exist
-            target_g_node = Node(False, game_id)
-            g_index = len(self.g_nodes)
-            self.g_nodes.append(target_g_node)
-            self.gid_lookup[game_id] = len(self.g_nodes) - 1  # Store list index in lookup
-            self.game_count += 1
+            self.add_game(game_id)
+            # target_g_node = Node(False, game_id)
+            # g_index = len(self.g_nodes)
+            # self.g_nodes.append(target_g_node)
+            # self.gid_lookup[game_id] = len(self.g_nodes) - 1  # Store list index in lookup
+            # self.game_count += 1
             # print("created new game node")
 
         # Step 3: Update the corresponding edges (Add the edges if they do not exist)
@@ -232,7 +236,7 @@ class Graph:
         self.global_num_users -= target_g_node.num_users
 
         # Step 2: Update target game info
-        target_g_node.average_weight()
+        # target_g_node.average_weight()
         target_g_node.calcHoursNorm()
 
         # Step 3: Add back new target game info

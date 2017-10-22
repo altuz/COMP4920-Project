@@ -25,6 +25,7 @@ export default class SignupForm extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
         this.checkPassword = this.checkPassword.bind(this);
+        this.isFail = this.isFail.bind(this);
     }
 
     onChange(e){
@@ -33,9 +34,9 @@ export default class SignupForm extends React.Component {
         );
     }
 
-    checkPassword(passwordconfirm)
+    checkPassword()
     {
-        if (this.state.password == passwordconfirm)
+        if (this.state.password == this.state.passwordconfirm)
         {
             return true;
         }
@@ -44,20 +45,30 @@ export default class SignupForm extends React.Component {
         }
 
     }
-
+    isFail() {
+    this.setState({
+      isSubmitting:false,
+      issuccess:2
+    })
+  }
 
 
     handleSubmit(e){
       e.preventDefault();
-        var user={
+      if (checkPassword()){
+            var user={
             user_name : this.state.username,
             email : this.state.email,
             pass_word : this.state.password,
             privacy : this.state.privacy
         }
         this.setState({isSubmitting:true});
-        this.props.dispatch(signup(user));
-        this.setState({issuccess:1})
+        this.setState({issuccess:1});
+        this.props.dispatch(signup(user,this.isFail));
+      }
+      else{
+        this.setState({issuccess:2});
+      }
 
       }
 

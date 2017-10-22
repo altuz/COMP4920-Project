@@ -19,6 +19,8 @@ class Graph:
         self.gid_names = None
         # Global average number of hours per user
         self.average_hoursNorm = 0
+        self.global_total_hoursNorm = 0
+        self.global_num_users = 0
 
     # Remove from gamelist should call this
     def remove_edge(self, user_id, game_id):
@@ -51,6 +53,8 @@ class Graph:
                 e_index += 1
         except:
             print("Couldn't delete edge game-to-user, game_node not found")
+
+        self.updateGlobal_hoursNorm(target_g)
 
     # Add to gamelist should call this (So should add review?)
     def add_edge(self, user_id, game_id, hrs = 0, rating = -1): # default value for rating is -1
@@ -108,6 +112,9 @@ class Graph:
             print("added edge g-u: " + str(target_g_node.node_id) + " ---> " + str(target_u_node.node_id))
             target_g_node.add_edge(g_u_edge)
 
+        self.updateGlobal_hoursNorm(target_g_node)
+
+        # Step 4: Update the global_averageNorm
         # # This is to test insertion was successful
         # u_index = self.uid_lookup[user_id]
         # target_u = self.u_nodes[u_index]
@@ -203,6 +210,36 @@ class Graph:
             print("add edge g-u " + str(target_g_node.node_id) + " --> " + str(target_u_node.node_id))
             target_g_node.add_edge(g_u_edge)
 
+        self.updateGlobal_hoursNorm(target_g_node)
+
+    # O(num_games) operation
+    def updateGlobal_hoursNorm(self, target_g_node):  
+
+        print("======= Prev stats: \ngame.total_hoursNorm = " + str(target_g_node.total_hoursNorm ) +
+            "\ngame.num_users = " + str(target_g_node.num_users) +
+            "\nglobal_total_hoursNorm = " + str(self.global_total_hoursNorm) +
+            "\nglobal_num_users = " + str(self.global_num_users) +
+            "\nglobal_average_hoursNorm = " + str(self.average_hoursNorm))
+        # Step 1: From global, subtract old target game info 
+        # (Game total_hoursNorm and num_users only updated on function vall to calcHoursNorm)
+        self.global_total_hoursNorm -= target_g_node.total_hoursNorm 
+        self.global_num_users -= target_g_node.num_users
+
+        # Step 2: Update target game info
+        target_g_node.average_weight()
+        target_g_node.calcHoursNorm()
+
+        # Step 3: Add back new target game info
+        self.global_total_hoursNorm += target_g_node.total_hoursNorm 
+        self.global_num_users += target_g_node.num_users
+        self.average_hoursNorm = (self.global_total_hoursNorm)/(self.global_num_users)
+
+        print("======= New stats: \ngame.total_hoursNorm = " + str(target_g_node.total_hoursNorm ) +
+            "\ngame.num_users = " + str(target_g_node.num_users) +
+            "\nglobal_total_hoursNorm = " + str(self.global_total_hoursNorm) +
+            "\nglobal_num_users = " + str(self.global_num_users) +
+            "\nglobal_average_hoursNorm = " + str(self.average_hoursNorm))
+
     # add user, returns true if added, false if user already in list
     def add_user(self, uid):
         if uid in self.uid_lookup:
@@ -261,6 +298,7 @@ class Graph:
     def add_names(self, unames, gnames):
         self.uid_names = unames
         self.gid_names = gnames
+
     # calculate stats for games
     def games_hours_stats(self):
         print("there are {} games".format(len(self.g_nodes)))
@@ -297,6 +335,8 @@ class Graph:
             global_num_users += game.num_users
             # print("game {} has averages of ({} hours, {} rating)".format(self.gid_names[game.node_id], game.average_hours, game.average_rating))
 
+        self.global_total_hoursNorm = global_total_hoursNorm
+        self.global_num_users = global_num_users
         self.average_hoursNorm = global_total_hoursNorm/global_num_users
         print("Global average is" + str(self.average_hoursNorm))
 
@@ -474,7 +514,7 @@ class Node:
             self.total_hoursNorm += edge.hoursNorm # keep track of total hoursNorm
             # print("------Adjusted-----edge hr: " + str(edge.hours) + ", node ave hr:"
             #       + str(self.average_hours) + " atanHr:" + str(edge.hoursNorm) + ", max: " + str(max))
-        print("For game" + str(self.node_id) + " total users = " + str(self.num_users) 
+        print("For game: " + str(self.node_id) + ", total users = " + str(self.num_users) 
             + ", total_hoursNorm = " + str(self.total_hoursNorm))
 
 class Edge:

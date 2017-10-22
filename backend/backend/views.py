@@ -1115,7 +1115,7 @@ def edit_game_hrs(request):
 
         try:
             library_entry.save()
-            game_graph.update_edge(user_entry.user_id, game_entry.game_id, played_hrs) # Update the graph value
+            game_graph.update_edge(user_entry.user_id, game_entry.game_id, int(played_hrs)) # Update the graph value
 
             # print("New played hrs is " + str(library_entry.played_hrs))
 

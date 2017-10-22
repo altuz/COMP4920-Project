@@ -158,7 +158,7 @@ export default class Others extends React.Component {
    						</Tab>
    						<Tab eventKey={3} title="Follow List">
    						    <div>
-    						    <BootstrapTable data={this.state.follow_list} hover>
+    						    <BootstrapTable data={this.state.follow_list} hover pagination>
                                     <TableHeaderColumn isKey dataField='user_name' dataFormat={this.profileFormatter}  width='300px'>Username</TableHeaderColumn>
                                     <TableHeaderColumn dataField='num_games'  width='300px'>Number of Games</TableHeaderColumn>
                                 </BootstrapTable>

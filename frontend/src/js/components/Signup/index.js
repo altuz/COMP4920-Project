@@ -65,8 +65,8 @@ export default class SignupForm extends React.Component {
             privacy : this.state.privacy
         }
         this.setState({isSubmitting:true});
-        this.setState({issuccess:1});
         this.props.dispatch(signup(user,this.isFail));
+        this.setState({issuccess:1});
       }
       else{
         this.setState({issuccess:2});

@@ -94,9 +94,8 @@ export function signup(user,isFail){
         user
     })
     .then((response)=>{
-        if(response.data ==='register created successfully'){
-
-        } else {
+        console.log(response.data.message);
+        if(response.data.message !== 'register created successfully'){
             isFail();
         }
     })

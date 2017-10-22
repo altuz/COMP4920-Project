@@ -1024,18 +1024,8 @@ def recommend_v1(request):
         result['genre_list'] = genre_list
         # print(result)
 
-    # Step 2: Get the games genre/categories
-    game_obj = GameList.objects.get(game_id=game_id)
-    genres_obj = Genres.objects.filter(game_id=game_obj)
-    category_obj = Categories.objects.filter(game_id=game_obj)
-    genre_list = []
-    category_list = []
-    for g in genres_obj:
-        genre_list.append(g.genre)
-    for c in category_obj:
-        category_list.append(c.category)
     outputJSON = json.dumps({"results": results_list,
-                             "top_genres": sorted_keys,
+                             "top_genres": top_genres,
                              }, ensure_ascii=False).encode('utf-16')
     return HttpResponse(outputJSON, content_type='application/json')
 
@@ -1336,7 +1326,7 @@ def graph_setup():
                  '                            SELECT *\n'
                  '                            FROM backend_user\n' 
                 #'                            ORDER BY RANDOM()\n'
-                # '                            LIMIT 200\n' # Comment this line out to remove limit 
+                '                            LIMIT 200\n' # Comment this line out to remove limit 
                  '                        ) y\n'
                  '                    ) u\n'
                  '                    ON u.user_id = p.user_id_id\n'
@@ -1359,6 +1349,7 @@ def graph_setup():
         for entry in rows:
             game = entry[0]
             user = entry[2]
+            # print(entry[3])
             # Get related rating
             rate_val = -1
             # If there is a rating

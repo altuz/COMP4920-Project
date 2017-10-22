@@ -11,7 +11,7 @@ import { getRecommendation2,getFollowList,getRecommendation1, edit_hrs,updateppr
 		user: store.user.user,
 		wishlist: store.user.wish_list,
     gamelist: store.user.game_list,
-		fetched: store.user.fetche,
+		fetched: store.user.fetched,
 	};
 })
 
@@ -166,7 +166,7 @@ export default class Profile extends React.Component {
    						</Tab>
    						<Tab eventKey={3} title="Popular Recommendation">
    						    <div>
-                    <strong>there are some popular genres that you usually play {this.state.genre_list}</strong>
+                    <strong>there are some popular genres that you usually play<div>{this.state.top_genres}</div></strong>
     						    <BootstrapTable data={this.state.rec1} hover>
                         <TableHeaderColumn dataField='image_url' dataFormat={this.imageFormatter} width = '90px' ></TableHeaderColumn>
                         <TableHeaderColumn isKey dataField='game_name'  dataFormat={this.nameFormatter} width='300px'>Game Name</TableHeaderColumn>
@@ -195,6 +195,6 @@ export default class Profile extends React.Component {
 			</div>
 			);
 		}
-		return null;
+    return <div>Please login in</div>;
 	}
 }

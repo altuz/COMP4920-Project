@@ -7,6 +7,7 @@ export function login(user,isFail) {
     })
     .then((response)=>{
         if(response.data.message ==='success'){
+          console.log(response.data);
           localStorage.setItem('cookie', JSON.stringify(response.data.cookie));
             dispatch( {
               type: 'SET_USER',
@@ -56,6 +57,18 @@ export function searchGame(isFetched,state){
     }
 }
 
+export function edit_hrs(game_id,user,hours){
+  const url = 'http://localhost:8000/backend/edit_game_hrs/';
+  const edit_game_hrs ={
+    username :user.user_name,
+    gameid: game_id,
+    played_hrs: hours,
+  }
+  return axios.post(url, {
+    edit_game_hrs
+  })
+}
+
 export function clearResult(){
   return function(dispatch){
     dispatch( {
@@ -74,12 +87,24 @@ export function getGameInfo(gameID,username){
   return axios.get(url);
 }
 
-export function signup(user){
+export function signup(user,isFail){
   console.log(user);
   return function(dispatch){
     axios.post('http://localhost:8000/backend/register/',{
         user
     })
+    .then((response)=>{
+        if(response.data ==='register created successfully'){
+
+        } else {
+            isFail();
+        }
+    })
+    .catch((err)=>{
+      console.log('fdfdfdf')
+      isFail();
+      console.log(err);
+    });
     }
 }
 
@@ -149,6 +174,12 @@ export function unfollow(user){
 
 export function search_user(q){
     const url='http://localhost:8000/backend/search_user/?q='+q;
+    return axios.get(url);
+}
+
+
+export function updatepprofile(username){
+    const url ='http://localhost:8000/backend/get_game_list/?username='+username;
     return axios.get(url);
 }
 

@@ -24,6 +24,8 @@ export default class Profile extends React.Component {
       is_my_wish:null,
       reviews_list:[],
       user_review:[],
+      genre_list:[],
+      category_list:[],
       isSubmitting:false,
     }
     this.add_to_game_list = this.add_to_game_list.bind(this);
@@ -49,20 +51,20 @@ export default class Profile extends React.Component {
     const gameID=this.props.match.params.gameID;
     getGameInfo(gameID,username)
         .then((res)=>{
-          console.log(res);
           this.setState({
             curr_game:res.data.game_info,
             in_my_game: res.data.in_game_list,
             in_my_wish: res.data.in_wish_list,
             reviews_list: res.data.reviews_list,
             user_review :res.data.user_review,
+            genre_list:res.data.genre_list,
+            category_list:res.data.category_list,
           })
 
         })
   }
 
   add_to_game_list(){
-    console.log(this.state.curr_game);
     this.props.dispatch(add_to_game_list(this.props.user.user_name,this.state.curr_game[0].game_id));
     this.setState({
       in_my_game: true,
@@ -72,7 +74,6 @@ export default class Profile extends React.Component {
   }
 
   add_to_wish_list(){
-    console.log(this.state.curr_game);
     this.props.dispatch(add_to_wish_list(this.props.user.user_name,this.state.curr_game[0].game_id));
     this.setState({
       in_my_wish: true,
@@ -81,7 +82,6 @@ export default class Profile extends React.Component {
   }
 
   remove_from_game_list(){
-    console.log(this.state.curr_game);
     this.props.dispatch(remove_from_game_list(this.props.user.user_name,this.state.curr_game[0].game_id));
     this.setState({
       in_my_wish: false,
@@ -123,15 +123,31 @@ export default class Profile extends React.Component {
     }
   }
 
+  renderGenres(){
+    const mapGenre = this.state.genre_list.map((genre,i)=>{
+      return (<div key={i}><span className="badge" >{genre}</span></div>)
+    })
+
+    return(<div>{mapGenre}</div>)
+  }
+
+  renderCategory(){
+    const mapCategory = this.state.category_list.map((category,i)=>{
+      return (<div key={i}><span className="badge" >{category}</span></div>)
+    })
+
+    return(<div>{mapCategory}</div>)
+  }
+
 
   render () {
-
+    console.log(this.state);
     if(this.state.curr_game.length>0){
       const game=this.state.curr_game[0];
       return(
           <div className='row'>
             <div className='col-md-9'>
-              <img className='description-img' src={game.image_url}/>
+              <img className='description-img' src={game.image_url} height='500px'/>
               <div className='page-tabs'>
               <Tabs>
                 <TabList>
@@ -164,6 +180,14 @@ export default class Profile extends React.Component {
             </div>
             <div className='col-md-3'>
                 {this.renderButton()}
+                <div className='genre'>Genres:</div>
+                <div className='genre-container'>
+                    {this.renderGenres()}
+                </div>
+              <div className='category'>Categories:</div>
+              <div className='genre-container'>
+                {this.renderCategory()}
+              </div>
             </div>
           </div>
       );

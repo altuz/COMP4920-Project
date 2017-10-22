@@ -276,14 +276,7 @@ input {
   width:100%
 }
 
-.wishbutton{
-  margin-top:20px;
-  width: 180px;
-}
 
-.gamebutton {
-  width: 180px;
-}
 
 
 
@@ -387,4 +380,6 @@ input {
   font-weight: 400;
   margin-bottom: 0;
 }
+
+
 

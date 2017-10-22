@@ -39,18 +39,14 @@ def user_prof_helper(username):
     # Get user
     try:
         user_entry = User.objects.get(user_name=username)
-        user_prof = '''
-                {{ 
-                    "username" : "{}",
-                    "user_id" : "{}"
-                }}
-            '''.format(user_entry.user_name, user_entry.user_id)
+        user_prof = json.dumps( {"username" : user_set.user_name, "user_id" : user_set.user_id}).encode('utf-16')
     except:
         HttpResponse('{ "user" : {}, "gamelist" : {}, "wishlist" : {} }')
     # Get game list
     try:
         game_list = get_list(username, True)
-    except:
+    except Exception as e:
+        print(e)
         print("No games")
     # Get wish list
     try:
@@ -69,7 +65,7 @@ def user_prof_helper(username):
                 "wishlist" : [{}],
                 "follows" : [{}]
             }}
-        '''.format(username, game_list, wish_list, flw_list)
+        '''.format(username.replace('"', '\\"'), game_list, wish_list, flw_list)
     return HttpResponse(ret_json)
 
 
@@ -160,7 +156,7 @@ def follow_list_helper(name):
         json_list = []
         for person in following_list:
             followed = person.follow_id
-            f_name = followed.user_name
+            f_name = followed.user_name.replace('"', '\\"')
             f_numg = followed.num_games
             f_json = '{{"user_name" : "{}", "num_games" : "{}"}}'.format(f_name, f_numg)
             json_list.append(f_json)
@@ -184,7 +180,7 @@ def get_reviews(request):
         for review in reviews:
             try:
                 reviewer = review.user_id
-                r_name = reviewer.user_name
+                r_name = reviewer.user_name.replace('"', '\\"')
                 r_bool = review.rate
                 r_comment = review.comment
                 f_json = '{{"user_name" : "{}", "rating" : "{}", "comment" : "{}"}}'.format(r_name, r_bool, r_comment)
@@ -236,8 +232,10 @@ def get_list(username, type):
                     g_played_hrs = 0
                     # print("Adjusted played hours for " + str(g_name) + " is: " + str(g_played_hrs))
                 g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}", "played_hrs":"{}"}}'.format(g_name, g_id, g_picture, g_played_hrs)
+                g_json = '{{"game_name":"{}", "game_id":"{}", "thumbnail":"{}", "played_hrs":"{}"}}'.format(g_name, g_id, g_picture, g_played_hrs)
                 json_list.append(g_json)
-            except:
+            except Exception as e:
+                print(e)
                 continue
         # print(','.join(json_list)) # Just for debugging
         return ','.join(json_list)
@@ -273,7 +271,8 @@ def get_gamelist(request):
             }}
         '''.format(game_list)
         return HttpResponse(ret_json)
-    except:
+    except Exception as e:
+        print(e)
         return HttpResponse('{"message":"does not exist, "gamelist":[]"}')
 
 
@@ -781,7 +780,7 @@ def get_game_info(request):
     # Step 5: Display whether in player game/wish list
     if player_obj:
         game_set = PlayerLibrary.objects.filter(user_id=player_obj, game_id=game_obj)
-        print(game_set)
+        # print(game_set)
         if game_set:
             print("output type2: Game is in player library")
             wish_list = game_set[0].wish_list # Should only have one entry, get entry 0
@@ -1345,7 +1344,9 @@ def graph_setup():
                  '                    ON r.user_id_id = p.user_id_id\n'
                  '                    AND r.game_id_id = p.game_id_id\n'
                  '                    WHERE p.played_hrs != 0\n'
-                 '                    OR p.played_hrs != null;\n'
+                 '                    OR p.played_hrs != null\n'
+                 '                    AND p.played != 0\n'
+                 '                    AND p.wish_list != 0\n;'
                  '                    ')
         cursor = connection.cursor()
         rows = cursor.execute(query)

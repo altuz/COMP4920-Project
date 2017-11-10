@@ -77,8 +77,8 @@ for i = 1:n
 			predictR = r_bar + b_u(i) + b_i(j)
 			if predictR > 5
 				predictR = 5
-			elseif predictR < 0
-				predictR = 0
+			elseif predictR < 1
+				predictR = 1
 			end
 			R_hat(i,j) = predictR
 		else
@@ -115,6 +115,13 @@ for i = 1:m
 	end
 end
 
+% Debugging (Using textbook values
+% D_movie = [NaN -0.21 -0.41 -0.97 -0.75;
+% -0.21 NaN -0.84 -0.73 0.51;
+% -0.41 -0.84 NaN -0.22 -0.93;
+% -0.97 -0.73 -0.22 NaN 0.068;
+% -0.75 0.51 -0.93 0.068 NaN]
+
 % r_hat_n for neighborhood model
 R_hat_n = zeros(n,m)
 L = 2 % Variable for number of neighbors that will count in neighborhood model
@@ -136,12 +143,12 @@ for i = 1:n
 			sum_abs_d = 0
 			for index = 1:min(length(neigh_abs), L) % For neighbor movies, L is limit variable
 				n_i = neigh_abs(index)
-                fprintf('n_i:%d\n', n_i)
+                % fprintf('n_i:%d\n', n_i)
 				if ~isnan(R_tilde(i, n_i))
 					% Using similarity d as the weighting
                     
-					fprintf('user: %d, neighbor: %d\n', i, n_i)
-					fprintf('cosine coeff: %d\n', D_movie(j,n_i))
+					% fprintf('user: %d, neighbor: %d\n', i, n_i)
+					% fprintf('cosine coeff: %d\n', D_movie(j,n_i))
 					sum_dr = sum_dr + D_movie(j,n_i) * R_tilde(i,n_i)
 					sum_abs_d = sum_abs_d + abs(D_movie(j,n_i))
 				end
@@ -157,8 +164,8 @@ for i = 1:n
 			predictR = r_bar + b_u(i) + b_i(j) + sum_d
 			if predictR > 5
 				predictR = 5
-			elseif predictR < 0
-				predictR = 0
+			elseif predictR < 1
+				predictR = 1
 			end
 
 			R_hat_n(i,j) = predictR

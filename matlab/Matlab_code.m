@@ -87,6 +87,7 @@ for i = 1:n
 	end
 end
 
+% Check the RMSE compared to training set
 diff_train = R_train - R_hat  
 RMSE_train = sqrt(mean((diff_train(:)).^2,'omitnan')) 
 
@@ -174,3 +175,7 @@ for i = 1:n
 		end
 	end
 end
+
+% Check the RMSE compared to training set
+diff_train = R_train - R_hat_n  
+RMSE_train = sqrt(mean((diff_train(:)).^2,'omitnan')) 

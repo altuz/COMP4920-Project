@@ -121,6 +121,10 @@ L = 2 % Variable for number of neighbors that will count in neighborhood model
 for i = 1:n 
 	for j = 1:m
 		if ~isnan(R(i,j)) % Don't really need this if statement, unless we're testing for RMSE
+			% for debugging
+%  			i = 2
+%  			j = 2
+
 			% Sum for top 2 movie neighbors to movie j 
 			neigh_abs = [(1:m)', abs(D_movie(:,j))] % Store movie neighbors to j and the movie index
 			neigh_abs = sortrows(neigh_abs, 2, 'descend') 
@@ -130,10 +134,12 @@ for i = 1:n
 			% Step 1: Find top L
 			sum_dr = 0 % using similarity d as the prediction weight (basic method)
 			sum_abs_d = 0
-			for n_i = 1:min(length(neigh_abs), L+1) % For neighbor movies, L is limit variable
-				fprintf('n_i:%d\n', n_i)
-				if ~isnan(R_tilde(n_i))
+			for index = 1:min(length(neigh_abs), L) % For neighbor movies, L is limit variable
+				n_i = neigh_abs(index)
+                fprintf('n_i:%d\n', n_i)
+				if ~isnan(R_tilde(i, n_i))
 					% Using similarity d as the weighting
+                    
 					fprintf('user: %d, neighbor: %d\n', i, n_i)
 					fprintf('cosine coeff: %d\n', D_movie(j,n_i))
 					sum_dr = sum_dr + D_movie(j,n_i) * R_tilde(i,n_i)

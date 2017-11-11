@@ -1305,23 +1305,6 @@ def graph_setup():
     global game_graph, user_set, game_set
     if game_graph is None:
         print("Initializing Graph")
-
-        #QUERY
-        #
-        # query = ''' SELECT  g.game_id as "game_id", g.game_name as "game_name",
-        #                     u.user_id as "user_id", u.user_name as "user_name",
-        #                     p.played_hrs as "played_hrs", r.rate as "rate"
-        #             FROM backend_playerlibrary p
-        #             LEFT JOIN backend_gamelist g
-        #             ON g.game_id = p.game_id_id
-        #             LEFT JOIN backend_user u
-        #             ON u.user_id = p.user_id_id
-        #             LEFT JOIN backend_rating r
-        #             ON r.user_id_id = p.user_id_id
-        #             AND r.game_id_id = p.game_id_id
-        #             WHERE p.played_hrs != 0
-        #             OR p.played_hrs != null;'''
-
         query = (' SELECT  g.game_id as "game_id", g.game_name as "game_name", \n'
                  '                            u.user_id as "user_id", u.user_name as "user_name", \n'
                  '                            p.played_hrs as "played_hrs", r.rate as "rate"\n'
@@ -1339,8 +1322,6 @@ def graph_setup():
                  '                        FROM (\n'
                  '                            SELECT *\n'
                  '                            FROM backend_user\n' 
-                #'                            ORDER BY RANDOM()\n' 
-                #'                            LIMIT 200\n' # Comment this line out to remove limit 
                  '                        ) y\n'
                  '                    ) u\n'
                  '                    ON u.user_id = p.user_id_id\n'
@@ -1363,18 +1344,13 @@ def graph_setup():
         for entry in rows:
             game = entry[0]
             user = entry[2]
-            # print(entry[3])
-            # Get related rating
             rate_val = -1
-            # If there is a rating
             rate_bool = entry[5]
             if rate_bool is not None:
                 rate_val = 1 if rate_bool else 0
             # TODO: Enter rate_val to edge
             user_set[user] = entry[3]
             game_set[game] = entry[1]
-            # print("Types - game: " + str(type(game)) + ", user: " + str(type(user)) 
-            #     + ", username??: " + str(type(entry[3])) + ", gamename: " + str(type(entry[1])))
 
             game_graph.connect_u_g(game, user, entry[4], rate_val)
             library_len += 1

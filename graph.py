@@ -491,8 +491,9 @@ class Graph:
                 os.makedirs(sub_path)
             num_users = i * 100
             users = self.get_random_usernodes(id, num_users - 1)
-            (r_m, r_train) = self.r_matrix(users)
-            scipy.io.savemat(sub_path+'/control_test.mat', mdict={'R': r_m, 'R_train' : r_train})
+            (r_m, r_train, r2_m, r2_train) = self.r_matrix(users)
+            scipy.io.savemat(sub_path+'/control_test.mat', mdict={'R': r_m, 'R_train' : r_train,
+                                                                  'R2': r2_m, 'R2_train' : r2_train})
         # missing users filled with random cliques
         # rationale: we do not just want any randoms
         # if our current user has very little friends, then using randoms can result in not accurate rating
@@ -500,6 +501,9 @@ class Graph:
     def r_matrix(self, user_list):
         r_m = np.zeros((len(user_list), self.game_count))
         r_train = np.zeros((len(user_list), self.game_count))
+        r2_m = np.zeros((len(user_list), self.game_count))
+        r2_train = np.zeros((len(user_list), self.game_count))
+
         edge_idxs = []
         # fill in r_m by going through all edges
         for user_idx in range(0, len(user_list)):
@@ -510,6 +514,13 @@ class Graph:
                 edge_idxs.append((user_idx, game_idx))
                 r_m[user_idx, game_idx] = edge.hoursNorm
                 r_train[user_idx, game_idx] = edge.hoursNorm
+                ave_rate = edge.hoursNorm
+                if edge.rating is not -1:
+                    ave_rate += edge.rating
+                    ave_rate /= 2
+                r_m[user_idx, game_idx] = ave_rate
+                r_train[user_idx, game_idx] = ave_rate
+
         # hide away data in r_train
         # total num of edges
         n_edges = len(edge_idxs)
@@ -518,7 +529,8 @@ class Graph:
         for r_edge in r_edges:
             (user_idx, game_idx) = r_edge
             r_train[user_idx, game_idx] = 0
-        return (r_m, r_train)
+            r2_train[user_idx, game_idx] = 0
+        return (r_m, r_train, r2_m, r2_train)
 class Node:
     # define a new node
     def __init__(self, nt, nid):

@@ -1,5 +1,5 @@
 % Load data from specific test folder
-load ../control_test/400/control_test % Loads R and R_train
+load ../control_test/1000/control_test % Loads R and R_train
 % Actual ratings
 % R = 'read from file'
 
@@ -159,7 +159,7 @@ RMSE_test_n = sqrt(mean((diff_test_n(:)).^2,'omitnan'));
 r_bar_mat = repmat(r_bar, size(R_train));
 r_demeaned = R_train - r_bar_mat;
 r_demeaned(isnan(r_demeaned))=0;
-[U, sigma, vt, flag] = svds(r_demeaned, 5);
+[U, sigma, vt, flag] = svds(r_demeaned, 100);
 
 % Making predictions from decomposed matrix
 r_tilde_latent = U * sigma * vt';

@@ -499,10 +499,10 @@ class Graph:
         # if our current user has very little friends, then using randoms can result in not accurate rating
     # create the R matrix for collaborative filtering from the given user_list
     def r_matrix(self, user_list):
-        r_m = np.zeros((len(user_list), self.game_count))
-        r_train = np.zeros((len(user_list), self.game_count))
-        r2_m = np.zeros((len(user_list), self.game_count))
-        r2_train = np.zeros((len(user_list), self.game_count))
+        r_m = np.full((len(user_list), self.game_count), np.nan)
+        r_train = np.full((len(user_list), self.game_count), np.nan)
+        r2_m = np.full((len(user_list), self.game_count), np.nan)
+        r2_train = np.full((len(user_list), self.game_count), np.nan)
 
         edge_idxs = []
         # fill in r_m by going through all edges

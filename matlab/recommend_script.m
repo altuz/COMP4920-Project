@@ -1,6 +1,6 @@
 % Load data from specific test folder
 tic % for timing
-load ../control_test/300/combined_rating % Loads R and R_train
+load ../control_test/500/combined_rating % Loads R and R_train
 % Actual ratings
 % R = 'read from file'
 

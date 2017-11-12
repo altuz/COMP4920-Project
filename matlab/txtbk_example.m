@@ -10,15 +10,34 @@
 % Least squares solving
 % https://au.mathworks.com/help/matlab/ref/mldivide.html
 
-load control_test % Loads R and R_train
 % Actual ratings
-% R = 'read from file'
+R = [5 4 4 NaN 5;
+NaN 3 5 3 4;
+5 2 NaN 2 3;
+NaN 2 3 1 2;
+4 NaN 5 4 5;
+5 3 NaN 3 5;
+3 2 3 2 NaN;
+5 3 4 NaN 5;
+4 2 5 4 NaN;
+5 NaN 5 3 4]
 
 % Training set
-% R_train = 'read from file'
+R_train = [5 4 4 NaN NaN;
+NaN 3 5 NaN 4;
+5 2 NaN NaN 3;
+NaN NaN 3 1 2;
+4 NaN NaN 4 5;
+NaN 3 NaN 3 5;
+3 NaN 3 2 NaN;
+5 NaN 4 NaN 5;
+NaN 2 5 4 NaN;
+NaN NaN 5 3 4]
 
 % Mean of training set
 r_bar = mean(R_train(:),'omitnan');
+% r_bar = 115/30 % for some reason txtbk example uses r_bar = 3.83
+
 
 % Making matrix A for training set
 [n, m] = size(R_train);
@@ -48,8 +67,8 @@ end
 % b = (A' * A) \ (A' * c) % Don't use this, 
 lambda = 1; % Is this how to regularise (A' * A) * b - lambda * b= A' c
 [n_A, m_A] = size(A' * A);
-b = pinv(A' * A + lambda * eye(n_A, m_A))*(A' * c); % with regularisation
-% b = pinv(A' * A)*(A' * c); % no regularisation
+% b = pinv(A' * A + lambda * eye(n_A, m_A))*(A' * c); % with regularisation
+b = pinv(A' * A)*(A' * c); % no regularisation
 b_u = b(1:n,1);
 b_i = b((n+1):(n+m),1);
 
@@ -60,11 +79,10 @@ for i = 1:n
 		if ~isnan(R(i,j)) % Don't really need this if statement
 			predictR = r_bar + b_u(i) + b_i(j);
 
-			% Range for 'ratings' is 0 to 1
-			if predictR > 1
+			if predictR > 5
+				predictR = 5;
+			elseif predictR < 1
 				predictR = 1;
-			elseif predictR < 0
-				predictR = 0;
 			end
 
 			R_hat(i,j) = predictR;
@@ -106,12 +124,22 @@ for i = 1:m
 	end
 end
 
+% Debugging (Using textbook values
+% D_movie = [NaN -0.21 -0.41 -0.97 -0.75;
+% -0.21 NaN -0.84 -0.73 0.51;
+% -0.41 -0.84 NaN -0.22 -0.93;
+% -0.97 -0.73 -0.22 NaN 0.068;
+% -0.75 0.51 -0.93 0.068 NaN]
+
 % r_hat_n for neighborhood model
 R_hat_n = zeros(n,m);
 L = 2; % Variable for number of neighbors that will count in neighborhood model
 for i = 1:n 
 	for j = 1:m
-		if ~isnan(R(i,j)) % Don't really need this if statement, unless we're testing for RMSE 
+		if ~isnan(R(i,j)) % Don't really need this if statement, unless we're testing for RMSE
+			% for debugging
+%  			i = 2
+%  			j = 2
 
 			% Sum for top 2 movie neighbors to movie j 
 			neigh_abs = [(1:m)', abs(D_movie(:,j))]; % Store movie neighbors to j and the movie index
@@ -144,10 +172,10 @@ for i = 1:n
 
 			predictR = r_bar + b_u(i) + b_i(j) + sum_d;
 
-			if predictR > 1
+			if predictR > 5
+ 				predictR = 5;
+			elseif predictR < 1
 				predictR = 1;
-			elseif predictR < 0
-				predictR = 0;
 			end
 
 			R_hat_n(i,j) = predictR;

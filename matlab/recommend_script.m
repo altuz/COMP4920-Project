@@ -1,16 +1,5 @@
-% Good site
-% https://blogs.mathworks.com/loren/2015/04/22/the-netflix-prize-and-production-machine-learning-systems-an-insider-look/
-
-% Lecturer/author of networked life txtbk coursera explanation vid
-% https://www.youtube.com/watch?v=dGM4bNQcVKI
-
-% Array filling optimizations
-% https://au.mathworks.com/matlabcentral/answers/82989-fastest-way-to-fill-in-an-array
-
-% Least squares solving
-% https://au.mathworks.com/help/matlab/ref/mldivide.html
-
-load control_test % Loads R and R_train
+% Load data from specific test folder
+load ../control_test/400/control_test % Loads R and R_train
 % Actual ratings
 % R = 'read from file'
 

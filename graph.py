@@ -518,8 +518,8 @@ class Graph:
                 if edge.rating is not -1:
                     ave_rate += edge.rating
                     ave_rate /= float(2)
-                r_m[user_idx, game_idx] = ave_rate
-                r_train[user_idx, game_idx] = ave_rate
+                r2_m[user_idx, game_idx] = ave_rate
+                r2_train[user_idx, game_idx] = ave_rate
 
         # hide away data in r_train
         # total num of edges

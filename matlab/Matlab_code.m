@@ -1,16 +1,6 @@
-% Good site
-% https://blogs.mathworks.com/loren/2015/04/22/the-netflix-prize-and-production-machine-learning-systems-an-insider-look/
-
-% Lecturer/author of networked life txtbk coursera explanation vid
-% https://www.youtube.com/watch?v=dGM4bNQcVKI
-
-% Array filling optimizations
-% https://au.mathworks.com/matlabcentral/answers/82989-fastest-way-to-fill-in-an-array
-
-% Least squares solving
-% https://au.mathworks.com/help/matlab/ref/mldivide.html
-
-load control_test % Loads R and R_train
+% Load data from specific test folder
+tic % for timing
+load ../control_test/400/control_test % Loads R and R_train
 % Actual ratings
 % R = 'read from file'
 
@@ -55,8 +45,9 @@ b_i = b((n+1):(n+m),1);
 
 % Compute R_hat
 R_hat = zeros(n,m);
-for i = 1:n 
-	for j = 1:m
+
+for j = 1:m
+    for i = 1:n 
 		if ~isnan(R(i,j)) % Don't really need this if statement
 			predictR = r_bar + b_u(i) + b_i(j);
 
@@ -85,8 +76,8 @@ RMSE_test = sqrt(mean((diff_test(:)).^2,'omitnan'));
 R_tilde = R_train - R_hat;
 D_movie = zeros(m,m);
 
-for i = 1:m
-	for j = 1:m
+for j = 1:m
+    for i = 1:m
 		if ~(i == j)
 			% Compute similarity value
 			sum_i_sq = 0;
@@ -109,8 +100,8 @@ end
 % r_hat_n for neighborhood model
 R_hat_n = zeros(n,m);
 L = 2; % Variable for number of neighbors that will count in neighborhood model
-for i = 1:n 
-	for j = 1:m
+for j = 1:m 
+	for i = 1:n
 		if ~isnan(R(i,j)) % Don't really need this if statement, unless we're testing for RMSE 
 
 			% Sum for top 2 movie neighbors to movie j 
@@ -183,3 +174,4 @@ RMSE_train_latent = sqrt(mean((diff_train_latent(:)).^2,'omitnan'));
 diff_test_latent = R - r_hat_latent;
 RMSE_test_latent = sqrt(mean((diff_test_latent(:)).^2,'omitnan'));
 fprintf("Script complete\n")
+toc

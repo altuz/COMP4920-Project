@@ -38,7 +38,6 @@ NaN NaN 5 3 4]
 r_bar = mean(R_train(:),'omitnan');
 % r_bar = 115/30 % for some reason txtbk example uses r_bar = 3.83
 
-
 % Making matrix A for training set
 [n, m] = size(R_train);
 n_ratings = sum(~isnan(R_train(:))); 
@@ -67,22 +66,24 @@ end
 % b = (A' * A) \ (A' * c) % Don't use this, 
 lambda = 1; % Is this how to regularise (A' * A) * b - lambda * b= A' c
 [n_A, m_A] = size(A' * A);
-% b = pinv(A' * A + lambda * eye(n_A, m_A))*(A' * c); % with regularisation
-b = pinv(A' * A)*(A' * c); % no regularisation
+b = pinv(A' * A + lambda * eye(n_A, m_A))*(A' * c); % with regularisation
+% b = pinv(A' * A)*(A' * c); % no regularisation
 b_u = b(1:n,1);
 b_i = b((n+1):(n+m),1);
 
 % Compute R_hat
 R_hat = zeros(n,m);
-for i = 1:n 
-	for j = 1:m
+
+for j = 1:m
+    for i = 1:n 
 		if ~isnan(R(i,j)) % Don't really need this if statement
 			predictR = r_bar + b_u(i) + b_i(j);
 
-			if predictR > 5
-				predictR = 5;
-			elseif predictR < 1
+			% Range for 'ratings' is 0 to 1
+			if predictR > 1
 				predictR = 1;
+			elseif predictR < 0
+				predictR = 0;
 			end
 
 			R_hat(i,j) = predictR;
@@ -103,8 +104,8 @@ RMSE_test = sqrt(mean((diff_test(:)).^2,'omitnan'));
 R_tilde = R_train - R_hat;
 D_movie = zeros(m,m);
 
-for i = 1:m
-	for j = 1:m
+for j = 1:m
+    for i = 1:m
 		if ~(i == j)
 			% Compute similarity value
 			sum_i_sq = 0;
@@ -124,22 +125,12 @@ for i = 1:m
 	end
 end
 
-% Debugging (Using textbook values
-% D_movie = [NaN -0.21 -0.41 -0.97 -0.75;
-% -0.21 NaN -0.84 -0.73 0.51;
-% -0.41 -0.84 NaN -0.22 -0.93;
-% -0.97 -0.73 -0.22 NaN 0.068;
-% -0.75 0.51 -0.93 0.068 NaN]
-
 % r_hat_n for neighborhood model
 R_hat_n = zeros(n,m);
 L = 2; % Variable for number of neighbors that will count in neighborhood model
-for i = 1:n 
-	for j = 1:m
-		if ~isnan(R(i,j)) % Don't really need this if statement, unless we're testing for RMSE
-			% for debugging
-%  			i = 2
-%  			j = 2
+for j = 1:m 
+	for i = 1:n
+		if ~isnan(R(i,j)) % Don't really need this if statement, unless we're testing for RMSE 
 
 			% Sum for top 2 movie neighbors to movie j 
 			neigh_abs = [(1:m)', abs(D_movie(:,j))]; % Store movie neighbors to j and the movie index
@@ -172,10 +163,10 @@ for i = 1:n
 
 			predictR = r_bar + b_u(i) + b_i(j) + sum_d;
 
-			if predictR > 5
- 				predictR = 5;
-			elseif predictR < 1
+			if predictR > 1
 				predictR = 1;
+			elseif predictR < 0
+				predictR = 0;
 			end
 
 			R_hat_n(i,j) = predictR;
@@ -211,3 +202,4 @@ RMSE_train_latent = sqrt(mean((diff_train_latent(:)).^2,'omitnan'));
 diff_test_latent = R - r_hat_latent;
 RMSE_test_latent = sqrt(mean((diff_test_latent(:)).^2,'omitnan'));
 fprintf("Script complete\n")
+toc

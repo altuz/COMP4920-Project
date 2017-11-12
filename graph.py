@@ -492,8 +492,8 @@ class Graph:
             num_users = i * 100
             users = self.get_random_usernodes(id, num_users - 1)
             (r_m, r_train, r2_m, r2_train) = self.r_matrix(users)
-            scipy.io.savemat(sub_path+'/control_test.mat', mdict={'R': r_m, 'R_train' : r_train,
-                                                                  'R2': r2_m, 'R2_train' : r2_train})
+            scipy.io.savemat(sub_path+'/implicit_feedback.mat', mdict={'R': r_m, 'R_train' : r_train})
+            scipy.io.savemat(sub_path+'/combined_rating.mat', mdict={'R': r2_m, 'R_train' : r2_train})
         # missing users filled with random cliques
         # rationale: we do not just want any randoms
         # if our current user has very little friends, then using randoms can result in not accurate rating
@@ -525,7 +525,7 @@ class Graph:
         # total num of edges
         n_edges = len(edge_idxs)
         # random_users = random.sample(copy_u, (num + 1 - count)) + random_users
-        r_edges = random.sample(edge_idxs, n_edges/10)
+        r_edges = random.sample(edge_idxs, int(n_edges/10))
         for r_edge in r_edges:
             (user_idx, game_idx) = r_edge
             r_train[user_idx, game_idx] = 0

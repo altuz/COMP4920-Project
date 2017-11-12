@@ -1,5 +1,5 @@
 % Load data from specific test folder
-load ../control_test/1000/control_test % Loads R and R_train
+load ../control_test/300/implicit_feedback % Loads R and R_train
 % Actual ratings
 % R = 'read from file'
 

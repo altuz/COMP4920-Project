@@ -34,6 +34,10 @@ NaN 3 NaN 3 5;
 NaN 2 5 4 NaN;
 NaN NaN 5 3 4]
 
+R_to_predict = R_train;
+R_to_predict(isnan(R_to_predict)) = 0;
+R_to_predict = R - R_to_predict;
+R_to_predict(R_to_predict == 0) = NaN;
 % Mean of training set
 r_bar = mean(R_train(:),'omitnan');
 % r_bar = 115/30 % for some reason txtbk example uses r_bar = 3.83
@@ -80,11 +84,11 @@ for j = 1:m
 			predictR = r_bar + b_u(i) + b_i(j);
 
 			% Range for 'ratings' is 0 to 1
-			if predictR > 5
-				predictR = 5;
-			elseif predictR < 1
-				predictR = 1;
-			end
+% 			if predictR > 5
+% 				predictR = 5;
+% 			elseif predictR < 1
+% 				predictR = 1;
+% 			end
 
 			R_hat(i,j) = predictR;
 		else
@@ -97,7 +101,7 @@ end
 diff_train = R_train - R_hat;  
 RMSE_train = sqrt(mean((diff_train(:)).^2,'omitnan')); 
 
-diff_test = R - R_hat;  
+diff_test = R_to_predict - R_hat;  
 RMSE_test = sqrt(mean((diff_test(:)).^2,'omitnan')); 
 
 % movie similarity matrix
@@ -163,11 +167,11 @@ for j = 1:m
 
 			predictR = r_bar + b_u(i) + b_i(j) + sum_d;
 
-			if predictR > 5
-				predictR = 5;
-			elseif predictR < 1
-				predictR = 1;
-			end
+% 			if predictR > 5
+% 				predictR = 5;
+% 			elseif predictR < 1
+% 				predictR = 1;
+% 			end
 
 			R_hat_n(i,j) = predictR;
 		else
@@ -181,7 +185,7 @@ end
 diff_train_n = R_train - R_hat_n;
 RMSE_train_n = sqrt(mean((diff_train_n(:)).^2,'omitnan')); 
 
-diff_test_n = R - R_hat_n;  
+diff_test_n = R_to_predict - R_hat_n;  
 RMSE_test_n = sqrt(mean((diff_test_n(:)).^2,'omitnan'));
 
 % Start of Latent Fagtor
@@ -189,7 +193,7 @@ RMSE_test_n = sqrt(mean((diff_test_n(:)).^2,'omitnan'));
 r_bar_mat = repmat(r_bar, size(R_train));
 r_demeaned = R_train - r_bar_mat;
 r_demeaned(isnan(r_demeaned))=0;
-[U, sigma, vt, flag] = svds(r_demeaned, 3);
+[U, sigma, vt, flag] = svds(r_demeaned, 5);
 
 % Making predictions from decomposed matrix
 r_tilde_latent = U * sigma * vt';
@@ -199,7 +203,7 @@ r_hat_latent = r_tilde_latent + r_bar_mat;
 diff_train_latent = R_train - r_hat_latent;
 RMSE_train_latent = sqrt(mean((diff_train_latent(:)).^2,'omitnan'));
 
-diff_test_latent = R - r_hat_latent;
+diff_test_latent = R_to_predict - r_hat_latent;
 RMSE_test_latent = sqrt(mean((diff_test_latent(:)).^2,'omitnan'));
 fprintf("Script complete\n")
 
@@ -242,11 +246,11 @@ for j = 1:m
 			predictR = w(1) * R_hat_n(i,j) + w(2) * r_hat_latent(i,j);
 
 			% Range for 'ratings' is 0 to 1
-			if predictR > 5
-				predictR = 5;
-			elseif predictR < 1
-				predictR = 1;
-			end
+% 			if predictR > 5
+% 				predictR = 5;
+% 			elseif predictR < 1
+% 				predictR = 1;
+% 			end
 
 			R_hat_c(i,j) = predictR;
 		else
@@ -259,12 +263,12 @@ end
 diff_train_c = R_train - R_hat_c;  
 RMSE_train_c = sqrt(mean((diff_train_c(:)).^2,'omitnan')); 
 
-diff_test_c = R - R_hat_c;  
+diff_test_c = R_to_predict - R_hat_c;  
 RMSE_test_c = sqrt(mean((diff_test_c(:)).^2,'omitnan')); 
 
 fprintf("----Baseline_predictor----\n");
 fprintf("RMSE_train %f\n", RMSE_train);
-fprintf("RMSE_test %f\n", RMSE_train);
+fprintf("RMSE_test %f\n", RMSE_test);
 
 fprintf("----Neighborhood----\n");
 fprintf("RMSE_train_n %f\n", RMSE_train_n);

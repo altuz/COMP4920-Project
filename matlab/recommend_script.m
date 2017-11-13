@@ -1,6 +1,6 @@
 % Load data from specific test folder
 tic % for timing
-load ../control_test/1000/implicit_feedback % Loads R and R_train
+load ../control_test/800/implicit_feedback % Loads R and R_train
 load ../control_test/ave_hours
 % Actual ratings
 % R = 'read from file'
@@ -172,7 +172,7 @@ RMSE_test_n = sqrt(mean((diff_test_n(:)).^2,'omitnan'));
 r_bar_mat = repmat(r_bar, size(R_train));
 r_demeaned = R_train - r_bar_mat;
 r_demeaned(isnan(r_demeaned))=0;
-[U, sigma, vt, flag] = svds(r_demeaned, 25);
+[U, sigma, vt, flag] = svds(r_demeaned, 50);
 
 % Making predictions from decomposed matrix
 r_tilde_latent = U * sigma * vt';
@@ -188,7 +188,7 @@ RMSE_test_latent = sqrt(mean((diff_test_latent(:)).^2,'omitnan'));
 % weighted sum of models
 fprintf("----Baseline_predictor----\n");
 fprintf("RMSE_train %f\n", RMSE_train);
-fprintf("RMSE_test %f\n", RMSE_train);
+fprintf("RMSE_test %f\n", RMSE_test);
 
 fprintf("----Neighborhood----\n");
 fprintf("RMSE_train_n %f\n", RMSE_train_n);

@@ -1,6 +1,7 @@
 % Load data from specific test folder
 tic % for timing
 load ../control_test/1000/implicit_feedback % Loads R and R_train
+load ../control_test/ave_hours
 % Actual ratings
 % R = 'read from file'
 
@@ -139,6 +140,16 @@ for j = 1:m
 				predictR = 1;
 			elseif predictR < 0
 				predictR = 0;
+%             elseif predictR < 0.2
+%                 predictR = 0.2;
+%             elseif predictR < 0.4
+%                 predictR = 0.4;
+%             elseif predictR < 0.6
+%                 predictR = 0.6;
+%             elseif predictR < 0.8
+%                 predictR = 0.8;
+%             elseif predictR < 1
+%                 predictR = 1;
 			end
 
 			R_hat_n(i,j) = predictR;
@@ -161,7 +172,7 @@ RMSE_test_n = sqrt(mean((diff_test_n(:)).^2,'omitnan'));
 r_bar_mat = repmat(r_bar, size(R_train));
 r_demeaned = R_train - r_bar_mat;
 r_demeaned(isnan(r_demeaned))=0;
-[U, sigma, vt, flag] = svds(r_demeaned, 100);
+[U, sigma, vt, flag] = svds(r_demeaned, 25);
 
 % Making predictions from decomposed matrix
 r_tilde_latent = U * sigma * vt';
@@ -173,5 +184,18 @@ RMSE_train_latent = sqrt(mean((diff_train_latent(:)).^2,'omitnan'));
 
 diff_test_latent = R - r_hat_latent;
 RMSE_test_latent = sqrt(mean((diff_test_latent(:)).^2,'omitnan'));
+
+% weighted sum of models
+fprintf("----Baseline_predictor----\n");
+fprintf("RMSE_train %f\n", RMSE_train);
+fprintf("RMSE_test %f\n", RMSE_train);
+
+fprintf("----Neighborhood----\n");
+fprintf("RMSE_train_n %f\n", RMSE_train_n);
+fprintf("RMSE_test_n %f\n", RMSE_test_n);
+
+fprintf("----Latent factor----\n");
+fprintf("RMSE_train_latent %f\n", RMSE_train_latent);
+fprintf("RMSE_test_latent %f\n", RMSE_test_latent);
 fprintf("Script complete\n")
 toc

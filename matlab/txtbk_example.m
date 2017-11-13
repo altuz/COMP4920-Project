@@ -189,7 +189,7 @@ RMSE_test_n = sqrt(mean((diff_test_n(:)).^2,'omitnan'));
 r_bar_mat = repmat(r_bar, size(R_train));
 r_demeaned = R_train - r_bar_mat;
 r_demeaned(isnan(r_demeaned))=0;
-[U, sigma, vt, flag] = svds(r_demeaned, 5);
+[U, sigma, vt, flag] = svds(r_demeaned, 3);
 
 % Making predictions from decomposed matrix
 r_tilde_latent = U * sigma * vt';
@@ -214,11 +214,11 @@ c = zeros(n_ratings, 1); % pre-fill for optimisation
 rowA = 1; 
 for j = 1:m 
 	for i = 1:n
-		if ~isnan(R(i,j))
+		if ~isnan(R_train(i,j))
 			A(rowA,1) = R_hat_n(i,j); % Column 1 for neighborhood
 			A(rowA,2) = r_hat_latent(i,j); % Column 2 for latent factor 
 
-			c(rowA) = R(i,j); 
+			c(rowA) = R_train(i,j); 
 			
 			rowA = rowA + 1;
 		end

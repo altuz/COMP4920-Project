@@ -8,3 +8,6 @@ backend/backend/migrations
 backend/steam_data/
 backend/steam_spy_data/
 backend/mysqlite.db
+mysqlite.db
+matlab/~$benchmarks.xlsx
+__pycache__/graph.cpython-35.pyc

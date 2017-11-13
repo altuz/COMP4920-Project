@@ -538,7 +538,7 @@ class Graph:
         # total num of edges
         n_edges = len(edge_idxs)
         # random_users = random.sample(copy_u, (num + 1 - count)) + random_users
-        r_edges = random.sample(edge_idxs, int(n_edges/10))
+        r_edges = random.sample(edge_idxs, int(n_edges/4))
         for r_edge in r_edges:
             (user_idx, game_idx) = r_edge
             r_train[user_idx, game_idx] = np.nan

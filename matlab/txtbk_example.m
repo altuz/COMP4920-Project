@@ -167,13 +167,15 @@ for j = 1:m
 			end
 
 			predictR = r_bar + b_u(i) + b_i(j) + sum_d;
-
-% 			if predictR > 5
-% 				predictR = 5;
-% 			elseif predictR < 1
-% 				predictR = 1;
-% 			end
-
+            
+            if ~isnan(R_to_predict(i,j))
+                if predictR > 5
+                    predictR = 5;
+                elseif predictR < 1
+                    predictR = 1;
+                end
+            end
+			
 
 			R_hat_n(i,j) = predictR;
 		else

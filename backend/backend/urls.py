@@ -45,5 +45,6 @@ urlpatterns = [
     url(r'^backend/is_following/', backend.views.is_following),
     url(r'^backend/unfollow_user/', backend.views.unfollow_user),
     url(r'^backend/edit_game_hrs/', backend.views.edit_game_hrs),
-    url(r'^backend/get_game_list/', backend.views.get_game_list)
+    url(r'^backend/get_game_list/', backend.views.get_game_list),
+    url(r'^backend/data_analysis/', backend.views.data_analysis)
 ]

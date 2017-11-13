@@ -733,6 +733,30 @@ def get_top_games(request):
     except:
         return HttpResponse('{"message":"input invalid", "get-top-games":{}}')
 
+# Just for data analysis
+# curl -X GET "http://localhost:8000/backend/data_analysis/?gameid=207610"
+@api_view(['GET'])
+def data_analysis(request):
+    # game_id = 578080 # PLAYERUNKNOWN'S BATTLEGROUNDS (PUBG)
+    # game_id = 113200 # Binding of isaac
+    # game_id = 319630 # Life is strange
+    # game_id = 207610 # The walking dead
+    target_game_id = int(request.GET.get('gameid'))
+    target_game = GameList.objects.filter(game_id=target_game_id)
+    player_set = PlayerLibrary.objects.filter(game_id=target_game).exclude(played_hrs=0)
+    
+    entries = []
+    for player in player_set:
+        player_obj = player.user_id
+        entry_dict = {}
+        entry_dict['username'] = player_obj.user_name
+        entry_dict['hrs'] = player.played_hrs
+        entries.append(entry_dict)
+    for entry in entries:
+        print(entry)
+    outputJSON = json.dumps(entries, ensure_ascii=False).encode('utf16')
+    return HttpResponse(outputJSON, content_type='application/json')
+
 # TESTED
 # Returns the game corresponding to given input gameid
 # @param    gameid of target game, if userid is provided, returns true/false for if in that users game/wishlist
@@ -1302,6 +1326,7 @@ def recommend_v2(request):
 
 
 def graph_setup():
+    # return # debugging for now
     global game_graph, user_set, game_set
     if game_graph is None:
         print("Initializing Graph")

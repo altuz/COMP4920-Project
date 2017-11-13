@@ -174,6 +174,7 @@ for j = 1:m
 % 				predictR = 1;
 % 			end
 
+
 			R_hat_n(i,j) = predictR;
 		else
 			R_hat_n(i,j) = NaN;
@@ -235,8 +236,8 @@ end
 % b = (A' * A) \ (A' * c) % Don't use this, 
 lambda = 1; % Is this how to regularise (A' * A) * b - lambda * b= A' c
 [n_A, m_A] = size(A' * A);
-% w = pinv(A' * A + lambda * eye(n_A, m_A))*(A' * c); % with regularisation
-w = pinv(A' * A)*(A' * c); % no regularisation 
+%w = pinv(A' * A + lambda * eye(n_A, m_A))*(A' * c); % with regularisation
+ w = pinv(A' * A)*(A' * c); % no regularisation 
 
 % Compute R_hat for combined model
 R_hat_c = zeros(n,m);

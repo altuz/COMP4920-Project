@@ -485,24 +485,35 @@ class Graph:
         path = "control_test"
         if not os.path.exists(path):
             os.makedirs(path)
+
+
         for i in range(3,11):
             sub_path = path + "/" + str(i * 100)
             if not os.path.exists(sub_path):
                 os.makedirs(sub_path)
             num_users = i * 100
             users = self.get_random_usernodes(id, num_users - 1)
-            (r_m, r_train, r2_m, r2_train) = self.r_matrix(users)
-            scipy.io.savemat(sub_path+'/implicit_feedback.mat', mdict={'R': r_m, 'R_train' : r_train})
-            scipy.io.savemat(sub_path+'/combined_rating.mat', mdict={'R': r2_m, 'R_train' : r2_train})
+            (r_m, r_train, r2_m, r2_train, r3_m, r3_train) = self.r_matrix(users)
+            scipy.io.savemat(sub_path+'/implicit_feedback.mat', mdict={'R': r_m, 'R_train' : r_train,
+                                                                       'Rh' : r3_m, 'Rh_train' : r3_train})
+            scipy.io.savemat(sub_path+'/combined_rating.mat', mdict={'R': r2_m, 'R_train' : r2_train,
+                                                                     'Rh': r3_m, 'Rh_train': r3_train})
+            # scipy.io.savemat(sub_path+'/raw_hours.mat', mdict={'R': r3_m, 'R_train' : r3_train})
         # missing users filled with random cliques
         # rationale: we do not just want any randoms
         # if our current user has very little friends, then using randoms can result in not accurate rating
+        ave_hours = self.ave_hours_vector()
+        scipy.io.savemat(path+'/ave_hours.mat', mdict={'ave_hours' : ave_hours})
+        return None
+
     # create the R matrix for collaborative filtering from the given user_list
     def r_matrix(self, user_list):
         r_m = np.full((len(user_list), self.game_count), np.nan)
         r_train = np.full((len(user_list), self.game_count), np.nan)
         r2_m = np.full((len(user_list), self.game_count), np.nan)
         r2_train = np.full((len(user_list), self.game_count), np.nan)
+        r3_m= np.full((len(user_list), self.game_count), np.nan)
+        r3_train = np.full((len(user_list), self.game_count), np.nan)
 
         edge_idxs = []
         # fill in r_m by going through all edges
@@ -520,6 +531,8 @@ class Graph:
                     ave_rate /= float(2)
                 r2_m[user_idx, game_idx] = ave_rate
                 r2_train[user_idx, game_idx] = ave_rate
+                r3_m[user_idx, game_idx] = edge.hours
+                r3_train[user_idx, game_idx] = edge.hours
 
         # hide away data in r_train
         # total num of edges
@@ -528,9 +541,16 @@ class Graph:
         r_edges = random.sample(edge_idxs, int(n_edges/10))
         for r_edge in r_edges:
             (user_idx, game_idx) = r_edge
-            r_train[user_idx, game_idx] = 0
-            r2_train[user_idx, game_idx] = 0
-        return (r_m, r_train, r2_m, r2_train)
+            r_train[user_idx, game_idx] = np.nan
+            r2_train[user_idx, game_idx] = np.nan
+            r3_train[user_idx, game_idx] = np.nan
+        return (r_m, r_train, r2_m, r2_train, r3_m, r3_train)
+
+    def ave_hours_vector(self):
+        ave_hour = np.full((1, self.game_count), np.nan)
+        for game_idx in range(0, self.game_count):
+            ave_hour[0, game_idx] = self.g_nodes[game_idx].average_hours
+        return ave_hour
 class Node:
     # define a new node
     def __init__(self, nt, nid):

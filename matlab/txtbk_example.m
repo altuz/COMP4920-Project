@@ -34,6 +34,7 @@ NaN 3 NaN 3 5;
 NaN 2 5 4 NaN;
 NaN NaN 5 3 4]
 
+% Lol
 R_to_predict = R_train;
 R_to_predict(isnan(R_to_predict)) = 0;
 R_to_predict = R - R_to_predict;

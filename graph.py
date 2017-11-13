@@ -3,6 +3,7 @@ import numpy as np
 import random
 import scipy.io
 import os
+from latent_factor import matrix_factorization
 # Bipartite graph between set of users and set of games
 class Graph:
     # define empty graph
@@ -494,10 +495,19 @@ class Graph:
             num_users = i * 100
             users = self.get_random_usernodes(id, num_users - 1)
             (r_m, r_train, r2_m, r2_train, r3_m, r3_train) = self.r_matrix(users)
-            scipy.io.savemat(sub_path+'/implicit_feedback.mat', mdict={'R': r_m, 'R_train' : r_train,
-                                                                       'Rh' : r3_m, 'Rh_train' : r3_train})
-            scipy.io.savemat(sub_path+'/combined_rating.mat', mdict={'R': r2_m, 'R_train' : r2_train,
-                                                                     'Rh': r3_m, 'Rh_train': r3_train})
+            # calculate latent factor
+            # N = num_users
+            # M = self.game_count
+            # K = 10
+            #
+            # P = np.random.rand(N, K)
+            # Q = np.random.rand(M, K)
+            # nP, nQ = matrix_factorization(r_train, P, Q, K)
+            # save into file
+            scipy.io.savemat(sub_path + '/implicit_feedback.mat', mdict={'R': r_m, 'R_train': r_train,
+                                                                         'Rh': r3_m, 'Rh_train': r3_train})
+            scipy.io.savemat(sub_path + '/combined_rating.mat', mdict={'R': r2_m, 'R_train': r2_train,
+                                                                       'Rh': r3_m, 'Rh_train': r3_train})
             # scipy.io.savemat(sub_path+'/raw_hours.mat', mdict={'R': r3_m, 'R_train' : r3_train})
         # missing users filled with random cliques
         # rationale: we do not just want any randoms

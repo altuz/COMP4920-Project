@@ -11,3 +11,4 @@ backend/mysqlite.db
 mysqlite.db
 matlab/~$benchmarks.xlsx
 __pycache__/graph.cpython-35.pyc
+*.pyc

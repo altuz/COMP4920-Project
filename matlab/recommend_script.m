@@ -1,12 +1,16 @@
 % Load data from specific test folder
 tic % for timing
-load ../control_test/800/implicit_feedback % Loads R and R_train
+load ../control_test/1000/implicit_feedback % Loads R and R_train
 load ../control_test/ave_hours
 % Actual ratings
 % R = 'read from file'
 
 % Training set
 % R_train = 'read from file'
+R_to_predict = R_train;
+R_to_predict(isnan(R_to_predict)) = 0;
+R_to_predict = R - R_to_predict;
+R_to_predict(R_to_predict == 0) = NaN;
 
 % Mean of training set
 r_bar = mean(R_train(:),'omitnan');
@@ -70,7 +74,7 @@ end
 diff_train = R_train - R_hat;  
 RMSE_train = sqrt(mean((diff_train(:)).^2,'omitnan')); 
 
-diff_test = R - R_hat;  
+diff_test = R_to_predict - R_hat;  
 RMSE_test = sqrt(mean((diff_test(:)).^2,'omitnan')); 
 
 % movie similarity matrix
@@ -164,7 +168,7 @@ end
 diff_train_n = R_train - R_hat_n;
 RMSE_train_n = sqrt(mean((diff_train_n(:)).^2,'omitnan')); 
 
-diff_test_n = R - R_hat_n;  
+diff_test_n = R_to_predict - R_hat_n;  
 RMSE_test_n = sqrt(mean((diff_test_n(:)).^2,'omitnan'));
 
 % Start of Latent Fagtor
@@ -172,7 +176,7 @@ RMSE_test_n = sqrt(mean((diff_test_n(:)).^2,'omitnan'));
 r_bar_mat = repmat(r_bar, size(R_train));
 r_demeaned = R_train - r_bar_mat;
 r_demeaned(isnan(r_demeaned))=0;
-[U, sigma, vt, flag] = svds(r_demeaned, 50);
+[U, sigma, vt, flag] = svds(r_demeaned, 40);
 
 % Making predictions from decomposed matrix
 r_tilde_latent = U * sigma * vt';
@@ -182,10 +186,68 @@ r_hat_latent = r_tilde_latent + r_bar_mat;
 diff_train_latent = R_train - r_hat_latent;
 RMSE_train_latent = sqrt(mean((diff_train_latent(:)).^2,'omitnan'));
 
-diff_test_latent = R - r_hat_latent;
+diff_test_latent = R_to_predict - r_hat_latent;
 RMSE_test_latent = sqrt(mean((diff_test_latent(:)).^2,'omitnan'));
+% Combining latent factor and neighborhood model
+% Making matrix A for training set
+[n, m] = size(R_train);
+n_ratings = sum(~isnan(R_train(:))); 
 
+A = zeros(n_ratings, 2); % pre-fill for optimisation
+c = zeros(n_ratings, 1); % pre-fill for optimisation
+
+rowA = 1; 
+for j = 1:m 
+	for i = 1:n
+		if ~isnan(R_train(i,j))
+			A(rowA,1) = R_hat_n(i,j); % Column 1 for neighborhood
+			A(rowA,2) = r_hat_latent(i,j); % Column 2 for latent factor 
+
+			c(rowA) = R_train(i,j); 
+			
+			rowA = rowA + 1;
+		end
+	end
+end 
+
+% Linear equation to solve
+% (A' * A) * b = A' c
+% b = (A' * A) \ (A' * c) % Don't use this, 
+lambda = 1; % Is this how to regularise (A' * A) * b - lambda * b= A' c
+[n_A, m_A] = size(A' * A);
+% w = pinv(A' * A + lambda * eye(n_A, m_A))*(A' * c); % with regularisation
+w = pinv(A' * A)*(A' * c); % no regularisation 
+
+% Compute R_hat for combined model
+R_hat_c = zeros(n,m);
+
+for j = 1:m
+    for i = 1:n 
+		if ~isnan(R(i,j)) % Don't really need this if statement
+			predictR = w(1) * R_hat_n(i,j) + w(2) * r_hat_latent(i,j);
+
+			% Range for 'ratings' is 0 to 1
+% 			if predictR > 5
+% 				predictR = 5;
+% 			elseif predictR < 1
+% 				predictR = 1;
+% 			end
+
+			R_hat_c(i,j) = predictR;
+		else
+			R_hat_c(i,j) = NaN;
+		end
+	end
+end
+
+% Check the RMSE compared to training set
+diff_train_c = R_train - R_hat_c;  
+RMSE_train_c = sqrt(mean((diff_train_c(:)).^2,'omitnan')); 
+
+diff_test_c = R_to_predict - R_hat_c;  
+RMSE_test_c = sqrt(mean((diff_test_c(:)).^2,'omitnan')); 
 % weighted sum of models
+
 fprintf("----Baseline_predictor----\n");
 fprintf("RMSE_train %f\n", RMSE_train);
 fprintf("RMSE_test %f\n", RMSE_test);
@@ -197,5 +259,9 @@ fprintf("RMSE_test_n %f\n", RMSE_test_n);
 fprintf("----Latent factor----\n");
 fprintf("RMSE_train_latent %f\n", RMSE_train_latent);
 fprintf("RMSE_test_latent %f\n", RMSE_test_latent);
+
+fprintf("----Combined----\n");
+fprintf("RMSE_train_c %f\n", RMSE_train_c);
+fprintf("RMSE_test_c %f\n", RMSE_test_c);
 fprintf("Script complete\n")
 toc

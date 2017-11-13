@@ -191,7 +191,7 @@ RMSE_test_n = sqrt(mean((diff_test_n(:)).^2,'omitnan'));
 r_bar_mat = repmat(r_bar, size(R_train));
 r_demeaned = R_train - r_bar_mat;
 r_demeaned(isnan(r_demeaned))=0;
-[U, sigma, vt, flag] = svds(r_demeaned, 5);
+[U, sigma, vt, flag] = svds(r_demeaned, 3);
 
 % Making predictions from decomposed matrix
 r_tilde_latent = U * sigma * vt';

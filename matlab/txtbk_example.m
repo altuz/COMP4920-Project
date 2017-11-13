@@ -66,8 +66,8 @@ end
 % b = (A' * A) \ (A' * c) % Don't use this, 
 lambda = 1; % Is this how to regularise (A' * A) * b - lambda * b= A' c
 [n_A, m_A] = size(A' * A);
-b = pinv(A' * A + lambda * eye(n_A, m_A))*(A' * c); % with regularisation
-% b = pinv(A' * A)*(A' * c); % no regularisation
+%b = pinv(A' * A + lambda * eye(n_A, m_A))*(A' * c); % with regularisation
+b = pinv(A' * A)*(A' * c); % no regularisation
 b_u = b(1:n,1);
 b_i = b((n+1):(n+m),1);
 
@@ -80,10 +80,10 @@ for j = 1:m
 			predictR = r_bar + b_u(i) + b_i(j);
 
 			% Range for 'ratings' is 0 to 1
-			if predictR > 1
+			if predictR > 5
+				predictR = 5;
+			elseif predictR < 1
 				predictR = 1;
-			elseif predictR < 0
-				predictR = 0;
 			end
 
 			R_hat(i,j) = predictR;
@@ -163,10 +163,10 @@ for j = 1:m
 
 			predictR = r_bar + b_u(i) + b_i(j) + sum_d;
 
-			if predictR > 1
+			if predictR > 5
+				predictR = 5;
+			elseif predictR < 1
 				predictR = 1;
-			elseif predictR < 0
-				predictR = 0;
 			end
 
 			R_hat_n(i,j) = predictR;
@@ -202,4 +202,79 @@ RMSE_train_latent = sqrt(mean((diff_train_latent(:)).^2,'omitnan'));
 diff_test_latent = R - r_hat_latent;
 RMSE_test_latent = sqrt(mean((diff_test_latent(:)).^2,'omitnan'));
 fprintf("Script complete\n")
+
+% Combining latent factor and neighborhood model
+% Making matrix A for training set
+[n, m] = size(R_train);
+n_ratings = sum(~isnan(R_train(:))); 
+
+A = zeros(n_ratings, 2); % pre-fill for optimisation
+c = zeros(n_ratings, 1); % pre-fill for optimisation
+
+rowA = 1; 
+for j = 1:m 
+	for i = 1:n
+		if ~isnan(R(i,j))
+			A(rowA,1) = R_hat_n(i,j); % Column 1 for neighborhood
+			A(rowA,2) = r_hat_latent(i,j); % Column 2 for latent factor 
+
+			c(rowA) = R(i,j); 
+			
+			rowA = rowA + 1;
+		end
+	end
+end 
+
+% Linear equation to solve
+% (A' * A) * b = A' c
+% b = (A' * A) \ (A' * c) % Don't use this, 
+lambda = 1; % Is this how to regularise (A' * A) * b - lambda * b= A' c
+[n_A, m_A] = size(A' * A);
+% w = pinv(A' * A + lambda * eye(n_A, m_A))*(A' * c); % with regularisation
+w = pinv(A' * A)*(A' * c); % no regularisation 
+
+% Compute R_hat for combined model
+R_hat_c = zeros(n,m);
+
+for j = 1:m
+    for i = 1:n 
+		if ~isnan(R(i,j)) % Don't really need this if statement
+			predictR = w(1) * R_hat_n(i,j) + w(2) * r_hat_latent(i,j);
+
+			% Range for 'ratings' is 0 to 1
+			if predictR > 5
+				predictR = 5;
+			elseif predictR < 1
+				predictR = 1;
+			end
+
+			R_hat_c(i,j) = predictR;
+		else
+			R_hat_c(i,j) = NaN;
+		end
+	end
+end
+
+% Check the RMSE compared to training set
+diff_train_c = R_train - R_hat_c;  
+RMSE_train_c = sqrt(mean((diff_train_c(:)).^2,'omitnan')); 
+
+diff_test_c = R - R_hat_c;  
+RMSE_test_c = sqrt(mean((diff_test_c(:)).^2,'omitnan')); 
+
+fprintf("----Baseline_predictor----\n");
+fprintf("RMSE_train %f\n", RMSE_train);
+fprintf("RMSE_test %f\n", RMSE_train);
+
+fprintf("----Neighborhood----\n");
+fprintf("RMSE_train_n %f\n", RMSE_train_n);
+fprintf("RMSE_test_n %f\n", RMSE_test_n);
+
+fprintf("----Latent factor----\n");
+fprintf("RMSE_train_latent %f\n", RMSE_train_latent);
+fprintf("RMSE_test_latent %f\n", RMSE_test_latent);
+
+fprintf("----Combined----\n");
+fprintf("RMSE_train_c %f\n", RMSE_train_c);
+fprintf("RMSE_test_c %f\n", RMSE_test_c);
 toc

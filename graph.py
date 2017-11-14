@@ -509,7 +509,7 @@ class Graph:
                                                                          'P' : nP, 'Q' : nQ})
             P = np.random.rand(N, K)
             Q = np.random.rand(M, K)
-            nP, nQ = matrix_factorization(r2_train, P, Q, K, 100)
+            nP, nQ = matrix_factorization(r2_train, P, Q, K, 500)
             scipy.io.savemat(sub_path + '/combined_rating.mat', mdict={'R': r2_m, 'R_train': r2_train,
                                                                        'Rh': r3_m, 'Rh_train': r3_train,
                                                                        'P' : nP, 'Q' : nQ})

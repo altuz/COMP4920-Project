@@ -1,6 +1,6 @@
 % Load data from specific test folder
 tic % for timing
-load ../control_test/1000/implicit_feedback % Loads R and R_train
+load ../control_test/300/implicit_feedback % Loads R and R_train
 load ../control_test/ave_hours
 % Actual ratings
 % R = 'read from file'
@@ -247,6 +247,14 @@ RMSE_train_c = sqrt(mean((diff_train_c(:)).^2,'omitnan'));
 diff_test_c = R_to_predict - R_hat_c;  
 RMSE_test_c = sqrt(mean((diff_test_c(:)).^2,'omitnan')); 
 % weighted sum of models
+
+%new latent
+diff_train_l2 = R_to_predict - (P * Q');
+RMSE_train_l2 = sqrt(mean((diff_train_l2(:)).^2,'omitnan'));
+
+diff_test_l2 = R_train - (P * Q');
+RMSE_test_l2 = sqrt(mean((diff_test_l2(:)).^2,'omitnan'));
+
 
 fprintf("----Baseline_predictor----\n");
 fprintf("RMSE_train %f\n", RMSE_train);

@@ -24,12 +24,14 @@ except:
 @OUTPUT:
     the final matrices P and Q
 """
-def matrix_factorization(R, P, Q, K, steps=5000, alpha=0.0002, beta=0.02):
+def matrix_factorization(R_, P, Q, K, steps=5000, alpha=0.0002, beta=0.02):
     Q = Q.T
+    R = numpy.nan_to_num(R_, True)
+
     for step in range(steps):
         for i in range(len(R)):
             for j in range(len(R[i])):
-                if R[i][j] is not numpy.nan:
+                if R[i][j] is not 0:
                     eij = R[i][j] - numpy.dot(P[i,:],Q[:,j])
                     for k in range(K):
                         P[i][k] = P[i][k] + alpha * (2 * eij * Q[k][j] - beta * P[i][k])

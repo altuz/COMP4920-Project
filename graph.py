@@ -363,8 +363,8 @@ class Graph:
         for game in self.g_nodes:
             game.average_weight()
             game.calcHoursNorm()
-            global_total_hoursNorm += game.total_hoursNorm
-            global_num_users += game.num_users
+            global_total_hoursNorm += (game.total_hoursNorm / game.num_users)
+            global_num_users += 1
             # print("game {} has averages of ({} hours, {} rating)".format(self.gid_names[game.node_id], game.average_hours, game.average_rating))
 
         self.global_total_hoursNorm = global_total_hoursNorm
@@ -500,17 +500,17 @@ class Graph:
             M = self.game_count
             K = 10
 
-            P = np.random.rand(N, K)
-            Q = np.random.rand(M, K)
-            nP, nQ = matrix_factorization(r_train, P, Q, K, 100)
+            nP = P = np.random.rand(N, K)
+            nQ = Q = np.random.rand(M, K)
+            # nP, nQ = matrix_factorization(r_train, P, Q, K, 100)
             # save into file
-            scipy.io.savemat(sub_path + '/implicit_feedback.mat', mdict={'R': r_m, 'R_train': r_train,
+            scipy.io.savemat(sub_path + '/implicit_feedback_med.mat', mdict={'R': r_m, 'R_train': r_train,
                                                                          'Rh': r3_m, 'Rh_train': r3_train,
                                                                          'P' : nP, 'Q' : nQ})
             P = np.random.rand(N, K)
             Q = np.random.rand(M, K)
-            nP, nQ = matrix_factorization(r2_train, P, Q, K, 500)
-            scipy.io.savemat(sub_path + '/combined_rating.mat', mdict={'R': r2_m, 'R_train': r2_train,
+            # nP, nQ = matrix_factorization(r2_train, P, Q, K, 500)
+            scipy.io.savemat(sub_path + '/combined_rating_med.mat', mdict={'R': r2_m, 'R_train': r2_train,
                                                                        'Rh': r3_m, 'Rh_train': r3_train,
                                                                        'P' : nP, 'Q' : nQ})
             # scipy.io.savemat(sub_path+'/raw_hours.mat', mdict={'R': r3_m, 'R_train' : r3_train})
@@ -518,7 +518,9 @@ class Graph:
         # rationale: we do not just want any randoms
         # if our current user has very little friends, then using randoms can result in not accurate rating
         ave_hours = self.ave_hours_vector()
-        scipy.io.savemat(path+'/ave_hours.mat', mdict={'ave_hours' : ave_hours})
+        med_hours = self.med_hours_vector()
+        max_hours = self.max_hours_vector()
+        scipy.io.savemat(path+'/ave_hours.mat', mdict={'ave_hours' : ave_hours, 'med_hours' : med_hours, 'max_hours' : max_hours})
         return None
 
     # create the R matrix for collaborative filtering from the given user_list
@@ -566,6 +568,18 @@ class Graph:
         for game_idx in range(0, self.game_count):
             ave_hour[0, game_idx] = self.g_nodes[game_idx].average_hours
         return ave_hour
+
+    def med_hours_vector(self):
+        ave_hour = np.full((1, self.game_count), np.nan)
+        for game_idx in range(0, self.game_count):
+            ave_hour[0, game_idx] = self.g_nodes[game_idx].median_hours
+        return ave_hour
+
+    def max_hours_vector(self):
+        ave_hour = np.full((1, self.game_count), np.nan)
+        for game_idx in range(0, self.game_count):
+            ave_hour[0, game_idx] = self.g_nodes[game_idx].max_hours
+        return ave_hour
 class Node:
     # define a new node
     def __init__(self, nt, nid):
@@ -576,6 +590,8 @@ class Node:
         # averages
         self.average_hours = 0
         self.average_rating = 0
+        self.median_hours = 0
+        self.max_hours = 0
         # number of reviews
         self.num_rating = 0
         # fields to be used for global average calc
@@ -604,11 +620,15 @@ class Node:
         total_hours = 0
         total_rating = 0
         rating_count = 0
+        hour_list = []
         for edge in self.edges:
             total_hours += edge.hours
+            hour_list.append(edge.hours)
             if edge.rating is not -1:
                 total_rating += edge.rating
                 rating_count += 1
+        hour_list.sort()
+        self.median_hours = hour_list[int(len(hour_list)/2)]
         self.num_rating = rating_count
         self.average_hours = float(total_hours)/len(self.edges)
         self.average_rating = float(total_rating)/rating_count if rating_count is not 0 else -1
@@ -618,10 +638,12 @@ class Node:
         max = 0
         self.num_users = 0
         self.total_hoursNorm = 0
+
         for edge in self.edges:
-            edge.hoursNorm = math.atan(edge.hours/(self.average_hours))
+            edge.hoursNorm = math.atan(edge.hours/(self.median_hours))
             if(edge.hoursNorm > max):
                 max = edge.hoursNorm
+                self.max_hours = max
             # print("------------edge hr: " + str(edge.hours) + ", node ave hr:" + str(self.average_hours) + " atanHr:" + str(edge.hoursNorm))
         # TODO not sure if need to scale even, since going to use for ranking
         # Scale according to the max so that value ranges are between 0 and 1
@@ -634,6 +656,7 @@ class Node:
             # print("------Adjusted-----edge hr: " + str(edge.hours) + ", node ave hr:"
             #       + str(self.average_hours) + " atanHr:" + str(edge.hoursNorm) + ", max: " + str(max))
         #print("For game: " + str(self.node_id) + ", total users = " + str(self.num_users)
+        # print("{}".format(self.total_hoursNorm/self.num_users))
         #    + ", total_hoursNorm = " + str(self.total_hoursNorm))
 
 class Edge:

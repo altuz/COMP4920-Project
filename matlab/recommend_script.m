@@ -364,6 +364,7 @@ diff_test_l2 = R_train - (P * Q');
 RMSE_test_l2 = sqrt(mean((diff_test_l2(:)).^2,'omitnan'));
 
 
+
 fprintf("----Baseline_predictor----\n");
 fprintf("RMSE_train %f\n", RMSE_train);
 fprintf("RMSE_test %f\n", RMSE_test);

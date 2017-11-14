@@ -171,6 +171,114 @@ RMSE_train_n = sqrt(mean((diff_train_n(:)).^2,'omitnan'));
 diff_test_n = R_to_predict - R_hat_n;  
 RMSE_test_n = sqrt(mean((diff_test_n(:)).^2,'omitnan'));
 
+% =================================================================================================
+% Neighborhood model with User neighbors
+% =================================================================================================
+% movie similarity matrix
+R_tilde = R_train - R_hat;
+D_user = zeros(n,n);
+
+for j = 1:n
+    for i = 1:n
+		if ~(i == j)
+			% Compute similarity value
+			sum_i_sq = 0;
+			sum_j_sq = 0;
+			sum_pair = 0;
+			for k = 1:m
+				if ~isnan(R_tilde(i,k)) && ~isnan(R_tilde(j,k))
+					% fprintf('both %d and %d rated movie %d\n', i, j, k);
+					sum_pair = sum_pair + R_tilde(i,k) * R_tilde(j,k);
+					sum_i_sq = sum_i_sq + R_tilde(i,k) ^ 2;
+					sum_j_sq = sum_j_sq + R_tilde(j,k) ^ 2;
+				end
+			end
+			D_user(i,j) = sum_pair/sqrt(sum_i_sq*sum_j_sq);
+		else 
+			D_user(i,j) = NaN;
+		end
+	end
+end
+
+% r_hat_n for neighborhood model
+R_hat_n_user = zeros(n,m);
+L = 2; % Variable for number of neighbors that will count in neighborhood model
+for j = 1:m 
+	for i = 1:n
+		if ~isnan(R(i,j)) % Don't really need this if statement, unless we're testing for RMSE 
+
+			% Sum for top 2 movie neighbors to movie j 
+			neigh_abs = [(1:n)', abs(D_user(:,i))]; % Store movie neighbors to j and the movie index
+			neigh_abs = sortrows(neigh_abs, 2, 'descend'); 
+			neigh_abs = neigh_abs(sum(isnan(neigh_abs),2)==0);
+
+			% TODO Calculate neighborhood factor
+			% Step 1: Find top L
+			sum_dr = 0; % using similarity d as the prediction weight (basic method)
+			sum_abs_d = 0;
+			for index = 1:min(length(neigh_abs), L) % For neighbor movies, L is limit variable
+				% FOR MOVIES
+				% n_i = neigh_abs(index);
+    %             % fprintf('n_i:%d\n', n_i)
+				% if ~isnan(R_tilde(i, n_i))
+				% 	% Using similarity d as the weighting
+                    
+				% 	% fprintf('user: %d, neighbor: %d\n', i, n_i)
+				% 	% fprintf('cosine coeff: %d\n', D_movie(j,n_i))
+				% 	sum_dr = sum_dr + D_movie(j,n_i) * R_tilde(i,n_i);
+				% 	sum_abs_d = sum_abs_d + abs(D_movie(j,n_i));
+				% end
+
+				% FOR USERS??? WHAT SHOULD PARAMS BE?
+				n_i = neigh_abs(index);
+                % fprintf('n_i:%d\n', n_i)
+				if ~isnan(R_tilde(n_i, j))
+					% Using similarity d as the weighting
+                    
+					% fprintf('user: %d, neighbor: %d\n', i, n_i)
+					% fprintf('cosine coeff: %d\n', D_movie(j,n_i))
+					sum_dr = sum_dr + D_user(n_i,i) * R_tilde(n_i,j);
+					sum_abs_d = sum_abs_d + abs(D_user(n_i,i));
+				end
+			end
+
+			% Neighborhood model: Calc normalised weighted sum of weightings 
+			if (sum_abs_d == 0) 
+				sum_d = 0;
+			else
+				sum_d = sum_dr/sum_abs_d;
+			end
+
+			predictR = r_bar + b_u(i) + b_i(j) + sum_d;
+            
+            if ~isnan(R_to_predict(i,j))
+                if predictR > 5
+                    predictR = 5;
+                elseif predictR < 1
+                    predictR = 1;
+                end
+            end
+			
+
+			R_hat_n_user(i,j) = predictR;
+		else
+			R_hat_n_user(i,j) = NaN;
+		end
+	end
+end
+
+% TODO play around with capping in above if predictR > 5 statement
+% Check the RMSE compared to training set
+diff_train_n_user = R_train - R_hat_n_user;
+RMSE_train_n_user = sqrt(mean((diff_train_n_user(:)).^2,'omitnan')); 
+
+diff_test_n_user = R_to_predict - R_hat_n_user;  
+RMSE_test_n_user = sqrt(mean((diff_test_n_user(:)).^2,'omitnan'));
+
+% =================================================================================================
+% Latent factor (not correct, do on python)
+% =================================================================================================
+
 % Start of Latent Fagtor
 % TODO: Might want to consider R_tilde/R_hat instead of R?
 r_bar_mat = repmat(r_bar, size(R_train));
@@ -263,6 +371,10 @@ fprintf("RMSE_test %f\n", RMSE_test);
 fprintf("----Neighborhood----\n");
 fprintf("RMSE_train_n %f\n", RMSE_train_n);
 fprintf("RMSE_test_n %f\n", RMSE_test_n);
+
+fprintf("----Neighborhood Users----\n");
+fprintf("RMSE_train_n_user %f\n", RMSE_train_n_user);
+fprintf("RMSE_test_n_user %f\n", RMSE_test_n_user);
 
 fprintf("----Latent factor----\n");
 fprintf("RMSE_train_latent %f\n", RMSE_train_latent);

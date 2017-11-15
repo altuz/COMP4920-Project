@@ -1,0 +1,109 @@
+tic
+load ../control_test/300/implicit_feedback % Loads R and R_train
+load ../control_test/ave_hours
+
+% get size of matrices
+[n, m] = size(Rh);
+% make a copy of matrices, and normalize those
+R_train = Rh_train;
+R = Rh;
+norm_max_hours = zeros(size(max_hours));
+for i = 1:m
+    % divide row by median
+%     R_train(:, i) = atan(R_train(:,i)/mean(R(:, i), 'omitnan'));
+%     R(:, i) = atan(R(:,i)/mean(R(:, i), 'omitnan'));
+    R_train(:, i) = atan(R_train(:,i)/ave_hours(i));
+    R(:, i) = atan(R(:,i)/ave_hours(i));
+
+    % get max value in column
+    [max_v, max_idx] = max(R(:,i));
+    % divide all value by max
+%     R_train(:, i) = R_train(:,i)/max_v;
+%     R(:, i) = R(:, i)/max_v;
+    norm_max_hours(i) = atan(max_hours(i)/ave_hours(i));
+    R_train(:, i) = R_train(:,i)/norm_max_hours(i);
+    R(:, i) = R(:, i)/norm_max_hours(i);
+    % put in vector
+end
+
+for j = 1:m
+    for i = 1:n
+        if all(R(i,j) >= 0 & R(i,j) < 0.2)
+            R(i, j) = 0.2
+        elseif all(R(i,j) >= 0.2 & R(i,j) < 0.4)
+            R(i, j) = 0.4
+        elseif all(R(i,j) >= 0.4 & R(i,j) < 0.6)
+            R(i, j) = 0.6
+        elseif all(R(i,j) >= 0.6 & R(i,j) < 0.8)
+            R(i, j) = 0.8
+        elseif all(R(i,j) >= 0.8 & R(i,j) < 1)
+            R(i, j) = 1.0
+        end
+        
+        if isnan(
+    end
+end
+
+% Training set
+% R_train = 'read from file'
+R_to_predict = R_train;
+R_to_predict(isnan(R_to_predict)) = 0;
+R_to_predict = R - R_to_predict;
+R_to_predict(R_to_predict == 0) = NaN;
+
+% measure of general user dedication
+r_bar = mean(R_train(:), 'omitnan');
+n_ratings = sum(~isnan(R_train(:)));
+% measure of user bias 
+b_u = zeros(1, n);
+
+for i = 1:n
+    user_vec = R_train(:, i) - r_bar;
+    b_u(i) = mean(user_vec(:), 'omitnan');
+    if isnan(b_u(i))
+        b_u(i) = 0;
+    end
+end
+
+A = zeros(n_ratings, m);
+c = zeros(n_ratings, 1);
+rowA = 1;
+for j = 1:m 
+	for i = 1:n
+		if ~isnan(R_train(i,j))
+            % we just need to calc movie bias
+			A(rowA,j) = 1;
+			c(rowA) = R_train(i,j) - r_bar - b_u(i); 
+			rowA = rowA + 1;
+		end
+	end
+end 
+% Linear equation to solve
+% (A' * A) * b = A' c
+% b = (A' * A) \ (A' * c) % Don't use this, 
+lambda = 1; % Is this how to regularise (A' * A) * b - lambda * b= A' c
+[n_A, m_A] = size(A' * A);
+b = pinv(A' * A + lambda * eye(n_A, m_A))*(A' * c); % with regularisation
+% b_i = pinv(A' * A)*(A' * c); % no regularisation
+
+R_hat = zeros(n,m);
+
+for j = 1:m
+    for i = 1:n 
+		if ~isnan(R(i,j)) % Don't really need this if statement
+			predictR = r_bar + b_u(i) + b_i(j);
+			R_hat(i,j) = predictR;
+		else
+			R_hat(i,j) = NaN;
+		end
+	end
+end
+
+% Check the RMSE compared to training set
+diff_train = R_train - R_hat;  
+RMSE_train = sqrt(mean((diff_train(:)).^2,'omitnan')); 
+
+diff_test = R_to_predict - R_hat;  
+RMSE_test = sqrt(mean((diff_test(:)).^2,'omitnan')); 
+
+toc

@@ -84,8 +84,8 @@ for j = 1:m
 				predictR = 1;
 			elseif predictR < 0
 				predictR = 0;
-			end
-
+            end
+            
 			R_hat(i,j) = predictR;
 		else
 			R_hat(i,j) = NaN;
@@ -160,11 +160,11 @@ for j = 1:m
 				sum_d = 0;
 			else
 				sum_d = sum_dr/sum_abs_d;
-			end
-
+            end
+            
 			predictR = r_bar + b_u(i) + b_i(j) + sum_d;
-            predictR = (tan(r_bar * norm_max_hours(j)) + tan(b_u(i) * norm_max_hours(j)) + tan(b_i(j) * norm_max_hours(j)) + tan(sum_d * norm_max_hours(j))) * ave_hours(j);
-            predictR = atan(predictR/ave_hours(j))/norm_max_hours(j);
+%             predictR = (tan(r_bar * norm_max_hours(j)) + tan(b_u(i) * norm_max_hours(j)) + tan(b_i(j) * norm_max_hours(j)) + tan(sum_d * norm_max_hours(j))) * ave_hours(j);
+%             predictR = atan(predictR/ave_hours(j))/norm_max_hours(j);
 			if predictR > 1
 				predictR = 1;
 			elseif predictR < 0
@@ -259,28 +259,26 @@ for j = 1:m
                 % fprintf('n_i:%d\n', n_i)
 				if ~isnan(R_tilde(n_i, j))
 					% Using similarity d as the weighting
-                    
 					% fprintf('user: %d, neighbor: %d\n', i, n_i)
 					% fprintf('cosine coeff: %d\n', D_movie(j,n_i))
 					sum_dr = sum_dr + D_user(n_i,i) * R_tilde(n_i,j);
 					sum_abs_d = sum_abs_d + abs(D_user(n_i,i));
 				end
-			end
-
+            end
+        
 			% Neighborhood model: Calc normalised weighted sum of weightings 
 			if (sum_abs_d == 0) 
 				sum_d = 0;
 			else
 				sum_d = sum_dr/sum_abs_d;
-			end
-
+            end
 			predictR = r_bar + b_u(i) + b_i(j) + sum_d;
             
             if ~isnan(R_to_predict(i,j))
-                if predictR > 5
-                    predictR = 5;
-                elseif predictR < 1
+                if predictR > 1
                     predictR = 1;
+                elseif predictR < 0
+                    predictR = 0;
                 end
             end
 			
@@ -309,7 +307,7 @@ RMSE_test_n_user = sqrt(mean((diff_test_n_user(:)).^2,'omitnan'));
 r_bar_mat = repmat(r_bar, size(R_train));
 r_demeaned = R_train - r_bar_mat;
 r_demeaned(isnan(r_demeaned))=0;
-[U, sigma, vt, flag] = svds(r_demeaned, 40);
+[U, sigma, vt, flag] = svds(r_demeaned, 100);
 
 % Making predictions from decomposed matrix
 r_tilde_latent = U * sigma * vt';
@@ -328,13 +326,13 @@ n_ratings = sum(~isnan(R_train(:)));
 
 A = zeros(n_ratings, 2); % pre-fill for optimisation
 c = zeros(n_ratings, 1); % pre-fill for optimisation
-
+r_grad_descent = P * Q';
 rowA = 1; 
 for j = 1:m 
 	for i = 1:n
 		if ~isnan(R_train(i,j))
 			A(rowA,1) = R_hat_n(i,j); % Column 1 for neighborhood
-			A(rowA,2) = r_hat_latent(i,j); % Column 2 for latent factor 
+			A(rowA,2) = r_grad_descent(i,j); % Column 2 for latent factor 
 
 			c(rowA) = R_train(i,j); 
 			
@@ -348,8 +346,8 @@ end
 % b = (A' * A) \ (A' * c) % Don't use this, 
 lambda = 1; % Is this how to regularise (A' * A) * b - lambda * b= A' c
 [n_A, m_A] = size(A' * A);
-% w = pinv(A' * A + lambda * eye(n_A, m_A))*(A' * c); % with regularisation
-w = pinv(A' * A)*(A' * c); % no regularisation 
+w = pinv(A' * A + lambda * eye(n_A, m_A))*(A' * c); % with regularisation
+% w = pinv(A' * A)*(A' * c); % no regularisation 
 
 % Compute R_hat for combined model
 R_hat_c = zeros(n,m);
@@ -357,7 +355,7 @@ R_hat_c = zeros(n,m);
 for j = 1:m
     for i = 1:n 
 		if ~isnan(R(i,j)) % Don't really need this if statement
-			predictR = w(1) * R_hat_n(i,j) + w(2) * r_hat_latent(i,j);
+			predictR = w(1) * R_hat_n(i,j) + w(2) * r_grad_descent(i,j);
 
 			% Range for 'ratings' is 0 to 1
 % 			if predictR > 5
@@ -409,5 +407,10 @@ fprintf("RMSE_test_latent %f\n", RMSE_test_latent);
 fprintf("----Combined----\n");
 fprintf("RMSE_train_c %f\n", RMSE_train_c);
 fprintf("RMSE_test_c %f\n", RMSE_test_c);
+
+fprintf("----Gradient Descent----\n");
+fprintf("RMSE_train_gd %f\n", RMSE_train_l2);
+fprintf("RMSE_test_gd %f\n", RMSE_test_l2);
+
 fprintf("Script complete\n")
 toc

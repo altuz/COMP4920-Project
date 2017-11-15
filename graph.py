@@ -640,10 +640,11 @@ class Node:
         self.total_hoursNorm = 0
 
         for edge in self.edges:
-            edge.hoursNorm = math.atan(edge.hours/(self.median_hours))
+            edge.hoursNorm = math.atan(edge.hours/(self.average_hours))
+            if(edge.hours > self.max_hours):
+                self.max_hours = edge.hours
             if(edge.hoursNorm > max):
                 max = edge.hoursNorm
-                self.max_hours = max
             # print("------------edge hr: " + str(edge.hours) + ", node ave hr:" + str(self.average_hours) + " atanHr:" + str(edge.hoursNorm))
         # TODO not sure if need to scale even, since going to use for ranking
         # Scale according to the max so that value ranges are between 0 and 1

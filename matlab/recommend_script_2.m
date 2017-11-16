@@ -1,6 +1,6 @@
 
 tic
-load ../control_test/300/implicit_feedback % Loads R and R_train
+load ../control_test/1000/combined_rating_med % Loads R and R_train
 load ../control_test/ave_hours
 
 % get size of matrices
@@ -8,6 +8,8 @@ load ../control_test/ave_hours
 % make a copy of matrices, and normalize those
 R_train = Rh_train;
 R = Rh;
+% ave_hours(:) = mean(ave_hours);
+% max_hours(:) = max(max_hours);
 norm_max_hours = zeros(size(max_hours));
 for i = 1:m
     % divide row by median
@@ -33,7 +35,6 @@ R_to_predict = R_train;
 R_to_predict(isnan(R_to_predict)) = 0;
 R_to_predict = R - R_to_predict;
 R_to_predict(R_to_predict == 0) = NaN;
-
 % Mean of training set
 r_bar = mean(R_train(:),'omitnan');
 
@@ -96,9 +97,11 @@ end
 % Check the RMSE compared to training set
 diff_train = R_train - R_hat;  
 RMSE_train = sqrt(mean((diff_train(:)).^2,'omitnan')); 
+MAE_train = mean(abs(diff_train(:)), 'omitnan');
 
 diff_test = R_to_predict - R_hat;  
 RMSE_test = sqrt(mean((diff_test(:)).^2,'omitnan')); 
+MAE_test = mean(abs(diff_test(:)), 'omitnan');
 
 % movie similarity matrix
 R_tilde = R_train - R_hat;
@@ -192,10 +195,10 @@ end
 % Check the RMSE compared to training set
 diff_train_n = R_train - R_hat_n;
 RMSE_train_n = sqrt(mean((diff_train_n(:)).^2,'omitnan')); 
-
+MAE_train_n = mean(abs(diff_train_n(:)), 'omitnan');
 diff_test_n = R_to_predict - R_hat_n;  
 RMSE_test_n = sqrt(mean((diff_test_n(:)).^2,'omitnan'));
-
+MAE_test_n = mean(abs(diff_test_n(:)), 'omitnan');
 % =================================================================================================
 % Neighborhood model with User neighbors
 % =================================================================================================

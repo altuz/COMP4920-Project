@@ -1,6 +1,6 @@
 % Load data from specific test folder
 tic % for timing
-load ../control_test/300/implicit_feedback % Loads R and R_train
+load ../control_test/1000/combined_rating_med % Loads R and R_train
 load ../control_test/ave_hours
 % Actual ratings
 % R = 'read from file'
@@ -252,10 +252,10 @@ for j = 1:m
 			predictR = r_bar + b_u(i) + b_i(j) + sum_d;
             
             if ~isnan(R_to_predict(i,j))
-                if predictR > 5
-                    predictR = 5;
-                elseif predictR < 1
+                if predictR > 1R
                     predictR = 1;
+                elseif predictR < 0
+                    predictR = 0;
                 end
             end
 			

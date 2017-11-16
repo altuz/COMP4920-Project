@@ -505,6 +505,7 @@ class Graph:
             # nP, nQ = matrix_factorization(r_train, P, Q, K, 100)
             # save into file
             scipy.io.savemat(sub_path + '/implicit_feedback_med.mat', mdict={'R': r_m, 'R_train': r_train,
+                                                                             'Rate' :r2_m, 'Rate_train': r2_train,
                                                                          'Rh': r3_m, 'Rh_train': r3_train,
                                                                          'P' : nP, 'Q' : nQ})
             P = np.random.rand(N, K)
@@ -542,10 +543,10 @@ class Graph:
                 edge_idxs.append((user_idx, game_idx))
                 r_m[user_idx, game_idx] = edge.hoursNorm
                 r_train[user_idx, game_idx] = edge.hoursNorm
-                ave_rate = edge.hoursNorm
+                ave_rate = np.nan
                 if edge.rating is not -1:
-                    ave_rate += edge.rating
-                    ave_rate /= float(2)
+                    ave_rate = edge.rating
+                    # ave_rate /= float(2)
                 r2_m[user_idx, game_idx] = ave_rate
                 r2_train[user_idx, game_idx] = ave_rate
                 r3_m[user_idx, game_idx] = edge.hours

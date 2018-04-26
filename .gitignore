@@ -12,3 +12,13 @@ mysqlite.db
 matlab/~$benchmarks.xlsx
 __pycache__/graph.cpython-35.pyc
 *.pyc
+4920_add/extend_review/
+4920_add/friend_data/
+4920_add/steam_data/
+4920_add/steam_game_review/
+4920_add/steam_spy_data/
+4920_add/user_data/
+
+
+
+
